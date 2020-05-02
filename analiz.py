@@ -9,26 +9,29 @@ heceGroupları = {}
 
 def analiz(dosyaAdi, icerik):
     toplamCumleSayısı = 0
-    for cumle in re.split(r'[.?]+', icerik):        
-        if(len(cumle) > 0):            
-            toplamCumleSayısı += 1
-            print(toplamCumleSayısı, ' ', cumle)
-
     toplamKelimeSayısı = 0
     toplamHeceSayısı = 0
-    for kelime in re.findall(r'\w+', icerik):
-        toplamKelimeSayısı+=1
-        heceSayısı = heceSayisiHesapla(kelime)
-        toplamHeceSayısı += heceSayısı
-        if heceGroupları.get(heceSayısı) is None:
-             heceGroupları[heceSayısı] = 0
 
-        heceGroupları[heceSayısı] += 1
+    for cumle in re.split(r'[(.+)…\?!—][\s\n]', icerik):        
+        if(len(cumle) > 0):            
+            toplamCumleSayısı += 1
+            print('================================================')
+            print(toplamCumleSayısı, ':')
+            print('')
+            print(cumle)
 
-        
-        #print(kelime, ': ',  heceSayısı)
+        for kelime in re.findall(r'\w+', cumle):        
+            toplamKelimeSayısı+=1
+            heceSayısı = heceSayisiHesapla(kelime)
+            print('kelime ', toplamKelimeSayısı,' (', heceSayısı, ' hece)',  ': ', kelime)
+            
+            toplamHeceSayısı += heceSayısı
+            if heceGroupları.get(heceSayısı) is None:
+                heceGroupları[heceSayısı] = 0
 
-    print('Metin Analizi: ' , dosyaAdi)
+            heceGroupları[heceSayısı] += 1
+
+    print('\nMetin Analizi: ' , dosyaAdi)
     print('-------------------')
     print('Toplam Cümle Sayısı: ', toplamCumleSayısı)
     print('Toplam Kelime: ', toplamKelimeSayısı)
