@@ -1,30 +1,34 @@
 #!/usr/bin/env python3
 import re
 import math
+import sys
+import os
 
 sesliHarfler = 'AaÂâEeIıİiÎîOoÖöUuÜü'
 heceGroupları = {}
 
-def analiz(icerik):
+def analiz(dosyaAdi, icerik):
     toplamCumleSayısı = 0
-    for cumle in re.split(r'[.!?]+', icerik):
-        if(len(cumle) > 0):
+    for cumle in re.split(r'[.?]+', icerik):        
+        if(len(cumle) > 0):            
             toplamCumleSayısı += 1
+            print(toplamCumleSayısı, ' ', cumle)
 
     toplamKelimeSayısı = 0
     toplamHeceSayısı = 0
     for kelime in re.findall(r'\w+', icerik):
         toplamKelimeSayısı+=1
         heceSayısı = heceSayisiHesapla(kelime)
+        toplamHeceSayısı += heceSayısı
         if heceGroupları.get(heceSayısı) is None:
              heceGroupları[heceSayısı] = 0
 
         heceGroupları[heceSayısı] += 1
 
-        toplamHeceSayısı += heceSayısı
+        
         #print(kelime, ': ',  heceSayısı)
 
-    print('Metin Analizi')
+    print('Metin Analizi: ' , dosyaAdi)
     print('-------------------')
     print('Toplam Cümle Sayısı: ', toplamCumleSayısı)
     print('Toplam Kelime: ', toplamKelimeSayısı)
@@ -34,7 +38,7 @@ def analiz(icerik):
     H4 = 0
     H5 = 0
     H6 = 0
-    OKS = toplamHeceSayısı / toplamCumleSayısı
+    OKS = toplamKelimeSayısı / toplamCumleSayısı
 
     for heceGrubu in sorted(heceGroupları.keys()):
         print(heceGrubu, ' herceli kelime sayısı: ', heceGroupları[heceGrubu])
@@ -70,9 +74,10 @@ def heceSayisiHesapla(kelime):
 
 
 def main(): 
-    file = open('ornek.txt', 'r')
+    dosyaYolu = str(sys.argv[1])
+    file = open(dosyaYolu, 'r')
     dosyaİceriği = file.read()
-    analiz(dosyaİceriği)            
+    analiz(os.path.splitext(dosyaYolu)[0], dosyaİceriği)            
       
 # Main function calling 
 if __name__=="__main__":       
