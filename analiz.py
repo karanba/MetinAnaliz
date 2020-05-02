@@ -8,6 +8,7 @@ sesliHarfler = 'AaÂâEeIıİiÎîOoÖöUuÜü'
 heceGroupları = {}
 
 def analiz(dosyaAdi, icerik):
+    icerik = icerik.replace('’','')
     toplamCumleSayısı = 0
     toplamKelimeSayısı = 0
     toplamHeceSayısı = 0
