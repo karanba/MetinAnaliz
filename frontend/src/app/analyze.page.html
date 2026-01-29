@@ -1,91 +1,110 @@
-<div class="grid">
-  <p-card class="input-card">
-    <ng-template pTemplate="title">Metin Girişi</ng-template>
-    <ng-template pTemplate="subtitle">
-      Türkçe metninizi girin, analiz sonuçlarını ve YOD değerini alın.
-    </ng-template>
+<p-tabs value="input">
+  <p-tablist>
+    <p-tab value="input">Metin</p-tab>
+    <p-tab value="results" [disabled]="!result && !loading">Sonuçlar</p-tab>
+  </p-tablist>
 
-    <div class="field">
-      <label for="inputText" class="field-label">Metin</label>
-      <textarea
-        id="inputText"
-        pTextarea
-        [(ngModel)]="text"
-        [autoResize]="true"
-        rows="8"
-        placeholder="Analiz edilecek Türkçe metni buraya yapıştırın..."
-      ></textarea>
-    </div>
+  <p-tabpanels>
+    <p-tabpanel value="input">
+      <div class="grid">
+        <p-card class="input-card">
+          <div class="card-toolbar">
+            <div>
+              <h2>Metin Girişi</h2>
+              <p class="meta">
+                Türkçe metninizi girin, analiz sonuçlarını ve YOD değerini alın.
+              </p>
+            </div>
+            <div class="header-actions">
+              <p-tag
+                [value]="text.length + ' karakter'"
+                icon="pi pi-file-edit"
+                severity="info"
+              ></p-tag>
+              <p-button
+                label="Analiz Et"
+                icon="pi pi-bolt"
+                styleClass="primary-action"
+                [loading]="loading"
+                [disabled]="!text.trim()"
+                (onClick)="analyze()"
+              ></p-button>
+            </div>
+          </div>
 
-    <div class="actions">
-      <p-tag
-        [value]="text.length + ' karakter'"
-        icon="pi pi-file-edit"
-        severity="info"
-      ></p-tag>
-      <div class="action-buttons">
-        <p-button
-          label="Analiz Et"
-          icon="pi pi-bolt"
-          styleClass="primary-action"
-          [loading]="loading"
-          [disabled]="!text.trim()"
-          (onClick)="analyze()"
-        ></p-button>
+          <div class="field">
+            <label for="inputText" class="field-label">Metin</label>
+            <textarea
+              id="inputText"
+              pTextarea
+              [(ngModel)]="text"
+              [autoResize]="true"
+              rows="8"
+              placeholder="Analiz edilecek Türkçe metni buraya yapıştırın..."
+            ></textarea>
+          </div>
+
+
+          <div class="error" *ngIf="errorMessage">
+            <i class="pi pi-exclamation-triangle"></i>
+            {{ errorMessage }}
+          </div>
+
+          <div class="export" *ngIf="result">
+            <div class="export-bar">
+              <div class="meta">
+                Export formatı
+                <span *ngIf="exporting"> · Dosya hazırlanıyor...</span>
+              </div>
+              <div class="export-actions">
+                <p-select
+                  [options]="exportFormats"
+                  [(ngModel)]="exportFormat"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Seçiniz"
+                ></p-select>
+                <p-button
+                  label="Export"
+                  icon="pi pi-download"
+                  styleClass="secondary-action"
+                  [loading]="exporting"
+                  [disabled]="exporting"
+                  (onClick)="exportResult()"
+                ></p-button>
+              </div>
+            </div>
+          </div>
+        </p-card>
       </div>
-    </div>
+    </p-tabpanel>
 
-    <div class="error" *ngIf="errorMessage">
-      <i class="pi pi-exclamation-triangle"></i>
-      {{ errorMessage }}
-    </div>
-
-    <div class="export" *ngIf="result">
-      <div class="export-title">
-        <span class="meta">Export formatı</span>
-        <span class="meta" *ngIf="exporting">Dosya hazırlanıyor...</span>
-      </div>
-      <div class="export-actions">
-        <p-select
-          [options]="exportFormats"
-          [(ngModel)]="exportFormat"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Seçiniz"
-        ></p-select>
-        <p-button
-          label="Export"
-          icon="pi pi-download"
-          styleClass="secondary-action"
-          [loading]="exporting"
-          [disabled]="exporting"
-          (onClick)="exportResult()"
-        ></p-button>
-      </div>
-    </div>
-  </p-card>
-
-  <div class="side">
-    <app-results-panel [statistics]="result?.statistics ?? null"></app-results-panel>
-    <p-card *ngIf="!result && !loading" class="status-card">
-      <ng-template pTemplate="title">Sonuçlar</ng-template>
-      <div class="meta">Analiz sonuçları burada görünecek.</div>
-    </p-card>
-    <p-card *ngIf="loading" class="status-card">
-      <div class="loading">
-        <p-progressSpinner
-          strokeWidth="3"
-          styleClass="spinner"
-        ></p-progressSpinner>
-        <div>
-          <strong>Analiz devam ediyor...</strong>
-          <div class="meta">Metin işlendiğinde sonuçlar otomatik güncellenir.</div>
+    <p-tabpanel value="results">
+      <div class="grid">
+        <div class="side">
+          <app-results-panel [statistics]="result?.statistics ?? null"></app-results-panel>
+          <p-card *ngIf="!result && !loading" class="status-card">
+            <ng-template pTemplate="title">Sonuçlar</ng-template>
+            <div class="meta">Analiz sonuçları burada görünecek.</div>
+          </p-card>
+          <p-card *ngIf="loading" class="status-card">
+            <div class="loading">
+              <p-progressSpinner
+                strokeWidth="3"
+                styleClass="spinner"
+              ></p-progressSpinner>
+              <div>
+                <strong>Analiz devam ediyor...</strong>
+                <div class="meta">Metin işlendiğinde sonuçlar otomatik güncellenir.</div>
+              </div>
+            </div>
+          </p-card>
         </div>
       </div>
-    </p-card>
-  </div>
-</div>
 
-<div class="results" *ngIf="result">
-  <app-sentence-list [sentences]="result.sentences"></app-sentence-list>
-</div>
+      <div class="results" *ngIf="result">
+        <app-sentence-list [sentences]="result.sentences"></app-sentence-list>
+      </div>
+    </p-tabpanel>
+  </p-tabpanels>
+</p-tabs>

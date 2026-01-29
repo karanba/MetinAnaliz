@@ -11,18 +11,37 @@
   font-weight: 600;
 }
 
-.actions {
+.card-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  margin: -16px -16px 16px;
+  border-bottom: 1px solid var(--stroke);
+  background: #ffffff;
   align-items: center;
-  margin-top: 12px;
-  gap: 12px;
   flex-wrap: wrap;
 }
 
-.action-buttons {
+.card-toolbar h2 {
+  margin: 0;
+}
+
+.header-actions {
   display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+:host ::ng-deep .primary-action {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
+  min-height: 40px;
 }
 
 .error {
@@ -40,10 +59,9 @@
   gap: 8px;
 }
 
-.export-title {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+.field textarea[pTextarea] {
+  height: 240px;
+  resize: none;
 }
 
 .export-actions {
@@ -51,6 +69,18 @@
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.export-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--stroke);
 }
 
 :host ::ng-deep .p-select {

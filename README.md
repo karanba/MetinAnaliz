@@ -57,6 +57,7 @@ npm run build
 
 Not: Frontend, dev ortamında `/api/analyze` çağırır ve `proxy.conf.json` üzerinden `http://localhost:8000` adresine yönlenir.
 Not: UI, PrimeNG v21 ve PrimeIcons kullanır; tema ve ikon stilleri `frontend/src/styles.scss` üzerinden yüklenir.
+Not: Frontend ana sayfaları `/text-analyze` ve `/help` rotalarındadır.
 
 ## Uygulamayı Ayağa Kaldırma
 

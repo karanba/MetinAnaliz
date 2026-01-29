@@ -14,6 +14,7 @@ import { Textarea } from "primeng/textarea";
 import { ProgressSpinner } from "primeng/progressspinner";
 import { Skeleton } from "primeng/skeleton";
 import { Tag } from "primeng/tag";
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primeng/tabs";
 
 @Component({
   selector: "app-analyze-page",
@@ -30,6 +31,11 @@ import { Tag } from "primeng/tag";
     ProgressSpinner,
     Skeleton,
     Tag,
+    Tabs,
+    TabList,
+    Tab,
+    TabPanels,
+    TabPanel,
   ],
   templateUrl: "./analyze.page.html",
   styleUrls: ["./analyze.page.scss"],

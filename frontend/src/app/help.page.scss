@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.help-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.help-section {
+  margin-top: 12px;
+}
+
+.help-section h3 {
+  margin: 0 0 6px;
+}
+
+.help-section p,
+.help-section li {
+  color: var(--muted);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

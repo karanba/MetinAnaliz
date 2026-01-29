@@ -1,10 +1,22 @@
 <div class="app-shell">
+  <nav class="top-nav">
+    <a class="brand" routerLink="/text-analyze">
+      <img src="assets/logo.svg" alt="Metin Analiz logo" />
+      <span>Metin Analiz</span>
+    </a>
+    <div class="nav-links">
+      <a routerLink="/text-analyze" routerLinkActive="active">Text Analyze</a>
+      <a routerLink="/help" routerLinkActive="active">Help</a>
+    </div>
+  </nav>
+
   <header class="hero">
     <div class="hero-text">
       <p-tag value="FastAPI + Angular" icon="pi pi-sparkles" severity="info"></p-tag>
-      <h1>Metin Analiz</h1>
+      <h1>Dil Araçları Platformu</h1>
       <p class="hero-subtitle">
-        Türkçe metinlerde cümle, kelime ve hece analizi yapın; YOD değerini hızlıca hesaplayın.
+        Metin Analiz bu platformdaki ilk araç. Yakında farklı analiz araçları ve sayfalar
+        ile genişleyecek.
       </p>
       <div class="hero-meta">
         <p-tag value="UTF-8" severity="success" icon="pi pi-language"></p-tag>
@@ -14,9 +26,9 @@
     </div>
     <div class="hero-card">
       <div class="hero-metric">
-        <span class="label">Hızlı analiz</span>
-        <strong>30 sn</strong>
-        <span class="meta">Zaman aşımı güvenlik limiti</span>
+        <span class="label">Aktif araç</span>
+        <strong>Text Analyze</strong>
+        <span class="meta">Türkçe metin çözümleri</span>
       </div>
       <div class="hero-metric">
         <span class="label">Export formatları</span>
@@ -25,5 +37,6 @@
       </div>
     </div>
   </header>
+
   <router-outlet />
 </div>
