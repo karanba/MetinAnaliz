@@ -107,3 +107,4 @@ uvicorn main:app --reload --env-file .env
 - Hece sayımı Türkçe sesli harf kümesine göre yapılır: `AaÂâEeIıİiÎîOoÖöUuÜü`.
 - Cümle bölme işlemi nokta, soru, ünlem, üç nokta ve benzeri işaretlerden sonra yapılır.
 - PDF export için Unicode destekli bir TTF font gerekir. Varsayılan olarak `fonts/NotoSans-Regular.ttf` kullanılır; alternatif olarak sistem fontu (örn. Windows Arial) kullanılabilir.
+- API çıktısında YOD hesaplaması için kullanılan OKS değeri `statistics.oks_value` olarak döner.

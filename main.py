@@ -41,6 +41,7 @@ class Statistics(BaseModel):
     total_sentences: int
     total_words: int
     total_syllables: int
+    oks_value: float
     syllable_distribution: dict
     yod_value: float  # Kept for backward compatibility
     readability_score: float
@@ -192,6 +193,7 @@ def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> A
         total_sentences=total_sentences,
         total_words=total_words,
         total_syllables=total_syllables,
+        oks_value=oks,
         syllable_distribution={
             3: h3,
             4: h4,
@@ -222,6 +224,7 @@ def _build_text_lines(analysis: AnalyzeResponse) -> List[str]:
         f"Toplam Cümle: {stats.total_sentences}",
         f"Toplam Kelime: {stats.total_words}",
         f"Toplam Hece: {stats.total_syllables}",
+        f"OKS: {stats.oks_value:.4f}",
         f"H3: {stats.syllable_distribution[3]:.4f}",
         f"H4: {stats.syllable_distribution[4]:.4f}",
         f"H5: {stats.syllable_distribution[5]:.4f}",
