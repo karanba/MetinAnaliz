@@ -51,17 +51,17 @@
 
 .input-card {
   position: sticky;
-  top: 140px;
+  top: 90px;
   align-self: start;
-  max-height: calc(100vh - 164px);
+  max-height: calc(100vh - 110px);
   overflow-y: auto;
   width: 100%;
 }
 
 @media (min-width: 1024px) {
   .input-card {
-    top: 145px;
-    max-height: calc(100vh - 169px);
+    top: 95px;
+    max-height: calc(100vh - 115px);
   }
 }
 
@@ -89,12 +89,13 @@
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
-.header-title-row {
+.header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -103,6 +104,7 @@
   font-weight: 700;
   margin: 0;
   color: var(--ink);
+  flex: 1;
 }
 
 .header-content .meta {
@@ -245,7 +247,11 @@
 
 // Empty State
 .empty-state {
-  background: linear-gradient(135deg, rgba(31, 122, 140, 0.03) 0%, rgba(246, 170, 28, 0.03) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(31, 122, 140, 0.03) 0%,
+    rgba(246, 170, 28, 0.03) 100%
+  );
   border: 2px dashed var(--stroke);
 }
 
@@ -297,7 +303,11 @@
 }
 
 .export-card {
-  background: linear-gradient(135deg, rgba(31, 122, 140, 0.04) 0%, rgba(246, 170, 28, 0.04) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(31, 122, 140, 0.04) 0%,
+    rgba(246, 170, 28, 0.04) 100%
+  );
   border: 1px solid var(--stroke);
 }
 
@@ -419,5 +429,141 @@
 
   .field textarea[pTextarea] {
     min-height: 250px;
+  }
+}
+
+// Analysis Options Dialog
+.options-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.option-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.option-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.option-section h3 i {
+  color: var(--accent);
+  font-size: 1.2rem;
+}
+
+.section-description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.analysis-types {
+  display: grid;
+  gap: 12px;
+}
+
+.analysis-type-card {
+  background: #ffffff;
+  border: 2px solid var(--stroke);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.analysis-type-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(31, 122, 140, 0.1);
+}
+
+.analysis-type-card.selected {
+  border-color: var(--accent);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(31, 122, 140, 0.15);
+  border-width: 3px;
+}
+
+.type-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.check-icon {
+  color: var(--stroke);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.analysis-type-card.selected .check-icon {
+  color: var(--accent);
+}
+
+.type-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.type-description {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.type-formula {
+  font-family: "Courier New", monospace;
+  background: #f8f9fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--accent-strong);
+  border-left: 3px solid var(--accent);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--stroke);
+}
+
+// Mobile responsive for dialog
+@media (max-width: 768px) {
+  .header-actions {
+    gap: 8px;
+  }
+
+  .header-actions
+    :host
+    ::ng-deep
+    .p-button:not(.primary-action)
+    .p-button-label {
+    display: none;
+  }
+
+  .analysis-type-card {
+    padding: 14px;
+  }
+
+  .type-formula {
+    font-size: 0.75rem;
+    padding: 6px 10px;
   }
 }

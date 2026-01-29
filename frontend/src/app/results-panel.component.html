@@ -2,17 +2,17 @@
   <div class="results-header">
     <div>
       <h2>Analiz Sonuçları</h2>
-      <p class="meta">YOD ve metin istatistikleri</p>
+      <p class="meta">{{ getScoreLabel() }} ve metin istatistikleri</p>
     </div>
   </div>
 
-  <!-- YOD Score - Featured -->
+  <!-- Readability Score - Featured -->
   <div class="yod-showcase">
     <div class="yod-label">
       <i class="pi pi-chart-line"></i>
-      <span>YOD Değeri</span>
+      <span>{{ getScoreLabel() }}</span>
     </div>
-    <div class="yod-value">{{ statistics.yod_value | number : '1.2-4' }}</div>
+    <div class="yod-value">{{ statistics.readability_score | number : '1.2-4' }}</div>
     <div class="yod-description">Okunabilirlik skoru</div>
   </div>
 

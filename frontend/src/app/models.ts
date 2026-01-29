@@ -1,5 +1,8 @@
+export type AnalysisType = 'yod' | 'atesman' | 'cetinkaya';
+
 export interface AnalyzeRequest {
   text: string;
+  analysis_type?: AnalysisType;
 }
 
 export type ExportFormat = 'csv' | 'txt' | 'pdf';
@@ -7,6 +10,7 @@ export type ExportFormat = 'csv' | 'txt' | 'pdf';
 export interface ExportRequest {
   text: string;
   format: ExportFormat;
+  analysis_type?: AnalysisType;
 }
 
 export interface WordInfo {
@@ -30,7 +34,9 @@ export interface Statistics {
     5: number;
     6: number;
   };
-  yod_value: number;
+  yod_value: number; // Kept for backward compatibility
+  readability_score: number;
+  analysis_type: string;
 }
 
 export interface AnalyzeResponse {

@@ -7,30 +7,32 @@
     <div class="nav-links">
       <a routerLink="/text-analyze" routerLinkActive="active">Text Analyze</a>
       <a routerLink="/help" routerLinkActive="active">Help</a>
+      <p-button
+        icon="pi pi-info-circle"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        (onClick)="showInfoDialog()"
+        pTooltip="Platform bilgileri"
+      ></p-button>
     </div>
   </nav>
 
-  <header class="page-header">
-    <div class="page-header-content">
-      <div class="header-left">
-        <h1>Dil Araçları Platformu</h1>
-        <span class="header-subtitle">Türkçe metin analizi ve YOD hesaplama</span>
+  <div class="main-content">
+    <router-outlet />
+  </div>
+
+  <footer class="page-footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <span class="footer-title">Dil Araçları Platformu</span>
+        <span class="footer-subtitle">Türkçe metin analizi ve YOD hesaplama</span>
       </div>
-      <div class="header-right">
-        <p-tag value="Text Analyze" icon="pi pi-bolt" severity="info"></p-tag>
-        <p-button
-          icon="pi pi-info-circle"
-          [text]="true"
-          [rounded]="true"
-          severity="secondary"
-          (onClick)="showInfoDialog()"
-          pTooltip="Platform bilgileri"
-        ></p-button>
+      <div class="footer-right">
+        <p-tag value="Text Analyze" icon="pi pi-bolt" severity="info" [style]="{ fontSize: '0.8rem' }"></p-tag>
       </div>
     </div>
-  </header>
-
-  <router-outlet />
+  </footer>
 </div>
 
 <!-- Info Dialog -->

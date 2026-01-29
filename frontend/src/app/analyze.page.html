@@ -6,17 +6,34 @@
         <div class="header-content">
           <div class="header-title-row">
             <h2>Metin Analizi</h2>
-            <p-button
-              label="Analiz Et"
-              icon="pi pi-bolt"
-              styleClass="primary-action"
-              [loading]="loading"
-              [disabled]="!text.trim()"
-              (onClick)="analyze()"
-            ></p-button>
+            <div class="header-actions">
+              <p-button
+                label="Analiz Et"
+                icon="pi pi-bolt"
+                styleClass="primary-action"
+                [loading]="loading"
+                [disabled]="!text.trim()"
+                (onClick)="analyze()"
+              ></p-button>
+              <p-button
+                label="Temizle"
+                icon="pi pi-times"
+                styleClass="secondary-action"
+                [disabled]="!text.trim() || loading"
+                (onClick)="clearText()"
+              ></p-button>
+              <p-button
+                icon="pi pi-cog"
+                [outlined]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="showOptionsDialog()"
+                pTooltip="Analiz seçenekleri"
+              ></p-button>
+            </div>
           </div>
           <p class="meta">
-            Türkçe metninizi girin ve YOD değerini öğrenin
+            Türkçe metninizi girin ve {{ getAnalysisTypeLabel() }} hesaplayın
           </p>
         </div>
       </div>
@@ -114,3 +131,76 @@
     </div>
   </div>
 </div>
+
+<!-- Analysis Options Dialog -->
+<p-dialog
+  header="Analiz Seçenekleri"
+  [(visible)]="optionsDialogVisible"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="options-dialog-content">
+    <div class="option-section">
+      <h3><i class="pi pi-chart-line"></i> Analiz Türü</h3>
+      <p class="section-description">Metin okunabilirlik analizinde kullanılacak formülü seçin</p>
+
+      <div class="analysis-types">
+        <div
+          class="analysis-type-card"
+          [class.selected]="selectedAnalysisType === 'yod'"
+          (click)="selectAnalysisType('yod')"
+        >
+          <div class="type-header">
+            <i class="pi pi-check-circle check-icon"></i>
+            <h4>YOD Değeri</h4>
+          </div>
+          <p class="type-description">Yeni Okunabilirlik Değeri - Modern Türkçe için geliştirilmiş formül</p>
+          <div class="type-formula">YOD = a + b × (K/C) + c × (H/K)</div>
+        </div>
+
+        <div
+          class="analysis-type-card"
+          [class.selected]="selectedAnalysisType === 'atesman'"
+          (click)="selectAnalysisType('atesman')"
+        >
+          <div class="type-header">
+            <i class="pi pi-check-circle check-icon"></i>
+            <h4>Ateşman Skoru</h4>
+          </div>
+          <p class="type-description">Flesch Reading Ease'in Türkçe uyarlaması</p>
+          <div class="type-formula">A = 198.825 - 40.175 × (K/C) - 2.610 × (H/K)</div>
+        </div>
+
+        <div
+          class="analysis-type-card"
+          [class.selected]="selectedAnalysisType === 'cetinkaya'"
+          (click)="selectAnalysisType('cetinkaya')"
+        >
+          <div class="type-header">
+            <i class="pi pi-check-circle check-icon"></i>
+            <h4>Çetinkaya-Uzun</h4>
+          </div>
+          <p class="type-description">Türkçe metinler için alternatif okunabilirlik formülü</p>
+          <div class="type-formula">ÇU = 118.823 - 25.987 × (K/C) - 0.971 × (H/K)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <p-button
+        label="İptal"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="optionsDialogVisible = false"
+      ></p-button>
+      <p-button
+        label="Uygula"
+        icon="pi pi-check"
+        styleClass="primary-action"
+        (onClick)="applyOptions()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

@@ -15,6 +15,8 @@ import { ProgressSpinner } from "primeng/progressspinner";
 import { Skeleton } from "primeng/skeleton";
 import { Tag } from "primeng/tag";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primeng/tabs";
+import { Dialog } from "primeng/dialog";
+import { Tooltip } from "primeng/tooltip";
 
 @Component({
   selector: "app-analyze-page",
@@ -36,6 +38,8 @@ import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primeng/tabs";
     Tab,
     TabPanels,
     TabPanel,
+    Dialog,
+    Tooltip,
   ],
   templateUrl: "./analyze.page.html",
   styleUrls: ["./analyze.page.scss"],
@@ -54,6 +58,11 @@ export class AnalyzePageComponent {
   ];
   exporting = false;
 
+  // Analysis options
+  optionsDialogVisible = false;
+  analysisType: 'yod' | 'atesman' | 'cetinkaya' = 'yod';
+  selectedAnalysisType: 'yod' | 'atesman' | 'cetinkaya' = 'yod';
+
   constructor(private readonly api: TextAnalysisApiService) {}
 
   async analyze(): Promise<void> {
@@ -63,7 +72,7 @@ export class AnalyzePageComponent {
 
     try {
       const response = await firstValueFrom(
-        this.api.analyze(this.text).pipe(timeout(30000)),
+        this.api.analyze(this.text, this.analysisType).pipe(timeout(30000)),
       );
       this.result = response;
       this.cdr.detectChanges();
@@ -83,7 +92,7 @@ export class AnalyzePageComponent {
     }
     this.exporting = true;
     this.errorMessage = "";
-    this.api.export(this.text, this.exportFormat).subscribe({
+    this.api.export(this.text, this.exportFormat, this.analysisType).subscribe({
       next: (blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -103,5 +112,42 @@ export class AnalyzePageComponent {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  clearText(): void {
+    this.text = "";
+    this.result = null;
+    this.errorMessage = "";
+  }
+
+  showOptionsDialog(): void {
+    this.selectedAnalysisType = this.analysisType;
+    this.optionsDialogVisible = true;
+  }
+
+  selectAnalysisType(type: 'yod' | 'atesman' | 'cetinkaya'): void {
+    this.selectedAnalysisType = type;
+  }
+
+  applyOptions(): void {
+    this.analysisType = this.selectedAnalysisType;
+    this.optionsDialogVisible = false;
+    // Re-analyze if there's existing text and results
+    if (this.text.trim() && this.result) {
+      this.analyze();
+    }
+  }
+
+  getAnalysisTypeLabel(): string {
+    switch (this.analysisType) {
+      case 'yod':
+        return 'YOD değerini';
+      case 'atesman':
+        return 'Ateşman skorunu';
+      case 'cetinkaya':
+        return 'Çetinkaya-Uzun skorunu';
+      default:
+        return 'okunabilirlik skorunu';
+    }
   }
 }

@@ -15,8 +15,15 @@ from pydantic import BaseModel, Field
 VOWELS = set("aeıioöuü")
 
 
+class AnalysisType(str, Enum):
+    yod = "yod"
+    atesman = "atesman"
+    cetinkaya = "cetinkaya"
+
+
 class AnalyzeRequest(BaseModel):
     text: str = Field(..., description="Turkish text to analyze")
+    analysis_type: AnalysisType = Field(default=AnalysisType.yod, description="Type of readability analysis")
 
 
 class WordInfo(BaseModel):
@@ -35,7 +42,9 @@ class Statistics(BaseModel):
     total_words: int
     total_syllables: int
     syllable_distribution: dict
-    yod_value: float
+    yod_value: float  # Kept for backward compatibility
+    readability_score: float
+    analysis_type: str
 
 
 class AnalyzeResponse(BaseModel):
@@ -52,6 +61,7 @@ class ExportFormat(str, Enum):
 class ExportRequest(BaseModel):
     text: str = Field(..., description="Turkish text to analyze")
     format: ExportFormat = Field(..., description="Export format")
+    analysis_type: AnalysisType = Field(default=AnalysisType.yod, description="Type of readability analysis")
 
 
 class Exporter(Protocol):
@@ -78,7 +88,46 @@ def count_syllables(word: str) -> int:
     return sum(1 for ch in word.lower() if ch in VOWELS)
 
 
-def analyze_text(text: str) -> AnalyzeResponse:
+def calculate_yod(oks: float, h3: float, h4: float, h5: float, h6: float) -> float:
+    """Calculate YOD (Yeni Okunabilirlik Değeri) - New Readability Value"""
+    return math.sqrt(oks * ((h3 * 0.84) + (h4 * 1.5) + (h5 * 3.5) + (h6 * 26.25)))
+
+
+def calculate_atesman(total_words: int, total_sentences: int, total_syllables: int) -> float:
+    """
+    Calculate Ateşman Readability Score
+    Turkish adaptation of Flesch Reading Ease
+    Formula: A = 198.825 - 40.175 × (K/C) - 2.610 × (H/K)
+    where K=words, C=sentences, H=syllables
+    """
+    if total_sentences == 0 or total_words == 0:
+        return 0.0
+
+    words_per_sentence = total_words / total_sentences
+    syllables_per_word = total_syllables / total_words
+
+    atesman_score = 198.825 - (40.175 * words_per_sentence) - (2.610 * syllables_per_word)
+    return atesman_score
+
+
+def calculate_cetinkaya_uzun(total_words: int, total_sentences: int, total_syllables: int) -> float:
+    """
+    Calculate Çetinkaya-Uzun Readability Score
+    Alternative Turkish readability formula
+    Formula: ÇU = 118.823 - 25.987 × (K/C) - 0.971 × (H/K)
+    where K=words, C=sentences, H=syllables
+    """
+    if total_sentences == 0 or total_words == 0:
+        return 0.0
+
+    words_per_sentence = total_words / total_sentences
+    syllables_per_word = total_syllables / total_words
+
+    cetinkaya_score = 118.823 - (25.987 * words_per_sentence) - (0.971 * syllables_per_word)
+    return cetinkaya_score
+
+
+def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> AnalyzeResponse:
     if not isinstance(text, str):
         raise ValueError("text must be a string")
     cleaned = text.strip()
@@ -126,7 +175,18 @@ def analyze_text(text: str) -> AnalyzeResponse:
     h5 = ratio_for(5)
     h6 = ratio_for(6)
 
-    yod_value = math.sqrt(oks * ((h3 * 0.84) + (h4 * 1.5) + (h5 * 3.5) + (h6 * 26.25)))
+    # Calculate readability score based on analysis type
+    if analysis_type == AnalysisType.yod:
+        readability_score = calculate_yod(oks, h3, h4, h5, h6)
+    elif analysis_type == AnalysisType.atesman:
+        readability_score = calculate_atesman(total_words, total_sentences, total_syllables)
+    elif analysis_type == AnalysisType.cetinkaya:
+        readability_score = calculate_cetinkaya_uzun(total_words, total_sentences, total_syllables)
+    else:
+        readability_score = calculate_yod(oks, h3, h4, h5, h6)
+
+    # Keep yod_value for backward compatibility (always calculate it)
+    yod_value = calculate_yod(oks, h3, h4, h5, h6)
 
     stats = Statistics(
         total_sentences=total_sentences,
@@ -139,6 +199,8 @@ def analyze_text(text: str) -> AnalyzeResponse:
             6: h6,
         },
         yod_value=yod_value,
+        readability_score=readability_score,
+        analysis_type=analysis_type.value,
     )
 
     return AnalyzeResponse(sentences=sentences, statistics=stats)
@@ -146,6 +208,14 @@ def analyze_text(text: str) -> AnalyzeResponse:
 
 def _build_text_lines(analysis: AnalyzeResponse) -> List[str]:
     stats = analysis.statistics
+
+    # Determine the score label based on analysis type
+    score_label = "YOD"
+    if stats.analysis_type == "atesman":
+        score_label = "Ateşman Skoru"
+    elif stats.analysis_type == "cetinkaya":
+        score_label = "Çetinkaya-Uzun"
+
     lines = [
         "Metin Analizi",
         "================",
@@ -156,7 +226,7 @@ def _build_text_lines(analysis: AnalyzeResponse) -> List[str]:
         f"H4: {stats.syllable_distribution[4]:.4f}",
         f"H5: {stats.syllable_distribution[5]:.4f}",
         f"H6: {stats.syllable_distribution[6]:.4f}",
-        f"YOD: {stats.yod_value:.4f}",
+        f"{score_label}: {stats.readability_score:.4f}",
         "",
         "Cümleler",
         "--------",
@@ -275,7 +345,7 @@ app = FastAPI(title="Metin Analiz API")
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
     try:
-        return analyze_text(payload.text)
+        return analyze_text(payload.text, payload.analysis_type)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -283,7 +353,7 @@ def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
 @app.post("/export")
 def export_endpoint(payload: ExportRequest):
     try:
-        analysis = analyze_text(payload.text)
+        analysis = analyze_text(payload.text, payload.analysis_type)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

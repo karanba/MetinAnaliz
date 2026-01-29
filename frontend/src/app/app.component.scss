@@ -3,6 +3,10 @@
   min-height: 100vh;
 }
 
+.main-content {
+  padding: 1em;
+}
+
 // Top Navigation Bar
 .top-nav {
   position: sticky;
@@ -19,44 +23,48 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-// Page Header (replaces hero)
-.page-header {
-  padding: 16px clamp(16px, 3vw, 40px);
-  background: linear-gradient(135deg, rgba(31, 122, 140, 0.02) 0%, rgba(246, 170, 28, 0.01) 100%);
-  border-bottom: 1px solid var(--stroke);
+// Page Footer
+.page-footer {
+  margin-top: auto;
+  padding: 12px clamp(16px, 3vw, 40px);
+  background: linear-gradient(
+    135deg,
+    rgba(31, 122, 140, 0.02) 0%,
+    rgba(246, 170, 28, 0.01) 100%
+  );
+  border-top: 1px solid var(--stroke);
 }
 
-.page-header-content {
+.footer-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.header-left {
-  display: flex;
-  align-items: baseline;
   gap: 16px;
   flex-wrap: wrap;
 }
 
-.header-left h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
+.footer-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-title {
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--ink);
 }
 
-.header-subtitle {
+.footer-subtitle {
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: 0.8rem;
 }
 
-.header-right {
+.footer-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand {
@@ -107,7 +115,7 @@
 }
 
 .nav-links a.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -16px;
   left: 0;
@@ -220,8 +228,9 @@
 
 // Main content area
 router-outlet + * {
-  padding: clamp(24px, 4vw, 48px) clamp(16px, 3vw, 40px);
+  padding: clamp(32px, 5vw, 64px) clamp(16px, 3vw, 40px);
   flex: 1;
+  margin-top: 32px;
 }
 
 // Responsive
@@ -230,16 +239,13 @@ router-outlet + * {
     padding: 16px clamp(24px, 3.5vw, 48px);
   }
 
-  .page-header {
-    padding: 18px clamp(24px, 3.5vw, 48px);
-  }
-
-  .header-left h1 {
-    font-size: 1.6rem;
+  .page-footer {
+    padding: 14px clamp(24px, 3.5vw, 48px);
   }
 
   router-outlet + * {
-    padding: clamp(32px, 5vw, 64px) clamp(24px, 3.5vw, 48px);
+    padding: clamp(40px, 6vw, 72px) clamp(24px, 3.5vw, 48px);
+    margin-top: 40px;
   }
 }
 
@@ -248,12 +254,13 @@ router-outlet + * {
     padding: 18px clamp(40px, 4vw, 64px);
   }
 
-  .page-header {
-    padding: 20px clamp(40px, 4vw, 64px);
+  .page-footer {
+    padding: 16px clamp(40px, 4vw, 64px);
   }
 
   router-outlet + * {
-    padding: clamp(40px, 6vw, 80px) clamp(40px, 4vw, 64px);
+    padding: clamp(48px, 7vw, 88px) clamp(40px, 4vw, 64px);
+    margin-top: 48px;
   }
 }
 
@@ -262,12 +269,13 @@ router-outlet + * {
     padding: 18px clamp(80px, 8vw, 120px);
   }
 
-  .page-header {
-    padding: 20px clamp(80px, 8vw, 120px);
+  .page-footer {
+    padding: 16px clamp(80px, 8vw, 120px);
   }
 
   router-outlet + * {
-    padding: clamp(48px, 6vw, 80px) clamp(80px, 8vw, 120px);
+    padding: clamp(56px, 7vw, 96px) clamp(80px, 8vw, 120px);
+    margin-top: 56px;
   }
 }
 
@@ -276,32 +284,32 @@ router-outlet + * {
     padding: 12px 16px;
   }
 
-  .page-header {
-    padding: 12px 16px;
+  .page-footer {
+    padding: 10px 16px;
   }
 
-  .page-header-content {
+  .footer-content {
     flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .footer-left {
+    flex-direction: column;
+    gap: 4px;
     align-items: flex-start;
   }
 
-  .header-left {
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  .header-left h1 {
-    font-size: 1.25rem;
-  }
-
-  .header-subtitle {
+  .footer-title {
     font-size: 0.85rem;
   }
 
-  .header-right {
+  .footer-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .footer-right {
     width: 100%;
-    justify-content: space-between;
   }
 
   router-outlet + * {

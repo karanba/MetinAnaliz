@@ -13,4 +13,21 @@ import { Tag } from 'primeng/tag';
 })
 export class ResultsPanelComponent {
   @Input() statistics: Statistics | null = null;
+
+  getScoreLabel(): string {
+    if (!this.statistics) {
+      return 'YOD Değeri';
+    }
+
+    switch (this.statistics.analysis_type) {
+      case 'yod':
+        return 'YOD Değeri';
+      case 'atesman':
+        return 'Ateşman Skoru';
+      case 'cetinkaya':
+        return 'Çetinkaya-Uzun';
+      default:
+        return 'Okunabilirlik Skoru';
+    }
+  }
 }
