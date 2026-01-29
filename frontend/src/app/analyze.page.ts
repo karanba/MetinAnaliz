@@ -7,6 +7,13 @@ import { TextAnalysisApiService } from "./text-analysis-api.service";
 import { AnalyzeResponse, ExportFormat } from "./models";
 import { ResultsPanelComponent } from "./results-panel.component";
 import { SentenceListComponent } from "./sentence-list.component";
+import { Button } from "primeng/button";
+import { Card } from "primeng/card";
+import { Select } from "primeng/select";
+import { Textarea } from "primeng/textarea";
+import { ProgressSpinner } from "primeng/progressspinner";
+import { Skeleton } from "primeng/skeleton";
+import { Tag } from "primeng/tag";
 
 @Component({
   selector: "app-analyze-page",
@@ -16,6 +23,13 @@ import { SentenceListComponent } from "./sentence-list.component";
     FormsModule,
     ResultsPanelComponent,
     SentenceListComponent,
+    Button,
+    Card,
+    Select,
+    Textarea,
+    ProgressSpinner,
+    Skeleton,
+    Tag,
   ],
   templateUrl: "./analyze.page.html",
   styleUrls: ["./analyze.page.scss"],
@@ -27,6 +41,11 @@ export class AnalyzePageComponent {
   errorMessage = "";
   result: AnalyzeResponse | null = null;
   exportFormat: ExportFormat = "csv";
+  exportFormats = [
+    { label: "CSV", value: "csv" },
+    { label: "TXT", value: "txt" },
+    { label: "PDF", value: "pdf" },
+  ];
   exporting = false;
 
   constructor(private readonly api: TextAnalysisApiService) {}

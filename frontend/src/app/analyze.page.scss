@@ -2,37 +2,76 @@
   display: block;
 }
 
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field-label {
+  font-weight: 600;
+}
+
 .actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 8px;
+  margin-top: 12px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .error {
-  margin-top: 8px;
+  margin-top: 12px;
   color: #b00020;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .export {
-  margin-top: 12px;
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.export-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .export-actions {
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-top: 6px;
+  flex-wrap: wrap;
 }
 
-select {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 6px 10px;
-  background: #fff;
+:host ::ng-deep .p-select {
+  min-width: 140px;
+}
+
+.status-card {
+  margin-top: 18px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
 }
 
 .results {
-  margin-top: 16px;
+  margin-top: 22px;
 }

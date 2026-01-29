@@ -1,7 +1,29 @@
 <div class="app-shell">
-  <div class="header">
-    <h1>Metin Analiz</h1>
-    <span class="badge">FastAPI + Angular</span>
-  </div>
+  <header class="hero">
+    <div class="hero-text">
+      <p-tag value="FastAPI + Angular" icon="pi pi-sparkles" severity="info"></p-tag>
+      <h1>Metin Analiz</h1>
+      <p class="hero-subtitle">
+        Türkçe metinlerde cümle, kelime ve hece analizi yapın; YOD değerini hızlıca hesaplayın.
+      </p>
+      <div class="hero-meta">
+        <p-tag value="UTF-8" severity="success" icon="pi pi-language"></p-tag>
+        <p-tag value="YOD" severity="warning" icon="pi pi-chart-line"></p-tag>
+        <p-tag value="Cümle · Kelime · Hece" severity="info" icon="pi pi-list"></p-tag>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hero-metric">
+        <span class="label">Hızlı analiz</span>
+        <strong>30 sn</strong>
+        <span class="meta">Zaman aşımı güvenlik limiti</span>
+      </div>
+      <div class="hero-metric">
+        <span class="label">Export formatları</span>
+        <strong>CSV · TXT · PDF</strong>
+        <span class="meta">Tek tık indirme</span>
+      </div>
+    </div>
+  </header>
   <router-outlet />
 </div>

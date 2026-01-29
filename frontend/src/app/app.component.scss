@@ -2,8 +2,61 @@
   display: block;
 }
 
-.app-shell {
-  max-width: 1100px;
-  margin: 24px auto 64px;
-  padding: 0 16px;
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 520px;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.hero-metric {
+  display: grid;
+  gap: 4px;
+}
+
+.hero-metric .label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.hero-metric strong {
+  font-size: 1.2rem;
+}
+
+@media (min-width: 980px) {
+  .hero {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+  }
 }

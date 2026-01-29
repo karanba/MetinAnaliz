@@ -1,13 +1,16 @@
-<div class="panel" *ngIf="sentences?.length">
-  <h3>Cümleler</h3>
+<p-card *ngIf="sentences?.length">
+  <ng-template pTemplate="title">Cümleler</ng-template>
+  <ng-template pTemplate="subtitle">Kelime ve hece dağılımı</ng-template>
   <div class="sentence" *ngFor="let sentence of sentences">
-    <div class="meta">{{ sentence.sentence_index }}.</div>
-    <div class="sentence-text">{{ sentence.sentence_text }}</div>
+    <div class="sentence-head">
+      <p-tag [value]="sentence.sentence_index + '.'" severity="info"></p-tag>
+      <div class="sentence-text">{{ sentence.sentence_text }}</div>
+    </div>
     <div class="words">
-      <span class="word-chip" *ngFor="let word of sentence.words">
-        <span>{{ word.word }}</span>
-        <span class="badge">{{ word.syllable_count }}</span>
-      </span>
+      <div class="word-chip" *ngFor="let word of sentence.words">
+        <p-chip [label]="word.word"></p-chip>
+        <p-tag [value]="word.syllable_count + ' hece'" severity="secondary"></p-tag>
+      </div>
     </div>
   </div>
-</div>
+</p-card>
