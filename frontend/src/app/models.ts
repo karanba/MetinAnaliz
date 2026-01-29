@@ -29,6 +29,12 @@ export interface Statistics {
   total_words: number;
   total_syllables: number;
   oks_value: number;
+  syllable_counts: {
+    3: number;
+    4: number;
+    5: number;
+    6: number;
+  };
   syllable_distribution: {
     3: number;
     4: number;

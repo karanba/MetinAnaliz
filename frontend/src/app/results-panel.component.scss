@@ -208,6 +208,12 @@
   text-align: right;
 }
 
+.distribution-count {
+  color: var(--muted);
+  font-weight: 500;
+  margin-left: 6px;
+}
+
 // Mobile Responsive
 @media (max-width: 768px) {
   .yod-value {

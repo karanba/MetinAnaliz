@@ -42,6 +42,7 @@ class Statistics(BaseModel):
     total_words: int
     total_syllables: int
     oks_value: float
+    syllable_counts: dict
     syllable_distribution: dict
     yod_value: float  # Kept for backward compatibility
     readability_score: float
@@ -201,6 +202,12 @@ def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> A
         total_words=total_words,
         total_syllables=total_syllables,
         oks_value=oks,
+        syllable_counts={
+            3: syllable_counts.get(3, 0),
+            4: syllable_counts.get(4, 0),
+            5: syllable_counts.get(5, 0),
+            6: sum(count for s, count in syllable_counts.items() if s >= 6),
+        },
         syllable_distribution={
             3: h3,
             4: h4,
@@ -232,10 +239,10 @@ def _build_text_lines(analysis: AnalyzeResponse) -> List[str]:
         f"Toplam Kelime: {stats.total_words}",
         f"Toplam Hece: {stats.total_syllables}",
         f"OKS: {stats.oks_value:.4f}",
-        f"H3: {stats.syllable_distribution[3]:.4f}",
-        f"H4: {stats.syllable_distribution[4]:.4f}",
-        f"H5: {stats.syllable_distribution[5]:.4f}",
-        f"H6: {stats.syllable_distribution[6]:.4f}",
+        f"H3: {stats.syllable_distribution[3]:.4f} ({stats.syllable_counts[3]} kelime)",
+        f"H4: {stats.syllable_distribution[4]:.4f} ({stats.syllable_counts[4]} kelime)",
+        f"H5: {stats.syllable_distribution[5]:.4f} ({stats.syllable_counts[5]} kelime)",
+        f"H6: {stats.syllable_distribution[6]:.4f} ({stats.syllable_counts[6]} kelime)",
         f"{score_label}: {stats.readability_score:.4f}",
         "",
         "Cümleler",

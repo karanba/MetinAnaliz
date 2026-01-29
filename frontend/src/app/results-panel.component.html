@@ -74,7 +74,10 @@
             [style.width.%]="statistics.syllable_distribution[3] * 100"
           ></div>
         </div>
-        <div class="distribution-value">{{ statistics.syllable_distribution[3] | number : '1.1-2' }}</div>
+        <div class="distribution-value">
+          {{ statistics.syllable_distribution[3] | number : '1.1-2' }}
+          <span class="distribution-count">({{ statistics.syllable_counts[3] }})</span>
+        </div>
       </div>
 
       <div class="distribution-item">
@@ -85,7 +88,10 @@
             [style.width.%]="statistics.syllable_distribution[4] * 100"
           ></div>
         </div>
-        <div class="distribution-value">{{ statistics.syllable_distribution[4] | number : '1.1-2' }}</div>
+        <div class="distribution-value">
+          {{ statistics.syllable_distribution[4] | number : '1.1-2' }}
+          <span class="distribution-count">({{ statistics.syllable_counts[4] }})</span>
+        </div>
       </div>
 
       <div class="distribution-item">
@@ -96,7 +102,10 @@
             [style.width.%]="statistics.syllable_distribution[5] * 100"
           ></div>
         </div>
-        <div class="distribution-value">{{ statistics.syllable_distribution[5] | number : '1.1-2' }}</div>
+        <div class="distribution-value">
+          {{ statistics.syllable_distribution[5] | number : '1.1-2' }}
+          <span class="distribution-count">({{ statistics.syllable_counts[5] }})</span>
+        </div>
       </div>
 
       <div class="distribution-item">
@@ -107,7 +116,10 @@
             [style.width.%]="statistics.syllable_distribution[6] * 100"
           ></div>
         </div>
-        <div class="distribution-value">{{ statistics.syllable_distribution[6] | number : '1.1-2' }}</div>
+        <div class="distribution-value">
+          {{ statistics.syllable_distribution[6] | number : '1.1-2' }}
+          <span class="distribution-count">({{ statistics.syllable_counts[6] }})</span>
+        </div>
       </div>
     </div>
   </div>
