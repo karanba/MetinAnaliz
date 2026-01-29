@@ -54,8 +54,8 @@ def analiz(dosyaAdi, icerik):
             H4 = heceGroupları[heceGrubu] / toplamCumleSayısı
         elif heceGrubu == 5:
             H5 = heceGroupları[heceGrubu] / toplamCumleSayısı              
-        elif heceGrubu == 6:
-            H6 = heceGroupları[heceGrubu] / toplamCumleSayısı            
+        elif heceGrubu >= 6:
+            H6 += heceGroupları[heceGrubu] / toplamCumleSayısı            
   
 
     

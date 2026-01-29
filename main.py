@@ -171,10 +171,17 @@ def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> A
             return 0.0
         return syllable_counts.get(count, 0) / total_sentences
 
+    def ratio_for_min(min_count: int) -> float:
+        if total_sentences == 0:
+            return 0.0
+        return sum(
+            count for syllables, count in syllable_counts.items() if syllables >= min_count
+        ) / total_sentences
+
     h3 = ratio_for(3)
     h4 = ratio_for(4)
     h5 = ratio_for(5)
-    h6 = ratio_for(6)
+    h6 = ratio_for_min(6)
 
     # Calculate readability score based on analysis type
     if analysis_type == AnalysisType.yod:
