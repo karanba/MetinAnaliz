@@ -4,16 +4,21 @@
     <p-card class="input-card">
       <div class="card-header">
         <div class="header-content">
-          <h2>Metin Analizi</h2>
+          <div class="header-title-row">
+            <h2>Metin Analizi</h2>
+            <p-button
+              label="Analiz Et"
+              icon="pi pi-bolt"
+              styleClass="primary-action"
+              [loading]="loading"
+              [disabled]="!text.trim()"
+              (onClick)="analyze()"
+            ></p-button>
+          </div>
           <p class="meta">
             Türkçe metninizi girin ve YOD değerini öğrenin
           </p>
         </div>
-        <p-tag
-          [value]="text.length + ' karakter'"
-          icon="pi pi-file-edit"
-          [severity]="text.length > 0 ? 'info' : 'secondary'"
-        ></p-tag>
       </div>
 
       <div class="field">
@@ -29,17 +34,12 @@
           rows="12"
           placeholder="Analiz edilecek Türkçe metni buraya yapıştırın..."
         ></textarea>
-      </div>
-
-      <div class="action-bar">
-        <p-button
-          label="Analiz Et"
-          icon="pi pi-bolt"
-          styleClass="primary-action w-full"
-          [loading]="loading"
-          [disabled]="!text.trim()"
-          (onClick)="analyze()"
-        ></p-button>
+        <div class="field-footer">
+          <span class="character-count" [class.has-text]="text.length > 0">
+            <i class="pi pi-file-edit"></i>
+            {{ text.length }} karakter
+          </span>
+        </div>
       </div>
 
       <div class="error" *ngIf="errorMessage">
