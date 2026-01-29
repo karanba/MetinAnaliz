@@ -4,30 +4,40 @@ Bu dosya, projede çalışan AI agentlar için kısa ve net çalışma talimatla
 
 ## Proje özeti
 - Amaç: Türkçe metinlerde cümle/kelime/hece analizi yapıp YOD değerini hesaplamak.
-- Girdi: UTF-8 metin dosyası.
-- Çıktı: Cümle ve kelime dökümü + özet istatistikler + YOD.
+- Backend: FastAPI ile `/analyze` endpointi JSON analiz çıktısı döner.
+- Frontend: Angular SPA (standalone) backend ile `/api/analyze` üzerinden konuşur.
 
 ## Önemli dosyalar
-- `analiz.py`: Ana CLI; metni okur, analiz eder, sonucu stdout'a yazar.
+- `main.py`: FastAPI uygulaması.
+- `analiz.py`: Eski CLI (örnek/geriye dönük kullanım).
+- `frontend/`: Angular SPA kaynakları.
 - `ornekler/`: Örnek giriş metinleri.
 - `sonuclar/`: Örnek çıktı metinleri.
 - `README.md`: Kullanım ve YOD formülü.
 
 ## Çalıştırma
-- Windows PowerShell:
-  - `python analiz.py ornekler/aa.txt > sonuclar/aa.txt`
+- Backend (PowerShell):
+  - `uvicorn main:app --reload`
+- Frontend (PowerShell):
+  - `cd frontend`
+  - `npm install`
+  - `npm run start`
 - Kod UTF-8 varsayar; girdiler UTF-8 olmalı.
 
 ## Davranışsal notlar
 - Hece sayımı sesli harf sayımıyla yapılır.
 - Cümle bölme regex ile yapılır; noktalama sonrası boşluk aranır.
-- Çıktı formatı test/karşılaştırma için önemlidir; satır düzenini bozmayın.
+- API sözleşmesini (JSON alan adları ve tipler) değiştirmemeye dikkat edin.
 
 ## Değişiklik yaparken
-- Çıktı formatını değiştirecekseniz README'yi güncelleyin.
+- API sözleşmesi veya frontend ekranı değişirse README'yi güncelleyin.
 - Regex veya hece mantığına dokunursanız `ornekler/` ve `sonuclar/` uyumunu kontrol edin.
 - Yeni örnek eklerken karşılık gelen sonuç dosyasını üretin.
 
 ## Hızlı kontrol
-- `python analiz.py ornekler/aa.txt > sonuclar/aa.txt`
-- Sonuçları gözle kontrol edin; özellikle toplam cümle/kelime/hece ve YOD.
+- Backend:
+  - `uvicorn main:app --reload`
+  - `Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/analyze -ContentType "application/json" -Body '{"text":"Merhaba dünya!"}'`
+- Frontend:
+  - `cd frontend`
+  - `npm run start`

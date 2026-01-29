@@ -1,0 +1,13 @@
+<div class="panel" *ngIf="sentences?.length">
+  <h3>Cümleler</h3>
+  <div class="sentence" *ngFor="let sentence of sentences">
+    <div class="meta">{{ sentence.sentence_index }}.</div>
+    <div class="sentence-text">{{ sentence.sentence_text }}</div>
+    <div class="words">
+      <span class="word-chip" *ngFor="let word of sentence.words">
+        <span>{{ word.word }}</span>
+        <span class="badge">{{ word.syllable_count }}</span>
+      </span>
+    </div>
+  </div>
+</div>

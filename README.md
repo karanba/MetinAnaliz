@@ -24,6 +24,83 @@ YOD = math.sqrt(OKS * ((H3 * 0.84) + (H4 * 1.5) + (H5 * 3.5) + (H6 * 26.25)))
 python analiz.py ornekler/aa.txt > sonuclar/aa.txt
 ```
 
+## API Kullanımı (FastAPI)
+
+Uygulamayı başlat:
+
+```powershell
+uvicorn main:app
+```
+
+Örnek istek:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/analyze -ContentType "application/json" -Body '{"text":"Merhaba dünya! Bugün hava güzel mi?"}'
+```
+
+## Frontend (Angular SPA)
+
+Geliştirme sunucusu (proxy ile):
+
+```powershell
+cd frontend
+npm install
+npm run start
+```
+
+Prod build:
+
+```powershell
+cd frontend
+npm run build
+```
+
+Not: Frontend, dev ortamında `/api/analyze` çağırır ve `proxy.conf.json` üzerinden `http://localhost:8000` adresine yönlenir.
+
+## Uygulamayı Ayağa Kaldırma
+
+Önerilen: sanal ortam oluşturup aktive edin.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Bağımlılıkları yükle:
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Sunucuyu çalıştır:
+
+```powershell
+uvicorn main:app --reload
+```
+
+Tarayıcıdan kontrol:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## Environment (.env) Kullanımı
+
+Proje köküne `.env` dosyası ekleyip çalıştırma sırasında yükleyebilirsiniz.
+
+Örnek `.env`:
+
+```text
+APP_NAME=Metin Analiz API
+```
+
+`.env` ile çalıştırma:
+
+```powershell
+uvicorn main:app --reload --env-file .env
+```
+
 ## Notlar
 - Hece sayımı Türkçe sesli harf kümesine göre yapılır: `AaÂâEeIıİiÎîOoÖöUuÜü`.
 - Cümle bölme işlemi nokta, soru, ünlem, üç nokta ve benzeri işaretlerden sonra yapılır.

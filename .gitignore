@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 ornekler/
 sonuclar/
+frontend/.angular/
+frontend/node_modules/

@@ -1,0 +1,120 @@
+:root {
+  --bg: #f7f7fb;
+  --panel: #ffffff;
+  --text: #1b1b22;
+  --muted: #6a6a7a;
+  --accent: #1e5eff;
+  --border: #e1e3ee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 24px auto 64px;
+  padding: 0 16px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+textarea {
+  width: 100%;
+  min-height: 160px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:disabled {
+  background: #c1c7e4;
+  cursor: not-allowed;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f3f5ff;
+  font-size: 12px;
+}
+
+.word-chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin: 4px 6px 0 0;
+  background: #fafbff;
+  font-size: 12px;
+}
+
+.error {
+  color: #b00020;
+  font-weight: 600;
+}
+
+pre {
+  background: #111217;
+  color: #e7e9f4;
+  padding: 12px;
+  border-radius: 10px;
+  overflow: auto;
+  font-size: 12px;
+}

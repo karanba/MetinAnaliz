@@ -1,0 +1,30 @@
+<div class="panel" *ngIf="statistics">
+  <h3>İstatistikler</h3>
+  <div class="stats-grid">
+    <div>
+      <div class="meta">Toplam cümle</div>
+      <strong>{{ statistics.total_sentences }}</strong>
+    </div>
+    <div>
+      <div class="meta">Toplam kelime</div>
+      <strong>{{ statistics.total_words }}</strong>
+    </div>
+    <div>
+      <div class="meta">Toplam hece</div>
+      <strong>{{ statistics.total_syllables }}</strong>
+    </div>
+    <div>
+      <div class="meta">YOD</div>
+      <strong>{{ statistics.yod_value | number : '1.2-4' }}</strong>
+    </div>
+  </div>
+  <div class="ratios">
+    <div class="meta">3-6 hece oranları</div>
+    <div class="ratio-list">
+      <div class="badge">H3: {{ statistics.syllable_distribution[3] | number : '1.2-4' }}</div>
+      <div class="badge">H4: {{ statistics.syllable_distribution[4] | number : '1.2-4' }}</div>
+      <div class="badge">H5: {{ statistics.syllable_distribution[5] | number : '1.2-4' }}</div>
+      <div class="badge">H6: {{ statistics.syllable_distribution[6] | number : '1.2-4' }}</div>
+    </div>
+  </div>
+</div>

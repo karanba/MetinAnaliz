@@ -1,0 +1,34 @@
+<div class="grid">
+  <div class="panel">
+    <label for="inputText"><strong>Metin</strong></label>
+    <textarea
+      id="inputText"
+      [(ngModel)]="text"
+      placeholder="Analiz edilecek Türkçe metni buraya yapıştırın..."
+    ></textarea>
+    <div class="actions">
+      <span class="meta">{{ text.length }} karakter</span>
+      <button (click)="analyze()" [disabled]="loading || !text.trim()">
+        {{ loading ? "Analiz ediliyor..." : "Analyze" }}
+      </button>
+    </div>
+    <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="copy" *ngIf="result">
+      <button (click)="copyJson()">JSON Kopyala</button>
+    </div>
+  </div>
+
+  <div>
+    <app-results-panel [statistics]="result?.statistics ?? null"></app-results-panel>
+    <div class="panel" *ngIf="!result && !loading">
+      <div class="meta">Sonuçlar burada görünecek.</div>
+    </div>
+    <div class="panel" *ngIf="loading">
+      <div class="meta">Analiz devam ediyor...</div>
+    </div>
+  </div>
+</div>
+
+<div class="results" *ngIf="result">
+  <app-sentence-list [sentences]="result.sentences"></app-sentence-list>
+</div>

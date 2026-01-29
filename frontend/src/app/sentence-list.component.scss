@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+.sentence {
+  margin-bottom: 16px;
+}
+
+.sentence-text {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.words {
+  display: flex;
+  flex-wrap: wrap;
+}
