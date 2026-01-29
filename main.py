@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import csv
+import io
 import math
 import re
-from typing import List
+from pathlib import Path
+from enum import Enum
+from typing import Dict, List, Protocol
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 VOWELS = set("aeıioöuü")
@@ -36,6 +41,26 @@ class Statistics(BaseModel):
 class AnalyzeResponse(BaseModel):
     sentences: List[SentenceInfo]
     statistics: Statistics
+
+
+class ExportFormat(str, Enum):
+    csv = "csv"
+    txt = "txt"
+    pdf = "pdf"
+
+
+class ExportRequest(BaseModel):
+    text: str = Field(..., description="Turkish text to analyze")
+    format: ExportFormat = Field(..., description="Export format")
+
+
+class Exporter(Protocol):
+    format: ExportFormat
+    content_type: str
+    extension: str
+
+    def export(self, analysis: AnalyzeResponse) -> bytes:
+        ...
 
 
 def split_sentences(text: str) -> List[str]:
@@ -119,6 +144,131 @@ def analyze_text(text: str) -> AnalyzeResponse:
     return AnalyzeResponse(sentences=sentences, statistics=stats)
 
 
+def _build_text_lines(analysis: AnalyzeResponse) -> List[str]:
+    stats = analysis.statistics
+    lines = [
+        "Metin Analizi",
+        "================",
+        f"Toplam Cümle: {stats.total_sentences}",
+        f"Toplam Kelime: {stats.total_words}",
+        f"Toplam Hece: {stats.total_syllables}",
+        f"H3: {stats.syllable_distribution[3]:.4f}",
+        f"H4: {stats.syllable_distribution[4]:.4f}",
+        f"H5: {stats.syllable_distribution[5]:.4f}",
+        f"H6: {stats.syllable_distribution[6]:.4f}",
+        f"YOD: {stats.yod_value:.4f}",
+        "",
+        "Cümleler",
+        "--------",
+    ]
+    for sentence in analysis.sentences:
+        lines.append(f"{sentence.sentence_index}. {sentence.sentence_text}")
+        for word in sentence.words:
+            lines.append(f"  - {word.word} ({word.syllable_count} hece)")
+        lines.append("")
+    return lines
+
+
+class CsvExporter:
+    format = ExportFormat.csv
+    content_type = "text/csv; charset=utf-8"
+    extension = "csv"
+
+    def export(self, analysis: AnalyzeResponse) -> bytes:
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["sentence_index", "sentence_text", "word", "syllable_count"])
+        for sentence in analysis.sentences:
+            if not sentence.words:
+                writer.writerow([sentence.sentence_index, sentence.sentence_text, "", ""])
+                continue
+            for word in sentence.words:
+                writer.writerow(
+                    [
+                        sentence.sentence_index,
+                        sentence.sentence_text,
+                        word.word,
+                        word.syllable_count,
+                    ]
+                )
+        return output.getvalue().encode("utf-8")
+
+
+class TxtExporter:
+    format = ExportFormat.txt
+    content_type = "text/plain; charset=utf-8"
+    extension = "txt"
+
+    def export(self, analysis: AnalyzeResponse) -> bytes:
+        return "\n".join(_build_text_lines(analysis)).encode("utf-8")
+
+
+class PdfExporter:
+    format = ExportFormat.pdf
+    content_type = "application/pdf"
+    extension = "pdf"
+
+    def export(self, analysis: AnalyzeResponse) -> bytes:
+        try:
+            from reportlab.lib.pagesizes import A4
+            from reportlab.pdfbase import pdfmetrics
+            from reportlab.pdfbase.ttfonts import TTFont
+            from reportlab.pdfgen import canvas
+        except Exception as exc:  # pragma: no cover
+            raise RuntimeError("PDF export requires reportlab") from exc
+
+        font_path = _resolve_pdf_font_path()
+        if font_path is None:
+            raise RuntimeError(
+                "PDF export requires a Unicode-capable TTF font. "
+                "Place a font at fonts/NotoSans-Regular.ttf or ensure a system font is available."
+            )
+
+        pdfmetrics.registerFont(TTFont("UnicodeFont", str(font_path)))
+        buffer = io.BytesIO()
+        pdf = canvas.Canvas(buffer, pagesize=A4)
+        width, height = A4
+        x = 40
+        y = height - 40
+        line_height = 14
+        pdf.setFont("UnicodeFont", 11)
+        for line in _build_text_lines(analysis):
+            if y <= 40:
+                pdf.showPage()
+                y = height - 40
+                pdf.setFont("UnicodeFont", 11)
+            pdf.drawString(x, y, line)
+            y -= line_height
+        pdf.save()
+        return buffer.getvalue()
+
+
+def _resolve_pdf_font_path() -> Path | None:
+    candidates = [
+        Path(__file__).resolve().parent / "fonts" / "NotoSans-Regular.ttf",
+        Path("fonts") / "NotoSans-Regular.ttf",
+        Path(__file__).resolve().parent / "fonts" / "DejaVuSans.ttf",
+        Path("fonts") / "DejaVuSans.ttf",
+        Path(r"C:\Windows\Fonts\arial.ttf"),
+        Path(r"C:\Windows\Fonts\SegoeUI.ttf"),
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
+        Path("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"),
+        Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf"),
+        Path("/System/Library/Fonts/Supplemental/Arial.ttf"),
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+EXPORTERS: Dict[ExportFormat, Exporter] = {
+    ExportFormat.csv: CsvExporter(),
+    ExportFormat.txt: TxtExporter(),
+    ExportFormat.pdf: PdfExporter(),
+}
+
+
 app = FastAPI(title="Metin Analiz API")
 
 
@@ -128,3 +278,24 @@ def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
         return analyze_text(payload.text)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+
+@app.post("/export")
+def export_endpoint(payload: ExportRequest):
+    try:
+        analysis = analyze_text(payload.text)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    exporter = EXPORTERS.get(payload.format)
+    if exporter is None:
+        raise HTTPException(status_code=400, detail="unsupported export format")
+
+    try:
+        content = exporter.export(analysis)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=501, detail=str(exc)) from exc
+
+    filename = f"metin-analiz.{exporter.extension}"
+    headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
+    return Response(content=content, media_type=exporter.content_type, headers=headers)

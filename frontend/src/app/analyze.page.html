@@ -13,8 +13,17 @@
       </button>
     </div>
     <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
-    <div class="copy" *ngIf="result">
-      <button (click)="copyJson()">JSON Kopyala</button>
+    <div class="export" *ngIf="result">
+      <label for="exportFormat" class="meta">Export formatı</label>
+      <div class="export-actions">
+        <select id="exportFormat" [(ngModel)]="exportFormat">
+          <option value="csv">CSV</option>
+          <option value="txt">TXT</option>
+          <option value="pdf">PDF</option>
+        </select>
+        <button (click)="exportResult()" [disabled]="exporting">Export</button>
+      </div>
+      <div class="meta" *ngIf="exporting">Dosya hazırlanıyor...</div>
     </div>
   </div>
 

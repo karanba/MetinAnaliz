@@ -4,7 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { timeout } from "rxjs/operators";
 import { firstValueFrom } from "rxjs";
 import { TextAnalysisApiService } from "./text-analysis-api.service";
-import { AnalyzeResponse } from "./models";
+import { AnalyzeResponse, ExportFormat } from "./models";
 import { ResultsPanelComponent } from "./results-panel.component";
 import { SentenceListComponent } from "./sentence-list.component";
 
@@ -26,6 +26,8 @@ export class AnalyzePageComponent {
   loading = false;
   errorMessage = "";
   result: AnalyzeResponse | null = null;
+  exportFormat: ExportFormat = "csv";
+  exporting = false;
 
   constructor(private readonly api: TextAnalysisApiService) {}
 
@@ -50,13 +52,31 @@ export class AnalyzePageComponent {
     }
   }
 
-  copyJson(): void {
-    if (!this.result) {
+  exportResult(): void {
+    if (!this.result || this.exporting) {
       return;
     }
-    const payload = JSON.stringify(this.result, null, 2);
-    navigator.clipboard.writeText(payload).catch(() => {
-      this.errorMessage = "JSON kopyalanamadı.";
+    this.exporting = true;
+    this.errorMessage = "";
+    this.api.export(this.text, this.exportFormat).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `metin-analiz.${this.exportFormat}`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        this.exporting = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.errorMessage =
+          err?.error?.detail || "Export sırasında bir hata oluştu.";
+        this.exporting = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 }

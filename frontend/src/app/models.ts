@@ -2,6 +2,13 @@ export interface AnalyzeRequest {
   text: string;
 }
 
+export type ExportFormat = 'csv' | 'txt' | 'pdf';
+
+export interface ExportRequest {
+  text: string;
+  format: ExportFormat;
+}
+
 export interface WordInfo {
   word: string;
   syllable_count: number;

@@ -15,8 +15,22 @@
   font-weight: 600;
 }
 
-.copy {
+.export {
   margin-top: 12px;
+}
+
+.export-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+select {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  background: #fff;
 }
 
 .results {
