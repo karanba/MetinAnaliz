@@ -4,6 +4,8 @@ import math
 import sys
 import os
 
+sys.stdout.reconfigure(encoding='utf-8')
+
 sesliHarfler = 'AaÂâEeIıİiÎîOoÖöUuÜü'
 heceGroupları = {}
 
@@ -45,7 +47,7 @@ def analiz(dosyaAdi, icerik):
     OKS = toplamKelimeSayısı / toplamCumleSayısı
 
     for heceGrubu in sorted(heceGroupları.keys()):
-        print(heceGrubu, ' herceli kelime sayısı: ', heceGroupları[heceGrubu])
+        print(heceGrubu, ' heceli kelime sayısı: ', heceGroupları[heceGrubu])
         if heceGrubu == 3:
             H3 = heceGroupları[heceGrubu] / toplamCumleSayısı
         elif heceGrubu == 4:
@@ -78,8 +80,8 @@ def heceSayisiHesapla(kelime):
 
 
 def main(): 
-    dosyaYolu = str(sys.argv[1])
-    file = open(dosyaYolu, 'r')
+    dosyaYolu = str(sys.argv[1])    
+    file = open(dosyaYolu, mode="r", encoding="utf-8")
     dosyaİceriği = file.read()
     analiz(os.path.splitext(dosyaYolu)[0], dosyaİceriği)            
       
