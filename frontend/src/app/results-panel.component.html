@@ -1,45 +1,104 @@
-<p-card *ngIf="statistics">
-  <ng-template pTemplate="title">İstatistikler</ng-template>
-  <ng-template pTemplate="subtitle">YOD ve temel sayımlar</ng-template>
-
-  <div class="stats-grid">
-    <div class="stat-tile">
-      <div class="meta">Toplam cümle</div>
-      <strong>{{ statistics.total_sentences }}</strong>
-    </div>
-    <div class="stat-tile">
-      <div class="meta">Toplam kelime</div>
-      <strong>{{ statistics.total_words }}</strong>
-    </div>
-    <div class="stat-tile">
-      <div class="meta">Toplam hece</div>
-      <strong>{{ statistics.total_syllables }}</strong>
-    </div>
-    <div class="stat-tile">
-      <div class="meta">YOD</div>
-      <strong>{{ statistics.yod_value | number : '1.2-4' }}</strong>
+<p-card *ngIf="statistics" class="results-card">
+  <div class="results-header">
+    <div>
+      <h2>Analiz Sonuçları</h2>
+      <p class="meta">YOD ve metin istatistikleri</p>
     </div>
   </div>
 
-  <div class="ratios">
-    <div class="meta">3-6 hece oranları</div>
-    <div class="ratio-list">
-      <p-tag
-        [value]="'H3: ' + (statistics.syllable_distribution[3] | number : '1.2-4')"
-        severity="info"
-      ></p-tag>
-      <p-tag
-        [value]="'H4: ' + (statistics.syllable_distribution[4] | number : '1.2-4')"
-        severity="success"
-      ></p-tag>
-      <p-tag
-        [value]="'H5: ' + (statistics.syllable_distribution[5] | number : '1.2-4')"
-        severity="warning"
-      ></p-tag>
-      <p-tag
-        [value]="'H6: ' + (statistics.syllable_distribution[6] | number : '1.2-4')"
-        severity="danger"
-      ></p-tag>
+  <!-- YOD Score - Featured -->
+  <div class="yod-showcase">
+    <div class="yod-label">
+      <i class="pi pi-chart-line"></i>
+      <span>YOD Değeri</span>
+    </div>
+    <div class="yod-value">{{ statistics.yod_value | number : '1.2-4' }}</div>
+    <div class="yod-description">Okunabilirlik skoru</div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-tile">
+      <div class="stat-icon">
+        <i class="pi pi-list"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics.total_sentences }}</div>
+        <div class="stat-label">Toplam Cümle</div>
+      </div>
+    </div>
+
+    <div class="stat-tile">
+      <div class="stat-icon">
+        <i class="pi pi-book"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics.total_words }}</div>
+        <div class="stat-label">Toplam Kelime</div>
+      </div>
+    </div>
+
+    <div class="stat-tile">
+      <div class="stat-icon">
+        <i class="pi pi-sparkles"></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ statistics.total_syllables }}</div>
+        <div class="stat-label">Toplam Hece</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Syllable Distribution -->
+  <div class="distribution-section">
+    <div class="section-header">
+      <i class="pi pi-chart-bar"></i>
+      <span>Hece Dağılımı</span>
+    </div>
+    <div class="distribution-grid">
+      <div class="distribution-item">
+        <div class="distribution-label">3 Hece</div>
+        <div class="distribution-bar">
+          <div
+            class="distribution-fill h3"
+            [style.width.%]="statistics.syllable_distribution[3] * 100"
+          ></div>
+        </div>
+        <div class="distribution-value">{{ statistics.syllable_distribution[3] | number : '1.1-2' }}</div>
+      </div>
+
+      <div class="distribution-item">
+        <div class="distribution-label">4 Hece</div>
+        <div class="distribution-bar">
+          <div
+            class="distribution-fill h4"
+            [style.width.%]="statistics.syllable_distribution[4] * 100"
+          ></div>
+        </div>
+        <div class="distribution-value">{{ statistics.syllable_distribution[4] | number : '1.1-2' }}</div>
+      </div>
+
+      <div class="distribution-item">
+        <div class="distribution-label">5 Hece</div>
+        <div class="distribution-bar">
+          <div
+            class="distribution-fill h5"
+            [style.width.%]="statistics.syllable_distribution[5] * 100"
+          ></div>
+        </div>
+        <div class="distribution-value">{{ statistics.syllable_distribution[5] | number : '1.1-2' }}</div>
+      </div>
+
+      <div class="distribution-item">
+        <div class="distribution-label">6+ Hece</div>
+        <div class="distribution-bar">
+          <div
+            class="distribution-fill h6"
+            [style.width.%]="statistics.syllable_distribution[6] * 100"
+          ></div>
+        </div>
+        <div class="distribution-value">{{ statistics.syllable_distribution[6] | number : '1.1-2' }}</div>
+      </div>
     </div>
   </div>
 </p-card>

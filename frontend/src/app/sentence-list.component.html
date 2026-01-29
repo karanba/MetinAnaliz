@@ -1,15 +1,42 @@
-<p-card *ngIf="sentences?.length">
-  <ng-template pTemplate="title">Cümleler</ng-template>
-  <ng-template pTemplate="subtitle">Kelime ve hece dağılımı</ng-template>
-  <div class="sentence" *ngFor="let sentence of sentences">
-    <div class="sentence-head">
-      <p-tag [value]="sentence.sentence_index + '.'" severity="info"></p-tag>
-      <div class="sentence-text">{{ sentence.sentence_text }}</div>
+<p-card *ngIf="sentences?.length" class="sentences-card">
+  <div class="sentences-header">
+    <div>
+      <h2>Cümle Analizi</h2>
+      <p class="meta">{{ sentences.length }} cümle, kelime ve hece dağılımı</p>
     </div>
-    <div class="words">
-      <div class="word-chip" *ngFor="let word of sentence.words">
-        <p-chip [label]="word.word"></p-chip>
-        <p-tag [value]="word.syllable_count + ' hece'" severity="secondary"></p-tag>
+  </div>
+
+  <div class="sentences-list">
+    <div class="sentence-card" *ngFor="let sentence of sentences; let i = index">
+      <div class="sentence-header">
+        <div class="sentence-number">
+          <span>{{ sentence.sentence_index }}</span>
+        </div>
+        <div class="sentence-stats">
+          <span class="stat-badge">
+            <i class="pi pi-book"></i>
+            {{ sentence.words.length }} kelime
+          </span>
+        </div>
+      </div>
+
+      <div class="sentence-text">
+        {{ sentence.sentence_text }}
+      </div>
+
+      <div class="words-section">
+        <div class="words-label">
+          <i class="pi pi-tags"></i>
+          Kelimeler
+        </div>
+        <div class="words-grid">
+          <div class="word-item" *ngFor="let word of sentence.words">
+            <span class="word-text">{{ word.word }}</span>
+            <span class="word-syllables" [attr.data-count]="word.syllable_count">
+              {{ word.syllable_count }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
