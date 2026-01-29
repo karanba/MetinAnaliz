@@ -1,4 +1,6 @@
 fastapi
 uvicorn
+gunicorn==23.0.0
+pydantic==2.10.3
 python-dotenv
 reportlab

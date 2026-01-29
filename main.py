@@ -352,6 +352,11 @@ EXPORTERS: Dict[ExportFormat, Exporter] = {
 app = FastAPI(title="Metin Analiz API")
 
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
     try:
