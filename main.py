@@ -278,7 +278,8 @@ class CsvExporter:
                         word.syllable_count,
                     ]
                 )
-        return output.getvalue().encode("utf-8")
+        # Use UTF-8 with BOM for better compatibility (e.g., Excel) with Turkish characters.
+        return output.getvalue().encode("utf-8-sig")
 
 
 class TxtExporter:
