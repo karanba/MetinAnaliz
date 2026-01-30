@@ -1,0 +1,28 @@
+# Security Dependencies for MetinAnaliz
+# Install with: pip install -r requirements-security.txt
+
+# Environment variables management
+python-dotenv==1.0.0
+
+# Rate limiting (production-ready)
+slowapi==0.1.9
+redis==5.0.1
+
+# HTTPS redirect
+fastapi[all]>=0.104.0
+
+# For enhanced logging and monitoring
+python-json-logger==2.0.7
+
+# Optional: For advanced security headers
+secure==0.3.0
+
+# Optional: For JWT tokens if you add authentication later
+# pyjwt[crypto]==2.8.0
+# python-jose[cryptography]==3.3.0
+
+# Optional: For password hashing if you add user accounts
+# passlib[bcrypt]==1.7.4
+
+# Optional: For API key management
+# python-multipart==0.0.6
