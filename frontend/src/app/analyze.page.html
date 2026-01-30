@@ -88,12 +88,24 @@
         <i class="pi pi-chart-bar empty-icon"></i>
         <h3>Sonuçlar burada görünecek</h3>
         <p class="meta">Metninizi girin ve analiz butonuna basın</p>
+
+        <!-- AdSense -->
+        <div class="ad-container" #adContainer>
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-7885050453788342"
+               data-ad-slot="6137189317"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+        </div>
       </div>
     </p-card>
 
     <!-- Results -->
     <div *ngIf="result && !loading" class="results-container">
-      <app-results-panel [statistics]="result?.statistics ?? null"></app-results-panel>
+      <app-results-panel
+        [statistics]="result?.statistics ?? null"
+      ></app-results-panel>
 
       <div class="export-section" *ngIf="result">
         <p-card class="export-card">
@@ -144,7 +156,9 @@
   <div class="options-dialog-content">
     <div class="option-section">
       <h3><i class="pi pi-chart-line"></i> Analiz Türü</h3>
-      <p class="section-description">Metin okunabilirlik analizinde kullanılacak formülü seçin</p>
+      <p class="section-description">
+        Metin okunabilirlik analizinde kullanılacak formülü seçin
+      </p>
 
       <div class="analysis-types">
         <div
@@ -157,8 +171,8 @@
             <h4>YOD Değeri</h4>
           </div>
           <p class="type-description">
-            Yeni Okunabilirlik Değeri (Bezirci–Yılmaz) – Modern Türkçe.
-            H6: 6+ heceli kelime yoğunluğu, payda toplam cümle sayısı.
+            Yeni Okunabilirlik Değeri (Bezirci–Yılmaz) – Modern Türkçe. H6: 6+
+            heceli kelime yoğunluğu, payda toplam cümle sayısı.
           </p>
           <div class="type-formula">
             YOD = √(OKS × (H3×0.84 + H4×1.5 + H5×3.5 + H6×26.25))
@@ -174,8 +188,12 @@
             <i class="pi pi-check-circle check-icon"></i>
             <h4>Ateşman Skoru</h4>
           </div>
-          <p class="type-description">Flesch Reading Ease'in Türkçe uyarlaması</p>
-          <div class="type-formula">A = 198.825 - 40.175 × (K/C) - 2.610 × (H/K)</div>
+          <p class="type-description">
+            Flesch Reading Ease'in Türkçe uyarlaması
+          </p>
+          <div class="type-formula">
+            A = 198.825 - 40.175 × (K/C) - 2.610 × (H/K)
+          </div>
         </div>
 
         <div
@@ -187,8 +205,12 @@
             <i class="pi pi-check-circle check-icon"></i>
             <h4>Çetinkaya-Uzun</h4>
           </div>
-          <p class="type-description">Türkçe metinler için alternatif okunabilirlik formülü</p>
-          <div class="type-formula">ÇU = 118.823 - 25.987 × (K/C) - 0.971 × (H/K)</div>
+          <p class="type-description">
+            Türkçe metinler için alternatif okunabilirlik formülü
+          </p>
+          <div class="type-formula">
+            ÇU = 118.823 - 25.987 × (K/C) - 0.971 × (H/K)
+          </div>
         </div>
       </div>
     </div>

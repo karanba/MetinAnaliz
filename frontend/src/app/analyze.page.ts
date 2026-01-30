@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from "@angular/core";
+import { ChangeDetectorRef, Component, inject, AfterViewChecked } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { timeout } from "rxjs/operators";
@@ -44,7 +44,7 @@ import { Tooltip } from "primeng/tooltip";
   templateUrl: "./analyze.page.html",
   styleUrls: ["./analyze.page.scss"],
 })
-export class AnalyzePageComponent {
+export class AnalyzePageComponent implements AfterViewChecked {
   private readonly cdr = inject(ChangeDetectorRef);
   text = "";
   loading = false;
@@ -63,7 +63,30 @@ export class AnalyzePageComponent {
   analysisType: 'yod' | 'atesman' | 'cetinkaya' = 'yod';
   selectedAnalysisType: 'yod' | 'atesman' | 'cetinkaya' = 'yod';
 
+  // AdSense tracking
+  private adPushed = false;
+
   constructor(private readonly api: TextAnalysisApiService) {}
+
+  ngAfterViewChecked(): void {
+    // Initialize AdSense when empty state is shown
+    if (!this.result && !this.loading && !this.adPushed) {
+      this.loadAd();
+    } else if ((this.result || this.loading) && this.adPushed) {
+      // Reset flag when conditions change
+      this.adPushed = false;
+    }
+  }
+
+  private loadAd(): void {
+    try {
+      const adsbygoogle = (window as any).adsbygoogle || [];
+      adsbygoogle.push({});
+      this.adPushed = true;
+    } catch (e) {
+      console.error('AdSense error:', e);
+    }
+  }
 
   async analyze(): Promise<void> {
     this.errorMessage = "";
