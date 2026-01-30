@@ -2,26 +2,66 @@
   display: block;
 }
 
-.help-grid {
+.help-layout {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.help-menu {
+  flex: 0 0 260px;
+}
+
+.help-menu {
+  position: sticky;
+  top: 16px;
+  height: fit-content;
+}
+
+.menu-links {
   display: grid;
-  gap: 16px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.help-section {
-  margin-top: 12px;
+.menu-links a {
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 600;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.help-section h3 {
-  margin: 0 0 6px;
+.menu-links a:hover {
+  border-color: var(--stroke);
+  background: #f9fafb;
 }
 
-.help-section p,
-.help-section li {
-  color: var(--muted);
+.menu-links a.active {
+  color: var(--accent);
+  border-color: rgba(31, 122, 140, 0.2);
+  background: rgba(31, 122, 140, 0.08);
+}
+
+.help-content-area {
+  min-width: 0;
+  flex: 1;
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+@media (max-width: 960px) {
+  .help-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .help-menu {
+    position: static;
+  }
 }

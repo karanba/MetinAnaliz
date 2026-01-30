@@ -1,0 +1,33 @@
+<p-card class="help-content-card">
+  <ng-template pTemplate="title">Nasıl Kullanılır?</ng-template>
+  <ng-template pTemplate="subtitle">Uygulama akışı ve seçeneklerin yorumu</ng-template>
+
+  <div class="help-content">
+    <p>
+      Uygulama akışı, metnin yapısal özelliklerini hızlıca ölçümleyebilecek şekilde
+      tasarlanmıştır. İlk adımda analiz edilecek metni giriş alanına yerleştirirsiniz.
+      Metin, cümle sınırları ve kelime kümeleri üzerinden ayrıştırılır; ardından her bir
+      kelimenin hece sayısı hesaplanır ve istatistiksel özet oluşturulur.
+    </p>
+    <p>
+      “Analiz Et” butonu, seçili okunabilirlik formülüne göre sonucu üretir. YOD seçiliyse
+      cümle başına 3, 4, 5 ve 6+ heceli kelime yoğunluğu katsayılarla ağırlıklandırılır.
+      Alternatif olarak Ateşman veya Çetinkaya‑Uzun formüllerini seçerek farklı dil
+      kolaylığı ölçütleriyle karşılaştırmalı değerlendirme yapabilirsiniz.
+    </p>
+    <p>
+      Analiz tamamlandığında sonuçlar; toplam cümle, kelime ve hece sayıları ile birlikte
+      okunabilirlik skorunu içerir. Bu sonuçlar raporlanabilir formatlarda (CSV, TXT, PDF)
+      dışa aktarılabilir. CSV çıktısı, tablo tabanlı inceleme; PDF çıktısı ise paylaşım ve
+      raporlama süreçleri için uygundur.
+    </p>
+
+    <h4>Arayüzdeki aksiyonlar</h4>
+    <ul class="action-list">
+      <li><strong>Analiz Et:</strong> Metni işler ve seçili formüle göre okunabilirlik skorunu hesaplar.</li>
+      <li><strong>Temizle:</strong> Giriş alanını sıfırlar ve mevcut sonuçları kaldırır.</li>
+      <li><strong>Analiz Seçenekleri:</strong> YOD, Ateşman veya Çetinkaya‑Uzun formülünü seçtirir.</li>
+      <li><strong>İndir:</strong> Sonuçları CSV, TXT veya PDF formatında dışa aktarır.</li>
+    </ul>
+  </div>
+</p-card>

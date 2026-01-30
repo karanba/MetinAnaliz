@@ -1,29 +1,17 @@
-<div class="help-grid">
-  <p-card>
+<div class="help-layout">
+  <p-card class="help-menu">
     <ng-template pTemplate="title">Yardım</ng-template>
-    <ng-template pTemplate="subtitle">Metin Analiz platformunu hızlıca kullanın</ng-template>
+    <ng-template pTemplate="subtitle">Metin Analizi rehberi</ng-template>
 
-    <div class="help-section">
-      <h3>Ne işe yarar?</h3>
-      <p>
-        Metin Analiz, Türkçe metinlerde cümle, kelime ve hece sayımı yapar; YOD
-        değerini hesaplar. Yakında farklı analiz araçları ve dil modülleri de eklenecek.
-      </p>
-    </div>
+    <nav class="menu-links">
+      <a routerLink="/help/genel" routerLinkActive="active">Metin analizi nedir?</a>
+      <a routerLink="/help/kullanim" routerLinkActive="active">Nasıl kullanılır?</a>
+      <a routerLink="/help/sss" routerLinkActive="active">Sıkça Sorulan Sorular</a>
+    </nav>
 
-    <div class="help-section">
-      <h3>Nasıl kullanılır?</h3>
-      <ol>
-        <li>Metin girişine içeriğinizi yapıştırın.</li>
-        <li>"Analiz Et" ile sonucu alın.</li>
-        <li>CSV, TXT veya PDF olarak dışa aktarın.</li>
-      </ol>
-    </div>
-
-    <div class="help-section chips">
-      <p-tag value="UTF-8" severity="success"></p-tag>
-      <p-tag value="Hızlı analiz" severity="info"></p-tag>
-      <p-tag value="Yeni araçlar yolda" severity="warning"></p-tag>
-    </div>
   </p-card>
+
+  <div class="help-content-area">
+    <router-outlet></router-outlet>
+  </div>
 </div>

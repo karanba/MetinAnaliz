@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+
+.help-content-card {
+  width: 100%;
+}
+
+.help-content p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 14px;
+}
+
+.help-content h4 {
+  margin: 12px 0 6px;
+  color: var(--ink);
+}
+
+.action-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.action-list li {
+  margin-bottom: 6px;
+}
