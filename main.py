@@ -3,14 +3,28 @@ from __future__ import annotations
 import csv
 import io
 import math
+import os
 import re
 from pathlib import Path
 from enum import Enum
 from typing import Dict, List, Protocol
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Security middleware imports
+from security_middleware import sanitize_text_input, validate_text_content
+
+# Configuration from environment variables
+MAX_TEXT_LENGTH = int(os.getenv("MAX_REQUEST_SIZE", "1048576"))  # Default: 1MB in bytes (for text, ~1M chars)
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:4200").split(",")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 VOWELS = set("aeıioöuü")
 
@@ -359,6 +373,16 @@ EXPORTERS: Dict[ExportFormat, Exporter] = {
 
 app = FastAPI(title="Metin Analiz API")
 
+# Configure CORS - Controls which domains can access the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,  # Domains allowed to access the API
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],  # Only allow GET and POST methods
+    allow_headers=["Content-Type", "Authorization"],
+    max_age=3600,  # Cache preflight requests for 1 hour
+)
+
 
 @app.get("/health")
 def health_check():
@@ -368,7 +392,11 @@ def health_check():
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
     try:
-        return analyze_text(payload.text, payload.analysis_type)
+        # Sanitize and validate input to prevent XSS and injection attacks
+        sanitized_text = sanitize_text_input(payload.text, max_length=MAX_TEXT_LENGTH)
+        validate_text_content(sanitized_text)
+
+        return analyze_text(sanitized_text, payload.analysis_type)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
@@ -376,7 +404,11 @@ def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
 @app.post("/export")
 def export_endpoint(payload: ExportRequest):
     try:
-        analysis = analyze_text(payload.text, payload.analysis_type)
+        # Sanitize and validate input to prevent XSS and injection attacks
+        sanitized_text = sanitize_text_input(payload.text, max_length=MAX_TEXT_LENGTH)
+        validate_text_content(sanitized_text)
+
+        analysis = analyze_text(sanitized_text, payload.analysis_type)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 

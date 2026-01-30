@@ -17,6 +17,7 @@ This document outlines security best practices and implementations for the Metin
 **Why:** Prevents XSS (Cross-Site Scripting), SQL Injection, and other injection attacks.
 
 **Implementation:**
+
 ```python
 # Use the provided security_middleware.py
 
@@ -32,6 +33,7 @@ def analyze_endpoint(payload: AnalyzeRequest):
 ```
 
 **What it does:**
+
 - ✅ Removes null bytes
 - ✅ Detects `<script>` tags and JavaScript injection
 - ✅ Checks for suspicious patterns (onclick, onerror, etc.)
@@ -44,6 +46,7 @@ def analyze_endpoint(payload: AnalyzeRequest):
 **Why:** Prevents brute force attacks and API abuse.
 
 **Implementation:**
+
 ```python
 from security_middleware import RateLimitMiddleware
 
@@ -51,6 +54,7 @@ app.add_middleware(RateLimitMiddleware, requests_per_minute=60)
 ```
 
 **For Production:** Use Redis-based rate limiting with [slowapi](https://github.com/laurentS/slowapi):
+
 ```bash
 pip install slowapi redis
 ```
@@ -75,6 +79,7 @@ def analyze_endpoint(request: Request, payload: AnalyzeRequest):
 **Why:** Controls which domains can access your API.
 
 **Implementation:**
+
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -92,6 +97,7 @@ app.add_middleware(
 ```
 
 **Never use in production:**
+
 ```python
 allow_origins=["*"]  # ❌ DANGEROUS - allows any domain
 ```
@@ -101,6 +107,7 @@ allow_origins=["*"]  # ❌ DANGEROUS - allows any domain
 **Why:** Protects against XSS, clickjacking, MIME sniffing attacks.
 
 **Implementation:**
+
 ```python
 from security_middleware import SecurityHeadersMiddleware
 
@@ -108,6 +115,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 ```
 
 **Headers added:**
+
 - `Content-Security-Policy`: Prevents XSS
 - `X-Frame-Options`: Prevents clickjacking
 - `X-Content-Type-Options`: Prevents MIME sniffing
@@ -120,6 +128,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 **Why:** Prevents memory exhaustion and DoS attacks.
 
 **Implementation:**
+
 ```python
 from security_middleware import RequestSizeLimitMiddleware
 
@@ -131,6 +140,7 @@ app.add_middleware(RequestSizeLimitMiddleware, max_size=1024 * 1024)  # 1MB
 **Why:** Encrypts all traffic between client and server.
 
 **Implementation:**
+
 ```python
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
@@ -145,6 +155,7 @@ if os.getenv("ENVIRONMENT") == "production":
 
 **Implementation:**
 Create `.env` file (add to `.gitignore`):
+
 ```env
 SECRET_KEY=your-secret-key-here
 DATABASE_URL=postgresql://...
@@ -172,6 +183,7 @@ settings = Settings()
 **Why:** Detect and respond to security incidents.
 
 **Implementation:**
+
 ```python
 import logging
 
@@ -207,6 +219,7 @@ Angular automatically sanitizes values to prevent XSS attacks when using:
 - `[property]="value"` (property binding)
 
 **⚠️ NEVER use `innerHTML` with user content:**
+
 ```typescript
 // ❌ DANGEROUS
 this.element.innerHTML = userInput;
@@ -227,6 +240,7 @@ getSafeHtml(html: string) {
 ### 2. Content Security Policy (CSP) 🛡️
 
 **Implementation in `index.html`:**
+
 ```html
 <head>
   <meta http-equiv="Content-Security-Policy" content="
@@ -244,6 +258,7 @@ getSafeHtml(html: string) {
 ### 3. Input Validation 📝
 
 **Client-side validation (user experience):**
+
 ```typescript
 // analyze.page.ts
 validateInput(text: string): boolean {
@@ -284,6 +299,7 @@ async analyze(): Promise<void> {
 ### 4. HTTPS Only 🔒
 
 **Force HTTPS in production:**
+
 ```typescript
 // main.ts
 import { enableProdMode } from '@angular/core';
@@ -302,6 +318,7 @@ if (environment.production) {
 ### 5. Secure API Communication 🔐
 
 **Use HttpClient with interceptors:**
+
 ```typescript
 // http-security.interceptor.ts
 import { Injectable } from '@angular/core';
@@ -345,6 +362,7 @@ const result = JSON.parse(userInput);  // For JSON
 ### 7. Dependency Security 🔄
 
 **Regularly update dependencies:**
+
 ```bash
 # Check for vulnerabilities
 npm audit
@@ -357,6 +375,7 @@ ng update @angular/core @angular/cli
 ```
 
 **Use npm scripts in `package.json`:**
+
 ```json
 {
   "scripts": {
@@ -385,6 +404,7 @@ ng update @angular/core @angular/cli
 ### 2. Server Configuration 🖥️
 
 **Nginx example:**
+
 ```nginx
 server {
     listen 443 ssl http2;
