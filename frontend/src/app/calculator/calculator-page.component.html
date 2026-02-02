@@ -1,249 +1,221 @@
-<p-tabs value="0">
-  <p-tablist>
-    <p-tab value="0">
-      <i class="pi pi-calculator"></i>
-      <span>Hesap Makinesi</span>
-    </p-tab>
-    <p-tab value="1">
-      <i class="pi pi-chart-line"></i>
-      <span>2D Grafik</span>
-    </p-tab>
-    <p-tab value="2">
-      <i class="pi pi-box"></i>
-      <span>3D Grafik</span>
-    </p-tab>
-  </p-tablist>
+<div class="calculator-page">
+  <div class="page-header">
+    <h1>Bilimsel Hesap Makinesi</h1>
+    <p class="meta">Matematiksel ifadeler hesaplayın</p>
+  </div>
 
-  <p-tabpanels>
-    <!-- Calculator Tab -->
-    <p-tabpanel value="0">
-      <div class="calculator-layout">
-        <!-- Left Column: Calculator -->
-        <div class="calculator-section">
-          <p-card class="calculator-card">
-            <div class="card-header">
-              <div class="header-content">
-                <div class="header-title-row">
-                  <h2>Bilimsel Hesap Makinesi</h2>
-                  <div class="header-actions">
-                    <p-button
-                      icon="pi pi-question-circle"
-                      [outlined]="true"
-                      [rounded]="true"
-                      severity="secondary"
-                      (onClick)="showShortcutsDialog()"
-                      pTooltip="Klavye kısayolları"
-                    ></p-button>
-                  </div>
-                </div>
-                <p class="meta">Matematiksel ifadeler hesaplayın</p>
-              </div>
+  <div class="calculator-layout">
+    <!-- Left Column: Calculator -->
+    <div class="calculator-section">
+      <p-card class="calculator-card">
+        <div class="card-header">
+          <div class="header-content">
+            <div class="header-title-row">
+              <span class="header-label">İfade Girişi</span>
+              <p-button
+                icon="pi pi-question-circle"
+                [outlined]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="showShortcutsDialog()"
+                pTooltip="Klavye kısayolları"
+              ></p-button>
             </div>
-
-            <!-- Display -->
-            <div class="display-section">
-              <div class="expression-input-wrapper">
-                <input
-                  #expressionInput
-                  type="text"
-                  pInputText
-                  [(ngModel)]="expression"
-                  placeholder="İfade girin..."
-                  class="expression-input"
-                  (keydown.enter)="evaluate()"
-                  (keydown.escape)="clear()"
-                />
-                <p-button
-                  icon="pi pi-play"
-                  styleClass="evaluate-btn"
-                  (onClick)="evaluate()"
-                  [disabled]="!expression.trim()"
-                  pTooltip="Hesapla (Enter)"
-                ></p-button>
-              </div>
-
-              @if (result()) {
-                <div class="result-display">
-                  <span class="result-label">= </span>
-                  <span class="result-value">{{ result() }}</span>
-                  <p-button
-                    icon="pi pi-copy"
-                    [text]="true"
-                    [rounded]="true"
-                    severity="secondary"
-                    (onClick)="copyResult()"
-                    pTooltip="Sonucu kopyala"
-                    class="copy-btn"
-                  ></p-button>
-                </div>
-              }
-
-              @if (error()) {
-                <p-message severity="error" [text]="error()!" styleClass="error-message"></p-message>
-              }
-            </div>
-
-            <!-- Settings Bar -->
-            <div class="settings-bar">
-              <div class="setting-item">
-                <label>Açı:</label>
-                <p-selectButton
-                  [options]="angleModeOptions"
-                  [(ngModel)]="angleMode"
-                  optionLabel="label"
-                  optionValue="value"
-                  (onChange)="onAngleModeChange()"
-                  [allowEmpty]="false"
-                ></p-selectButton>
-              </div>
-
-              <div class="setting-item">
-                <label>Hassasiyet:</label>
-                <p-select
-                  [options]="precisionOptions"
-                  [(ngModel)]="precision"
-                  optionLabel="label"
-                  optionValue="value"
-                  (onChange)="onPrecisionChange()"
-                  styleClass="precision-select"
-                ></p-select>
-              </div>
-
-              <div class="setting-item">
-                <label>Bilimsel:</label>
-                <p-toggleSwitch
-                  [(ngModel)]="scientificNotation"
-                  (onChange)="onScientificNotationChange()"
-                ></p-toggleSwitch>
-              </div>
-
-              <div class="setting-item example-select">
-                <label>Örnekler:</label>
-                <p-select
-                  [options]="examples"
-                  [(ngModel)]="selectedExample"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Seçin..."
-                  (onChange)="onExampleSelect()"
-                  [showClear]="true"
-                ></p-select>
-              </div>
-            </div>
-
-            <!-- Memory Display -->
-            <div class="memory-display" [class.has-value]="memory() !== '0'">
-              <span class="memory-label">M:</span>
-              <span class="memory-value">{{ memory() }}</span>
-            </div>
-
-            <!-- Memory Buttons -->
-            <div class="memory-buttons">
-              @for (btn of memoryButtons; track btn.value) {
-                <button
-                  class="calc-btn memory-btn"
-                  (click)="handleButtonClick(btn)"
-                  [pTooltip]="btn.label"
-                >
-                  {{ btn.label }}
-                </button>
-              }
-            </div>
-
-            <!-- Scientific Functions -->
-            <div class="scientific-buttons">
-              @for (btn of scientificButtons; track btn.value) {
-                <button
-                  class="calc-btn function-btn"
-                  (click)="handleButtonClick(btn)"
-                >
-                  {{ btn.label }}
-                </button>
-              }
-            </div>
-
-            <!-- Main Keypad -->
-            <div class="main-buttons">
-              @for (btn of mainButtons; track btn.value) {
-                <button
-                  class="calc-btn {{ btn.class || '' }}"
-                  [class.number-btn]="btn.type === 'number'"
-                  (click)="handleButtonClick(btn)"
-                >
-                  {{ btn.label }}
-                </button>
-              }
-            </div>
-          </p-card>
+          </div>
         </div>
 
-        <!-- Right Column: History & Info -->
-        <div class="side-section">
-          <p-card class="history-card">
-            <div class="history-header">
-              <h3><i class="pi pi-history"></i> Geçmiş</h3>
-              @if (history.entries().length > 0) {
-                <p-button
-                  icon="pi pi-trash"
-                  [text]="true"
-                  [rounded]="true"
-                  severity="danger"
-                  (onClick)="clearHistory()"
-                  pTooltip="Geçmişi temizle"
-                ></p-button>
-              }
-            </div>
+        <!-- Display -->
+        <div class="display-section">
+          <div class="expression-input-wrapper">
+            <input
+              #expressionInput
+              type="text"
+              pInputText
+              [(ngModel)]="expression"
+              placeholder="İfade girin..."
+              class="expression-input"
+              (keydown.enter)="evaluate()"
+              (keydown.escape)="clear()"
+            />
+            <p-button
+              icon="pi pi-play"
+              styleClass="evaluate-btn"
+              (onClick)="evaluate()"
+              [disabled]="!expression.trim()"
+              pTooltip="Hesapla (Enter)"
+            ></p-button>
+          </div>
 
-            @if (history.entries().length === 0) {
-              <div class="empty-history">
-                <i class="pi pi-clock"></i>
-                <p>Henüz hesaplama yok</p>
-              </div>
-            } @else {
-              <div class="history-list">
-                @for (entry of history.entries(); track trackByHistoryId($index, entry)) {
-                  <button class="history-entry" (click)="useHistoryEntry(entry)">
-                    <span class="history-expression">{{ entry.expression }}</span>
-                    <span class="history-result">= {{ entry.result }}</span>
-                  </button>
-                }
-              </div>
+          @if (result()) {
+            <div class="result-display">
+              <span class="result-label">= </span>
+              <span class="result-value">{{ result() }}</span>
+              <p-button
+                icon="pi pi-copy"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="copyResult()"
+                pTooltip="Sonucu kopyala"
+                class="copy-btn"
+              ></p-button>
+            </div>
+          }
+
+          @if (error()) {
+            <p-message severity="error" [text]="error()!" styleClass="error-message"></p-message>
+          }
+        </div>
+
+        <!-- Settings Bar -->
+        <div class="settings-bar">
+          <div class="setting-item">
+            <label>Açı:</label>
+            <p-selectButton
+              [options]="angleModeOptions"
+              [(ngModel)]="angleMode"
+              optionLabel="label"
+              optionValue="value"
+              (onChange)="onAngleModeChange()"
+              [allowEmpty]="false"
+            ></p-selectButton>
+          </div>
+
+          <div class="setting-item">
+            <label>Hassasiyet:</label>
+            <p-select
+              [options]="precisionOptions"
+              [(ngModel)]="precision"
+              optionLabel="label"
+              optionValue="value"
+              (onChange)="onPrecisionChange()"
+              styleClass="precision-select"
+            ></p-select>
+          </div>
+
+          <div class="setting-item">
+            <label>Bilimsel:</label>
+            <p-toggleSwitch
+              [(ngModel)]="scientificNotation"
+              (onChange)="onScientificNotationChange()"
+            ></p-toggleSwitch>
+          </div>
+
+          <div class="setting-item example-select">
+            <label>Örnekler:</label>
+            <p-select
+              [options]="examples"
+              [(ngModel)]="selectedExample"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seçin..."
+              (onChange)="onExampleSelect()"
+              [showClear]="true"
+            ></p-select>
+          </div>
+        </div>
+
+        <!-- Memory Display -->
+        <div class="memory-display" [class.has-value]="memory() !== '0'">
+          <span class="memory-label">M:</span>
+          <span class="memory-value">{{ memory() }}</span>
+        </div>
+
+        <!-- Memory Buttons -->
+        <div class="memory-buttons">
+          @for (btn of memoryButtons; track btn.value) {
+            <button
+              class="calc-btn memory-btn"
+              (click)="handleButtonClick(btn)"
+              [pTooltip]="btn.label"
+            >
+              {{ btn.label }}
+            </button>
+          }
+        </div>
+
+        <!-- Scientific Functions -->
+        <div class="scientific-buttons">
+          @for (btn of scientificButtons; track btn.value) {
+            <button
+              class="calc-btn function-btn"
+              (click)="handleButtonClick(btn)"
+            >
+              {{ btn.label }}
+            </button>
+          }
+        </div>
+
+        <!-- Main Keypad -->
+        <div class="main-buttons">
+          @for (btn of mainButtons; track btn.value) {
+            <button
+              class="calc-btn {{ btn.class || '' }}"
+              [class.number-btn]="btn.type === 'number'"
+              (click)="handleButtonClick(btn)"
+            >
+              {{ btn.label }}
+            </button>
+          }
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Right Column: History & Info -->
+    <div class="side-section">
+      <p-card class="history-card">
+        <div class="history-header">
+          <h3><i class="pi pi-history"></i> Geçmiş</h3>
+          @if (history.entries().length > 0) {
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              (onClick)="clearHistory()"
+              pTooltip="Geçmişi temizle"
+            ></p-button>
+          }
+        </div>
+
+        @if (history.entries().length === 0) {
+          <div class="empty-history">
+            <i class="pi pi-clock"></i>
+            <p>Henüz hesaplama yok</p>
+          </div>
+        } @else {
+          <div class="history-list">
+            @for (entry of history.entries(); track trackByHistoryId($index, entry)) {
+              <button class="history-entry" (click)="useHistoryEntry(entry)">
+                <span class="history-expression">{{ entry.expression }}</span>
+                <span class="history-result">= {{ entry.result }}</span>
+              </button>
             }
-          </p-card>
+          </div>
+        }
+      </p-card>
 
-          <p-card class="info-card">
-            <h3><i class="pi pi-info-circle"></i> Kullanım İpuçları</h3>
-            <ul class="tips-list">
-              <li><strong>Örtük çarpma:</strong> 2pi, 2(3+4), sin(x)cos(x)</li>
-              <li><strong>Üs alma:</strong> 2^10, e^x (sağdan birleşimli)</li>
-              <li><strong>Faktöriyel:</strong> 5!, 10!</li>
-              <li><strong>Permütasyon:</strong> nPr(n, r)</li>
-              <li><strong>Kombinasyon:</strong> nCr(n, r)</li>
-              <li><strong>Sabitler:</strong> pi, e</li>
-            </ul>
-          </p-card>
-        </div>
-      </div>
-    </p-tabpanel>
-
-    <!-- 2D Graph Tab -->
-    <p-tabpanel value="1">
-      <app-graph2d></app-graph2d>
-    </p-tabpanel>
-
-    <!-- 3D Graph Tab -->
-    <p-tabpanel value="2">
-      <app-graph3d></app-graph3d>
-    </p-tabpanel>
-  </p-tabpanels>
-</p-tabs>
+      <p-card class="info-card">
+        <h3><i class="pi pi-info-circle"></i> Kullanım İpuçları</h3>
+        <ul class="tips-list">
+          <li><strong>Örtük çarpma:</strong> 2pi, 2(3+4), sin(x)cos(x)</li>
+          <li><strong>Üs alma:</strong> 2^10, e^x (sağdan birleşimli)</li>
+          <li><strong>Faktöriyel:</strong> 5!, 10!</li>
+          <li><strong>Permütasyon:</strong> nPr(n, r)</li>
+          <li><strong>Kombinasyon:</strong> nCr(n, r)</li>
+          <li><strong>Sabitler:</strong> pi, e</li>
+        </ul>
+      </p-card>
+    </div>
+  </div>
+</div>
 
 <!-- Keyboard Shortcuts Dialog -->
 <p-dialog
   header="Klavye Kısayolları"
   [(visible)]="shortcutsDialogVisible"
   [modal]="true"
-  [style]="{ width: '450px' }"
+  [style]="{ width: '450px', maxWidth: '95vw' }"
   [draggable]="false"
   [resizable]="false"
 >

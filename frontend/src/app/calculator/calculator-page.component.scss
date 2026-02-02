@@ -3,35 +3,33 @@
   width: 100%;
 }
 
-// Tabs styling
-:host ::ng-deep {
-  .p-tablist {
-    border-bottom: 1px solid var(--stroke);
-    margin-bottom: 24px;
-  }
+.calculator-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
-  .p-tab {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    font-weight: 600;
-    color: var(--muted);
-    transition: all 0.2s ease;
+.page-header {
+  margin-bottom: 8px;
+}
 
-    &:hover {
-      color: var(--ink);
-    }
+.page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
 
-    &[data-p-active="true"] {
-      color: var(--accent);
-      border-bottom: 2px solid var(--accent);
-    }
+.page-header .meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
 
-    i {
-      font-size: 1.1rem;
-    }
-  }
+.header-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
 }
 
 // Calculator Layout

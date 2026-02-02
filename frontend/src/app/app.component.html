@@ -1,13 +1,37 @@
 <div class="app-shell">
   <nav class="top-nav">
-    <a class="brand" routerLink="/text-analyze">
-      <img src="assets/logo.svg" alt="Metin Analiz logo" />
-      <span>Metin Analiz</span>
+    <a class="brand" routerLink="/">
+      <img src="assets/logo.svg" alt="Araç Kutusu logo" />
+      <span>Araç Kutusu</span>
     </a>
-    <div class="nav-links">
-      <a routerLink="/text-analyze" routerLinkActive="active">Metin Analizi</a>
-      <a routerLink="/calc" routerLinkActive="active">Hesap Makinesi</a>
-      <a routerLink="/help" routerLinkActive="active">Yardım</a>
+
+    <!-- Desktop Navigation -->
+    <div class="nav-links desktop-nav">
+      <!-- Language Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isLanguageActive()">
+        <button class="nav-dropdown-trigger" (click)="languageMenu.toggle($event)">
+          <i class="pi pi-language"></i>
+          <span>Dil Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #languageMenu [model]="languageTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <!-- Engineering Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isEngineeringActive()">
+        <button class="nav-dropdown-trigger" (click)="engineeringMenu.toggle($event)">
+          <i class="pi pi-cog"></i>
+          <span>Mühendislik Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #engineeringMenu [model]="engineeringTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <a routerLink="/help" routerLinkActive="active" class="nav-link">
+        <i class="pi pi-question-circle"></i>
+        <span>Yardım</span>
+      </a>
+
       <p-button
         icon="pi pi-info-circle"
         [text]="true"
@@ -17,7 +41,48 @@
         pTooltip="Platform bilgileri"
       ></p-button>
     </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+      <i class="pi" [ngClass]="mobileMenuVisible ? 'pi-times' : 'pi-bars'"></i>
+    </button>
   </nav>
+
+  <!-- Mobile Navigation -->
+  @if (mobileMenuVisible) {
+    <div class="mobile-nav" (click)="closeMobileMenu()">
+      <div class="mobile-nav-section">
+        <span class="mobile-nav-label">Dil Araçları</span>
+        <a routerLink="/tools/language/text-analysis" class="mobile-nav-link">
+          <i class="pi pi-file-edit"></i>
+          Metin Analizi
+        </a>
+      </div>
+
+      <div class="mobile-nav-section">
+        <span class="mobile-nav-label">Mühendislik Araçları</span>
+        <a routerLink="/tools/engineering/calculator" class="mobile-nav-link">
+          <i class="pi pi-calculator"></i>
+          Hesap Makinesi
+        </a>
+        <a routerLink="/tools/engineering/graph" class="mobile-nav-link">
+          <i class="pi pi-chart-line"></i>
+          Grafik Çizimi
+        </a>
+      </div>
+
+      <div class="mobile-nav-section">
+        <a routerLink="/help" class="mobile-nav-link">
+          <i class="pi pi-question-circle"></i>
+          Yardım
+        </a>
+        <button class="mobile-nav-link" (click)="showInfoDialog(); $event.stopPropagation()">
+          <i class="pi pi-info-circle"></i>
+          Platform Bilgileri
+        </button>
+      </div>
+    </div>
+  }
 
   <div class="main-content">
     <router-outlet />
@@ -26,11 +91,11 @@
   <footer class="page-footer">
     <div class="footer-content">
       <div class="footer-left">
-        <span class="footer-title">Dil Araçları Platformu</span>
-        <span class="footer-subtitle">Türkçe metin analizi ve YOD hesaplama</span>
+        <span class="footer-title">Araç Kutusu</span>
+        <span class="footer-subtitle">Dil ve mühendislik araçları platformu</span>
       </div>
       <div class="footer-right">
-        <p-tag value="Metin Analizi" icon="pi pi-bolt" severity="info" [style]="{ fontSize: '0.8rem' }"></p-tag>
+        <p-tag value="Beta" icon="pi pi-bolt" severity="info" [style]="{ fontSize: '0.8rem' }"></p-tag>
       </div>
     </div>
   </footer>
@@ -41,7 +106,7 @@
   header="Platform Bilgileri"
   [(visible)]="infoDialogVisible"
   [modal]="true"
-  [style]="{ width: '600px' }"
+  [style]="{ width: '600px', maxWidth: '95vw' }"
   [draggable]="false"
   [resizable]="false"
 >
@@ -49,51 +114,30 @@
     <div class="info-section">
       <h3><i class="pi pi-info-circle"></i> Hakkında</h3>
       <p>
-        Metin Analizi bu platformdaki ilk araç. Yakında farklı analiz araçları ve sayfalar ile genişleyecek.
+        Araç Kutusu, dil ve mühendislik alanlarında çeşitli araçlar sunan bir platformdur.
       </p>
     </div>
 
     <div class="info-section">
-      <h3><i class="pi pi-cog"></i> Teknoloji</h3>
-      <p>Altyapı detayları sade tutulmuştur.</p>
-    </div>
-
-    <div class="info-section">
-      <h3><i class="pi pi-bolt"></i> Aktif Araç: Metin Analizi</h3>
-      <p class="tool-description">Türkçe metin çözümleri ve YOD değeri hesaplama</p>
+      <h3><i class="pi pi-language"></i> Dil Araçları</h3>
       <div class="features-list">
         <div class="feature-item">
           <i class="pi pi-check-circle"></i>
-          <span>Cümle, kelime ve hece sayımı</span>
-        </div>
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>YOD (Okunabilirlik) değeri hesaplama</span>
-        </div>
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>Hece dağılımı analizi</span>
+          <span>Türkçe metin analizi ve okunabilirlik hesaplama</span>
         </div>
       </div>
     </div>
 
     <div class="info-section">
-      <h3><i class="pi pi-download"></i> Dışa Aktarma Formatları</h3>
-      <div class="export-formats">
-        <div class="format-item">
-          <i class="pi pi-file"></i>
-          <strong>CSV</strong>
-          <span>Tablo formatı</span>
+      <h3><i class="pi pi-cog"></i> Mühendislik Araçları</h3>
+      <div class="features-list">
+        <div class="feature-item">
+          <i class="pi pi-check-circle"></i>
+          <span>Bilimsel hesap makinesi</span>
         </div>
-        <div class="format-item">
-          <i class="pi pi-file-edit"></i>
-          <strong>TXT</strong>
-          <span>Düz metin</span>
-        </div>
-        <div class="format-item">
-          <i class="pi pi-file-pdf"></i>
-          <strong>PDF</strong>
-          <span>Raporlama</span>
+        <div class="feature-item">
+          <i class="pi pi-check-circle"></i>
+          <span>2D ve 3D fonksiyon grafik çizimi</span>
         </div>
       </div>
     </div>

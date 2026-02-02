@@ -17,12 +17,9 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Dialog } from 'primeng/dialog';
 import { Tooltip } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Message } from 'primeng/message';
 import { ExpressionEvaluatorService, AngleMode } from './expression-evaluator.service';
 import { HistoryService, HistoryEntry } from './history.service';
-import { Graph2dComponent } from './graph2d.component';
-import { Graph3dComponent } from './graph3d.component';
 
 interface CalcButton {
   label: string;
@@ -46,14 +43,7 @@ interface CalcButton {
     Dialog,
     Tooltip,
     ToggleSwitch,
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel,
     Message,
-    Graph2dComponent,
-    Graph3dComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './calculator-page.component.html',
