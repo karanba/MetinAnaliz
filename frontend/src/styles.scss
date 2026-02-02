@@ -10,18 +10,21 @@
   --sun: #f6aa1c;
   --card: #ffffff;
   --stroke: rgba(20, 20, 30, 0.08);
-
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
+  height: 100%;
   margin: 0;
+}
+
+body {
   font-family: "Source Sans 3", "Segoe UI", sans-serif;
   color: var(--ink);
-  min-height: 100vh;
   background: linear-gradient(135deg, #f8f4ec 0%, #eff6ff 45%, #fdfcff 100%);
 }
 
