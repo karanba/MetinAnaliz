@@ -55,8 +55,7 @@
 }
 
 .calculator-card {
-  position: sticky;
-  top: 90px;
+  align-self: start;
 }
 
 .card-header {
@@ -524,10 +523,6 @@
 
 // Mobile Responsive
 @media (max-width: 768px) {
-  .calculator-card {
-    position: relative;
-    top: 0;
-  }
 
   .header-title-row h2 {
     font-size: 1.2rem;

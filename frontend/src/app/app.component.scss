@@ -1,39 +1,41 @@
 :host {
   display: block;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 // Top Navigation Bar
 .top-nav {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding: 16px clamp(16px, 3vw, 40px);
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98);
   border-bottom: 1px solid var(--stroke);
-  backdrop-filter: blur(12px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 // Page Footer
 .page-footer {
-  margin-top: auto;
+  flex-shrink: 0;
   padding: 12px clamp(16px, 3vw, 40px);
   background: linear-gradient(
     135deg,
@@ -236,9 +238,8 @@
 
 // Main content area
 router-outlet + * {
-  padding: clamp(32px, 5vw, 64px) clamp(16px, 3vw, 40px);
+  padding: clamp(24px, 4vw, 48px) clamp(16px, 3vw, 40px);
   flex: 1;
-  margin-top: 32px;
 }
 
 // Responsive
@@ -252,8 +253,7 @@ router-outlet + * {
   }
 
   router-outlet + * {
-    padding: clamp(40px, 6vw, 72px) clamp(24px, 3.5vw, 48px);
-    margin-top: 40px;
+    padding: clamp(32px, 5vw, 56px) clamp(24px, 3.5vw, 48px);
   }
 }
 
@@ -267,8 +267,7 @@ router-outlet + * {
   }
 
   router-outlet + * {
-    padding: clamp(48px, 7vw, 88px) clamp(40px, 4vw, 64px);
-    margin-top: 48px;
+    padding: clamp(40px, 6vw, 64px) clamp(40px, 4vw, 64px);
   }
 }
 
@@ -282,8 +281,7 @@ router-outlet + * {
   }
 
   router-outlet + * {
-    padding: clamp(56px, 7vw, 96px) clamp(80px, 8vw, 120px);
-    margin-top: 56px;
+    padding: clamp(48px, 6vw, 72px) clamp(80px, 8vw, 120px);
   }
 }
 

@@ -50,19 +50,8 @@
 }
 
 .input-card {
-  position: sticky;
-  top: 90px;
   align-self: start;
-  max-height: calc(100vh - 110px);
-  overflow-y: auto;
   width: 100%;
-}
-
-@media (min-width: 1024px) {
-  .input-card {
-    top: 95px;
-    max-height: calc(100vh - 115px);
-  }
 }
 
 .card-header {
@@ -363,11 +352,6 @@
 @media (max-width: 768px) {
   .page-layout {
     gap: 20px;
-  }
-
-  .input-card {
-    position: relative;
-    top: 0;
   }
 
   .card-header {
