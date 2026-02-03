@@ -10,6 +10,8 @@ import { StlViewerComponent } from './sections/engineering/tools/stl-viewer/stl-
 import { ToolsComponent } from './sections/tools/tools.component';
 import { EngineeringComponent } from './sections/engineering/engineering.component';
 import { LanguageComponent } from './sections/language/language.component';
+import { DesignComponent } from './sections/design/design.component';
+import { ColorConverterComponent } from './sections/design/tools/color-converter/color-converter.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tools', pathMatch: 'full' },
@@ -26,6 +28,10 @@ export const routes: Routes = [
   { path: 'tools/engineering/calculator', component: CalculatorComponent },
   { path: 'tools/engineering/graph', component: GraphComponent },
   { path: 'tools/engineering/stl-viewer', component: StlViewerComponent },
+
+  // Design Tools
+  { path: 'tools/design', component: DesignComponent },
+  { path: 'tools/design/color-converter', component: ColorConverterComponent },
 
   // Help
   {

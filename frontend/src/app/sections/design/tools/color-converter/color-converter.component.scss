@@ -1,0 +1,311 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.color-converter-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.converter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--stroke);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+}
+
+// Color Input Card
+.color-input-card {
+  :host ::ng-deep .p-card-body {
+    padding: 20px;
+  }
+}
+
+.color-input-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.color-picker-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.color-picker {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.color-preview {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  border: 3px solid var(--stroke);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.hex-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hex-input {
+  width: 120px;
+  text-align: center;
+  font-family: 'Source Code Pro', monospace;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+// Formats Card
+.format-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.format-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(31, 122, 140, 0.04);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(31, 122, 140, 0.08);
+  }
+}
+
+.format-label {
+  width: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.format-value {
+  flex: 1;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+// Palette Card
+.palette-card {
+  .harmony-select {
+    width: 200px;
+  }
+}
+
+.palette-colors {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.palette-color {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: scale(1.05);
+    border-color: var(--accent);
+  }
+
+  .color-hex {
+    font-size: 0.65rem;
+    font-family: 'Source Code Pro', monospace;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+  }
+}
+
+.palette-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--stroke);
+  margin-top: 8px;
+}
+
+// Contrast Card
+.contrast-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.contrast-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+  }
+}
+
+.color-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mini-color-picker {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: 2px solid var(--stroke);
+    border-radius: 8px;
+  }
+}
+
+.mini-hex-input {
+  flex: 1;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.contrast-preview {
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 16px;
+  border: 1px solid var(--stroke);
+
+  span {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.contrast-results {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.contrast-ratio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .ratio-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .ratio-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: 'Source Code Pro', monospace;
+  }
+}
+
+.wcag-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.wcag-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  &.pass {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+  }
+
+  &.fail {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+  }
+}
+
+// Global card styling
+:host ::ng-deep {
+  .p-card {
+    border-radius: 16px;
+    border: 1px solid var(--stroke);
+    overflow: hidden;
+  }
+
+  .p-card-header {
+    padding: 0;
+  }
+
+  .p-card-body {
+    padding: 16px;
+  }
+}

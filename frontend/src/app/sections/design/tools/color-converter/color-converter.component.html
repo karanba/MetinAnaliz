@@ -1,0 +1,244 @@
+<div class="color-converter-page">
+  <app-page-header
+    title="Renk Dönüştürücü"
+    description="Renk formatları arası dönüşüm, palet oluşturma ve kontrast kontrolü"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Tasarım', route: '/tools/design' },
+      { label: 'Renk Dönüştürücü' }
+    ]"
+  />
+
+  <div class="converter-grid">
+    <!-- Color Input Section -->
+    <p-card class="color-input-card">
+      <div class="color-input-section">
+        <div class="color-picker-wrapper">
+          <input
+            type="color"
+            [value]="hexColor()"
+            (input)="onColorChange($event)"
+            class="color-picker"
+          />
+          <div class="color-preview" [style.background-color]="hexColor()"></div>
+        </div>
+
+        <div class="hex-input-row">
+          <input
+            pInputText
+            [ngModel]="hexColor()"
+            (ngModelChange)="onHexInput($event)"
+            placeholder="#FFFFFF"
+            class="hex-input"
+          />
+          <p-button
+            icon="pi pi-refresh"
+            [rounded]="true"
+            [text]="true"
+            pTooltip="Rastgele Renk"
+            (onClick)="randomColor()"
+          />
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Format Outputs Section -->
+    <p-card class="formats-card">
+      <ng-template #header>
+        <div class="card-header">
+          <h3>Format Çıktıları</h3>
+        </div>
+      </ng-template>
+
+      <div class="format-list">
+        <div class="format-item">
+          <span class="format-label">HEX</span>
+          <span class="format-value">{{ hexOutput() }}</span>
+          <p-button
+            icon="pi pi-copy"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            pTooltip="Kopyala"
+            (onClick)="copyToClipboard(hexOutput())"
+          />
+        </div>
+
+        <div class="format-item">
+          <span class="format-label">RGB</span>
+          <span class="format-value">{{ rgbOutput() }}</span>
+          <p-button
+            icon="pi pi-copy"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            pTooltip="Kopyala"
+            (onClick)="copyToClipboard(rgbOutput())"
+          />
+        </div>
+
+        <div class="format-item">
+          <span class="format-label">HSL</span>
+          <span class="format-value">{{ hslOutput() }}</span>
+          <p-button
+            icon="pi pi-copy"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            pTooltip="Kopyala"
+            (onClick)="copyToClipboard(hslOutput())"
+          />
+        </div>
+
+        <div class="format-item">
+          <span class="format-label">HSV</span>
+          <span class="format-value">{{ hsvOutput() }}</span>
+          <p-button
+            icon="pi pi-copy"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            pTooltip="Kopyala"
+            (onClick)="copyToClipboard(hsvOutput())"
+          />
+        </div>
+
+        <div class="format-item">
+          <span class="format-label">CMYK</span>
+          <span class="format-value">{{ cmykOutput() }}</span>
+          <p-button
+            icon="pi pi-copy"
+            [rounded]="true"
+            [text]="true"
+            size="small"
+            pTooltip="Kopyala"
+            (onClick)="copyToClipboard(cmykOutput())"
+          />
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Palette Generator Section -->
+  <p-card class="palette-card">
+    <ng-template #header>
+      <div class="card-header">
+        <h3>Renk Paleti</h3>
+        <p-select
+          [options]="harmonyTypes"
+          [(ngModel)]="selectedHarmony"
+          optionLabel="label"
+          optionValue="value"
+          class="harmony-select"
+        />
+      </div>
+    </ng-template>
+
+    <div class="palette-colors">
+      @for (color of palette(); track color) {
+        <div
+          class="palette-color"
+          [style.background-color]="color"
+          (click)="hexColor.set(color)"
+          pTooltip="{{ color }}"
+        >
+          <span class="color-hex">{{ color }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="palette-actions">
+      <p-button
+        label="CSS"
+        icon="pi pi-copy"
+        [outlined]="true"
+        size="small"
+        (onClick)="exportPalette('css')"
+      />
+      <p-button
+        label="SCSS"
+        icon="pi pi-copy"
+        [outlined]="true"
+        size="small"
+        (onClick)="exportPalette('scss')"
+      />
+      <p-button
+        label="JSON"
+        icon="pi pi-copy"
+        [outlined]="true"
+        size="small"
+        (onClick)="exportPalette('json')"
+      />
+    </div>
+  </p-card>
+
+  <!-- Contrast Checker Section -->
+  <p-card class="contrast-card">
+    <ng-template #header>
+      <div class="card-header">
+        <h3>Kontrast Kontrolü (WCAG)</h3>
+      </div>
+    </ng-template>
+
+    <div class="contrast-inputs">
+      <div class="contrast-input-group">
+        <label>Ön Plan (Metin)</label>
+        <div class="color-input-row">
+          <input
+            type="color"
+            [value]="foregroundColor()"
+            (input)="foregroundColor.set($any($event.target).value)"
+            class="mini-color-picker"
+          />
+          <input
+            pInputText
+            [ngModel]="foregroundColor()"
+            (ngModelChange)="foregroundColor.set($event)"
+            class="mini-hex-input"
+          />
+        </div>
+      </div>
+
+      <div class="contrast-input-group">
+        <label>Arka Plan</label>
+        <div class="color-input-row">
+          <input
+            type="color"
+            [value]="backgroundColor()"
+            (input)="backgroundColor.set($any($event.target).value)"
+            class="mini-color-picker"
+          />
+          <input
+            pInputText
+            [ngModel]="backgroundColor()"
+            (ngModelChange)="backgroundColor.set($event)"
+            class="mini-hex-input"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="contrast-preview" [style.background-color]="backgroundColor()">
+      <span [style.color]="foregroundColor()">Örnek Metin - Sample Text</span>
+    </div>
+
+    <div class="contrast-results">
+      <div class="contrast-ratio">
+        <span class="ratio-label">Kontrast Oranı</span>
+        <span class="ratio-value">{{ contrastRatio() | number:'1.2-2' }}:1</span>
+      </div>
+
+      <div class="wcag-badges">
+        <span class="wcag-badge" [class.pass]="wcagAALarge()" [class.fail]="!wcagAALarge()">
+          AA Büyük {{ wcagAALarge() ? '✓' : '✗' }}
+        </span>
+        <span class="wcag-badge" [class.pass]="wcagAA()" [class.fail]="!wcagAA()">
+          AA {{ wcagAA() ? '✓' : '✗' }}
+        </span>
+        <span class="wcag-badge" [class.pass]="wcagAAA()" [class.fail]="!wcagAAA()">
+          AAA {{ wcagAAA() ? '✓' : '✗' }}
+        </span>
+      </div>
+    </div>
+  </p-card>
+</div>

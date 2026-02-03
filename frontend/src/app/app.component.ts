@@ -29,6 +29,11 @@ export class AppComponent {
       label: 'Grafik Çizimi',
       icon: 'pi pi-chart-line',
       command: () => this.router.navigate(['/tools/engineering/graph'])
+    },
+    {
+      label: 'STL Görüntüleyici',
+      icon: 'pi pi-box',
+      command: () => this.router.navigate(['/tools/engineering/stl-viewer'])
     }
   ];
 
