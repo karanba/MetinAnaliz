@@ -14,11 +14,10 @@ import { FormsModule } from '@angular/forms';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { PageHeaderComponent } from '../../../shared';
+import { PageHeaderComponent } from '../../../../components/shared';
 import { Button } from 'primeng/button';
 import { Card } from 'primeng/card';
 import { SelectButton } from 'primeng/selectbutton';
-import { Slider } from 'primeng/slider';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ColorPicker } from 'primeng/colorpicker';
 import { Tooltip } from 'primeng/tooltip';
@@ -42,7 +41,6 @@ interface ModelStats {
     Button,
     Card,
     SelectButton,
-    Slider,
     ToggleSwitch,
     ColorPicker,
     Tooltip,

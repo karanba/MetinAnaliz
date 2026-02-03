@@ -18,9 +18,9 @@ import { Dialog } from 'primeng/dialog';
 import { Tooltip } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Message } from 'primeng/message';
-import { ExpressionEvaluatorService, AngleMode } from './expression-evaluator.service';
-import { HistoryService, HistoryEntry } from './history.service';
-import { PageHeaderComponent } from '../shared';
+import { ExpressionEvaluatorService, AngleMode } from '../../../../services/expression-evaluator.service';
+import { HistoryService, HistoryEntry } from '../../../../services/history.service';
+import { PageHeaderComponent } from '../../../../components/shared';
 
 interface CalcButton {
   label: string;
@@ -31,7 +31,7 @@ interface CalcButton {
 }
 
 @Component({
-  selector: 'app-calculator-page',
+  selector: 'app-calculator',
   standalone: true,
   imports: [
     CommonModule,
@@ -48,10 +48,10 @@ interface CalcButton {
     PageHeaderComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './calculator-page.component.html',
-  styleUrls: ['./calculator-page.component.scss'],
+  templateUrl: './calculator.component.html',
+  styleUrls: ['./calculator.component.scss'],
 })
-export class CalculatorPageComponent {
+export class CalculatorComponent {
   @ViewChild('expressionInput') expressionInput!: ElementRef<HTMLInputElement>;
 
   private readonly evaluator = inject(ExpressionEvaluatorService);

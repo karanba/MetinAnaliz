@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AnalyzeRequest, AnalyzeResponse, AnalysisType, ExportFormat, ExportRequest } from './models';
-import { environment } from '../environments/environment';
+import { AnalyzeRequest, AnalyzeResponse, AnalysisType, ExportFormat, ExportRequest } from '../models/models';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TextAnalysisApiService {

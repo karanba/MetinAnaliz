@@ -1,41 +1,41 @@
 import { Routes } from '@angular/router';
-import { AnalyzePageComponent } from './analyze.page';
-import { HelpPageComponent } from './help.page';
-import { HelpOverviewPageComponent } from './help-overview.page';
-import { HelpUsagePageComponent } from './help-usage.page';
-import { HelpFaqPageComponent } from './help-faq.page';
-import { CalculatorPageComponent } from './calculator/calculator-page.component';
-import { GraphPageComponent } from './tools/engineering/graph-page.component';
-import { StlViewerComponent } from './tools/engineering/stl-viewer/stl-viewer.component';
-import { ToolsPageComponent } from './tools/tools-page.component';
-import { EngineeringPageComponent } from './tools/engineering/engineering-page.component';
-import { LanguagePageComponent } from './tools/language/language-page.component';
+import { AnalyzeComponent } from './sections/language/tools/analyze/analyze.component';
+import { HelpComponent } from './help/help.component';
+import { HelpOverviewComponent } from './help/help-overview.component';
+import { HelpUsageComponent } from './help/help-usage.component';
+import { HelpFaqComponent } from './help/help-faq.component';
+import { CalculatorComponent } from './sections/engineering/tools/calculator/calculator.component';
+import { GraphComponent } from './sections/engineering/tools/graph/graph.component';
+import { StlViewerComponent } from './sections/engineering/tools/stl-viewer/stl-viewer.component';
+import { ToolsComponent } from './sections/tools/tools.component';
+import { EngineeringComponent } from './sections/engineering/engineering.component';
+import { LanguageComponent } from './sections/language/language.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tools', pathMatch: 'full' },
 
   // Tools Landing
-  { path: 'tools', component: ToolsPageComponent },
+  { path: 'tools', component: ToolsComponent },
 
   // Language Tools
-  { path: 'tools/language', component: LanguagePageComponent },
-  { path: 'tools/language/text-analysis', component: AnalyzePageComponent },
+  { path: 'tools/language', component: LanguageComponent },
+  { path: 'tools/language/text-analysis', component: AnalyzeComponent },
 
   // Engineering Tools
-  { path: 'tools/engineering', component: EngineeringPageComponent },
-  { path: 'tools/engineering/calculator', component: CalculatorPageComponent },
-  { path: 'tools/engineering/graph', component: GraphPageComponent },
+  { path: 'tools/engineering', component: EngineeringComponent },
+  { path: 'tools/engineering/calculator', component: CalculatorComponent },
+  { path: 'tools/engineering/graph', component: GraphComponent },
   { path: 'tools/engineering/stl-viewer', component: StlViewerComponent },
 
   // Help
   {
     path: 'help',
-    component: HelpPageComponent,
+    component: HelpComponent,
     children: [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
-      { path: 'overview', component: HelpOverviewPageComponent },
-      { path: 'usage', component: HelpUsagePageComponent },
-      { path: 'faq', component: HelpFaqPageComponent },
+      { path: 'overview', component: HelpOverviewComponent },
+      { path: 'usage', component: HelpUsageComponent },
+      { path: 'faq', component: HelpFaqComponent },
     ],
   },
 

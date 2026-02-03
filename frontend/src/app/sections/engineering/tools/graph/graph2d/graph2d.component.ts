@@ -16,57 +16,50 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Card } from 'primeng/card';
 import { Select } from 'primeng/select';
 import { Message } from 'primeng/message';
-import { ExpressionEvaluatorService } from '../../calculator/expression-evaluator.service';
+import { ExpressionEvaluatorService } from '../../../../../services/expression-evaluator.service';
 
 declare const Plotly: any;
 
+interface PlotData {
+  x: number[];
+  y: number[];
+}
+
 @Component({
-  selector: 'app-graph3d',
+  selector: 'app-graph2d',
   standalone: true,
   imports: [CommonModule, FormsModule, Button, InputText, InputNumber, Card, Select, Message],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './graph3d.component.html',
-  styleUrls: ['./graph3d.component.scss'],
+  templateUrl: './graph2d.component.html',
+  styleUrls: ['./graph2d.component.scss'],
 })
-export class Graph3dComponent implements AfterViewInit, OnDestroy {
+export class Graph2dComponent implements AfterViewInit, OnDestroy {
   @ViewChild('plotContainer') plotContainer!: ElementRef<HTMLDivElement>;
 
   private readonly evaluator = inject(ExpressionEvaluatorService);
   private plotlyLoaded = false;
 
   expression = '';
-  xMin = -5;
-  xMax = 5;
-  yMin = -5;
-  yMax = 5;
-  resolution = 50;
-  colorscale = 'Viridis';
+  xMin = -10;
+  xMax = 10;
+  samples = 500;
 
-  resolutionOptions = [
-    { label: 'Düşük (25)', value: 25 },
-    { label: 'Orta (50)', value: 50 },
-    { label: 'Yüksek (75)', value: 75 },
-    { label: 'Çok Yüksek (100)', value: 100 },
-  ];
-
-  colorscaleOptions = [
-    { label: 'Viridis', value: 'Viridis' },
-    { label: 'Plasma', value: 'Plasma' },
-    { label: 'Inferno', value: 'Inferno' },
-    { label: 'Magma', value: 'Magma' },
-    { label: 'Cividis', value: 'Cividis' },
-    { label: 'Turbo', value: 'Turbo' },
-    { label: 'Rainbow', value: 'Rainbow' },
-    { label: 'Jet', value: 'Jet' },
+  sampleOptions = [
+    { label: 'Düşük (100)', value: 100 },
+    { label: 'Orta (500)', value: 500 },
+    { label: 'Yüksek (1000)', value: 1000 },
+    { label: 'Çok Yüksek (2000)', value: 2000 },
   ];
 
   examples = [
-    'sin(sqrt(x^2+y^2))',
-    'x^2 - y^2',
-    'cos(x)*sin(y)',
-    'exp(-(x^2+y^2)/10)',
-    'x*y',
-    'sin(x)*cos(y)',
+    'sin(x)',
+    'x^2',
+    'cos(x)*exp(-x^2/10)',
+    '1/x',
+    'tan(x)',
+    'sqrt(abs(x))',
+    'sin(x)/x',
+    'x^3 - 3x',
   ];
 
   error = signal<string | null>(null);
@@ -120,17 +113,17 @@ export class Graph3dComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    if (this.yMin >= this.yMax) {
-      this.error.set('y Min, y Max\'tan küçük olmalıdır');
-      return;
-    }
-
     this.error.set(null);
 
     try {
       await this.loadPlotly();
 
-      const data = this.generateSurfaceData();
+      const data = this.generatePlotData();
+      if (data.x.length === 0) {
+        this.error.set('Geçerli veri noktası üretilemedi');
+        return;
+      }
+
       this.renderPlot(data);
       this.hasPlot.set(true);
     } catch (e: any) {
@@ -138,85 +131,91 @@ export class Graph3dComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private generateSurfaceData(): { x: number[]; y: number[]; z: number[][] } {
-    const xStep = (this.xMax - this.xMin) / this.resolution;
-    const yStep = (this.yMax - this.yMin) / this.resolution;
-
+  private generatePlotData(): PlotData {
+    const step = (this.xMax - this.xMin) / this.samples;
     const x: number[] = [];
     const y: number[] = [];
-    const z: number[][] = [];
 
-    // Generate x values
-    for (let i = 0; i <= this.resolution; i++) {
-      x.push(this.xMin + i * xStep);
-    }
+    let prevY: number | null = null;
+    const discontinuityThreshold = 1000;
 
-    // Generate y values
-    for (let j = 0; j <= this.resolution; j++) {
-      y.push(this.yMin + j * yStep);
-    }
+    for (let i = 0; i <= this.samples; i++) {
+      const xVal = this.xMin + i * step;
+      const result = this.evaluator.evaluateWithVariable(this.expression, 'x', xVal);
 
-    // Generate z values
-    for (let j = 0; j <= this.resolution; j++) {
-      const row: number[] = [];
-      const yVal = y[j];
+      if (result.success && result.value) {
+        const yVal = result.value.toNumber();
 
-      for (let i = 0; i <= this.resolution; i++) {
-        const xVal = x[i];
-        const result = this.evaluator.evaluateWithTwoVariables(
-          this.expression, 'x', xVal, 'y', yVal
-        );
-
-        if (result.success && result.value) {
-          const zVal = result.value.toNumber();
-          row.push(isFinite(zVal) ? zVal : NaN);
+        // Check for discontinuities
+        if (isFinite(yVal)) {
+          // If there's a huge jump, insert NaN to break the line
+          if (prevY !== null && Math.abs(yVal - prevY) > discontinuityThreshold) {
+            x.push(xVal);
+            y.push(NaN);
+          }
+          x.push(xVal);
+          y.push(yVal);
+          prevY = yVal;
         } else {
-          row.push(NaN);
+          // Insert NaN for infinite values to break the line
+          x.push(xVal);
+          y.push(NaN);
+          prevY = null;
         }
+      } else {
+        // Insert NaN for errors to break the line
+        x.push(xVal);
+        y.push(NaN);
+        prevY = null;
       }
-
-      z.push(row);
     }
 
-    return { x, y, z };
+    return { x, y };
   }
 
-  private renderPlot(data: { x: number[]; y: number[]; z: number[][] }): void {
+  private renderPlot(data: PlotData): void {
     const trace = {
-      type: 'surface',
       x: data.x,
       y: data.y,
-      z: data.z,
-      colorscale: this.colorscale,
-      showscale: true,
-      colorbar: {
-        title: 'z',
-        titleside: 'right',
+      type: 'scatter',
+      mode: 'lines',
+      line: {
+        color: '#1f7a8c',
+        width: 2,
       },
+      name: `f(x) = ${this.expression}`,
+      connectgaps: false,
     };
 
     const layout = {
       title: {
-        text: `z = ${this.expression}`,
+        text: `f(x) = ${this.expression}`,
         font: { family: 'Space Grotesk, sans-serif', size: 16 },
       },
-      scene: {
-        xaxis: { title: 'x' },
-        yaxis: { title: 'y' },
-        zaxis: { title: 'z' },
-        camera: {
-          eye: { x: 1.5, y: 1.5, z: 1.2 },
-        },
+      xaxis: {
+        title: 'x',
+        gridcolor: 'rgba(0,0,0,0.1)',
+        zerolinecolor: 'rgba(0,0,0,0.3)',
+        zerolinewidth: 2,
+      },
+      yaxis: {
+        title: 'y',
+        gridcolor: 'rgba(0,0,0,0.1)',
+        zerolinecolor: 'rgba(0,0,0,0.3)',
+        zerolinewidth: 2,
       },
       paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: 'rgba(255,255,255,0.8)',
       font: { family: 'Source Sans 3, sans-serif' },
-      margin: { t: 50, r: 30, b: 30, l: 30 },
+      margin: { t: 50, r: 30, b: 50, l: 60 },
+      hovermode: 'closest',
     };
 
     const config = {
       responsive: true,
       displayModeBar: true,
       displaylogo: false,
+      modeBarButtonsToRemove: ['lasso2d', 'select2d'],
     };
 
     Plotly.newPlot(this.plotContainer.nativeElement, [trace], layout, config);

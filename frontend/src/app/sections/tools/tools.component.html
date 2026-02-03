@@ -1,0 +1,13 @@
+<div class="tools-page">
+  <app-page-header
+    title="Araçlar"
+    description="Metin analizi ve mühendislik araçlarına göz atın"
+    [breadcrumbs]="[{ label: 'Araçlar' }]"
+  />
+
+  <div class="tools-grid">
+    @for (category of categories; track category.route) {
+      <app-tool-card [tool]="category" />
+    }
+  </div>
+</div>

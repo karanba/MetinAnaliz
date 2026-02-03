@@ -3,8 +3,8 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { timeout } from "rxjs/operators";
 import { firstValueFrom } from "rxjs";
-import { TextAnalysisApiService } from "./text-analysis-api.service";
-import { AnalyzeResponse, ExportFormat } from "./models";
+import { TextAnalysisApiService } from "../../../../services/text-analysis-api.service";
+import { AnalyzeResponse, ExportFormat } from "../../../../models/models";
 import { ResultsPanelComponent } from "./results-panel.component";
 import { SentenceListComponent } from "./sentence-list.component";
 import { Button } from "primeng/button";
@@ -12,15 +12,12 @@ import { Card } from "primeng/card";
 import { Select } from "primeng/select";
 import { Textarea } from "primeng/textarea";
 import { ProgressSpinner } from "primeng/progressspinner";
-import { Skeleton } from "primeng/skeleton";
-import { Tag } from "primeng/tag";
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primeng/tabs";
 import { Dialog } from "primeng/dialog";
 import { Tooltip } from "primeng/tooltip";
-import { PageHeaderComponent } from "./shared";
+import { PageHeaderComponent } from "../../../../components/shared";
 
 @Component({
-  selector: "app-analyze-page",
+  selector: "app-analyze",
   standalone: true,
   imports: [
     CommonModule,
@@ -32,21 +29,14 @@ import { PageHeaderComponent } from "./shared";
     Select,
     Textarea,
     ProgressSpinner,
-    Skeleton,
-    Tag,
-    Tabs,
-    TabList,
-    Tab,
-    TabPanels,
-    TabPanel,
     Dialog,
     Tooltip,
     PageHeaderComponent,
   ],
-  templateUrl: "./analyze.page.html",
-  styleUrls: ["./analyze.page.scss"],
+  templateUrl: "./analyze.component.html",
+  styleUrls: ["./analyze.component.scss"],
 })
-export class AnalyzePageComponent implements AfterViewChecked {
+export class AnalyzeComponent implements AfterViewChecked {
   private readonly cdr = inject(ChangeDetectorRef);
   text = "";
   loading = false;
@@ -130,9 +120,15 @@ export class AnalyzePageComponent implements AfterViewChecked {
         this.exporting = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        this.errorMessage =
-          err?.error?.detail || "Export sırasında bir hata oluştu.";
+      error: (err: unknown) => {
+        const detail =
+          typeof err === "object" &&
+          err !== null &&
+          "error" in err &&
+          typeof (err as { error?: { detail?: string } }).error?.detail === "string"
+            ? (err as { error?: { detail?: string } }).error!.detail!
+            : "Export sırasında bir hata oluştu.";
+        this.errorMessage = detail;
         this.exporting = false;
         this.cdr.detectChanges();
       },

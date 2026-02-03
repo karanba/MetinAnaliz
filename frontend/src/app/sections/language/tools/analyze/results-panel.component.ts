@@ -1,13 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Statistics } from './models';
+import { Statistics } from '../../../../models/models';
 import { Card } from 'primeng/card';
-import { Tag } from 'primeng/tag';
 
 @Component({
   selector: 'app-results-panel',
   standalone: true,
-  imports: [CommonModule, Card, Tag],
+  imports: [CommonModule, Card],
   templateUrl: './results-panel.component.html',
   styleUrls: ['./results-panel.component.scss']
 })

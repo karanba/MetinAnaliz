@@ -3,10 +3,10 @@ import { CommonModule } from "@angular/common";
 import { Card } from "primeng/card";
 
 @Component({
-  selector: "app-help-overview-page",
+  selector: "app-help-usage",
   standalone: true,
   imports: [CommonModule, Card],
-  templateUrl: "./help-overview.page.html",
-  styleUrls: ["./help-overview.page.scss"],
+  templateUrl: "./help-usage.component.html",
+  styleUrls: ["./help-usage.component.scss"],
 })
-export class HelpOverviewPageComponent {}
+export class HelpUsageComponent {}
