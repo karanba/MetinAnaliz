@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
-import { Graph2dComponent } from '../../calculator/graph2d.component';
-import { Graph3dComponent } from '../../calculator/graph3d.component';
+import { Graph2dComponent } from '../../component/graph2d/graph2d.component';
+import { Graph3dComponent } from '../../component/graph3d/graph3d.component';
 import { PageHeaderComponent } from '../../shared';
 
 @Component({

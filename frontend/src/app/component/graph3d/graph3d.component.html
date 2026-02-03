@@ -1,0 +1,138 @@
+<div class="graph3d-container">
+  <p-card class="controls-card">
+    <div class="controls-header">
+      <h3><i class="pi pi-box"></i> 3D Grafik</h3>
+      <p class="meta">z = f(x, y) formatında fonksiyon girin</p>
+    </div>
+
+    <div class="controls-grid">
+      <div class="field full-width">
+        <label for="expression">z = f(x, y) =</label>
+        <input
+          id="expression"
+          type="text"
+          pInputText
+          [(ngModel)]="expression"
+          placeholder="sin(sqrt(x^2+y^2)), x^2-y^2, ..."
+          (keydown.enter)="plot()"
+        />
+      </div>
+
+      <div class="field">
+        <label for="xMin">x Min</label>
+        <p-inputNumber
+          id="xMin"
+          [(ngModel)]="xMin"
+          [showButtons]="true"
+          [step]="1"
+          mode="decimal"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+        ></p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label for="xMax">x Max</label>
+        <p-inputNumber
+          id="xMax"
+          [(ngModel)]="xMax"
+          [showButtons]="true"
+          [step]="1"
+          mode="decimal"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+        ></p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label for="yMin">y Min</label>
+        <p-inputNumber
+          id="yMin"
+          [(ngModel)]="yMin"
+          [showButtons]="true"
+          [step]="1"
+          mode="decimal"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+        ></p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label for="yMax">y Max</label>
+        <p-inputNumber
+          id="yMax"
+          [(ngModel)]="yMax"
+          [showButtons]="true"
+          [step]="1"
+          mode="decimal"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="2"
+        ></p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label for="resolution">Çözünürlük</label>
+        <p-select
+          id="resolution"
+          [options]="resolutionOptions"
+          [(ngModel)]="resolution"
+          optionLabel="label"
+          optionValue="value"
+        ></p-select>
+      </div>
+
+      <div class="field">
+        <label for="colorscale">Renk Paleti</label>
+        <p-select
+          id="colorscale"
+          [options]="colorscaleOptions"
+          [(ngModel)]="colorscale"
+          optionLabel="label"
+          optionValue="value"
+        ></p-select>
+      </div>
+
+      <div class="field actions">
+        <p-button
+          label="Çiz"
+          icon="pi pi-play"
+          styleClass="primary-action"
+          (onClick)="plot()"
+          [disabled]="!expression.trim()"
+        ></p-button>
+        <p-button
+          label="Temizle"
+          icon="pi pi-trash"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="clear()"
+        ></p-button>
+      </div>
+    </div>
+
+    <div class="examples-section">
+      <label>Örnekler:</label>
+      <div class="example-chips">
+        @for (example of examples; track example) {
+          <button class="example-chip" (click)="useExample(example)">
+            {{ example }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (error()) {
+      <p-message severity="error" [text]="error()!" styleClass="error-message"></p-message>
+    }
+  </p-card>
+
+  <p-card class="plot-card">
+    <div #plotContainer class="plot-container"></div>
+    @if (!hasPlot()) {
+      <div class="empty-plot">
+        <i class="pi pi-box"></i>
+        <p>3D Grafik burada görünecek</p>
+      </div>
+    }
+  </p-card>
+</div>
