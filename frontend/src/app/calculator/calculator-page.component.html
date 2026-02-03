@@ -1,8 +1,12 @@
 <div class="calculator-page">
-  <div class="page-header">
-    <h1>Bilimsel Hesap Makinesi</h1>
-    <p class="meta">Matematiksel ifadeler hesaplayın</p>
-  </div>
+  <app-page-header
+    title="Bilimsel Hesap Makinesi"
+    description="Matematiksel ifadeler hesaplayın"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Hesap Makinesi' }
+    ]"
+  />
 
   <div class="calculator-layout">
     <!-- Left Column: Calculator -->

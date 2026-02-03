@@ -20,6 +20,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Message } from 'primeng/message';
 import { ExpressionEvaluatorService, AngleMode } from './expression-evaluator.service';
 import { HistoryService, HistoryEntry } from './history.service';
+import { PageHeaderComponent } from '../shared';
 
 interface CalcButton {
   label: string;
@@ -44,6 +45,7 @@ interface CalcButton {
     Tooltip,
     ToggleSwitch,
     Message,
+    PageHeaderComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './calculator-page.component.html',

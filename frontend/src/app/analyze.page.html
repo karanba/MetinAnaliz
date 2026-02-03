@@ -1,40 +1,43 @@
-<div class="page-layout">
-  <!-- Left Column: Input Section -->
+<div class="analyze-page">
+  <app-page-header
+    title="Metin Analizi"
+    description="Türkçe metinlerin okunabilirlik ve karmaşıklık analizini yapın"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Dil', route: '/tools/language' },
+      { label: 'Metin Analizi' }
+    ]"
+  />
+
+  <div class="page-layout">
+    <!-- Left Column: Input Section -->
   <div class="input-section">
     <p-card class="input-card">
       <div class="card-header">
-        <div class="header-content">
-          <div class="header-title-row">
-            <h2>Metin Analizi</h2>
-            <div class="header-actions">
-              <p-button
-                label="Analiz Et"
-                icon="pi pi-bolt"
-                styleClass="primary-action"
-                [loading]="loading"
-                [disabled]="!text.trim()"
-                (onClick)="analyze()"
-              ></p-button>
-              <p-button
-                label="Temizle"
-                icon="pi pi-times"
-                styleClass="secondary-action"
-                [disabled]="!text.trim() || loading"
-                (onClick)="clearText()"
-              ></p-button>
-              <p-button
-                icon="pi pi-cog"
-                [outlined]="true"
-                [rounded]="true"
-                severity="secondary"
-                (onClick)="showOptionsDialog()"
-                pTooltip="Analiz seçenekleri"
-              ></p-button>
-            </div>
-          </div>
-          <p class="meta">
-            Türkçe metninizi girin ve {{ getAnalysisTypeLabel() }} hesaplayın
-          </p>
+        <div class="header-actions">
+          <p-button
+            label="Analiz Et"
+            icon="pi pi-bolt"
+            styleClass="primary-action"
+            [loading]="loading"
+            [disabled]="!text.trim()"
+            (onClick)="analyze()"
+          ></p-button>
+          <p-button
+            label="Temizle"
+            icon="pi pi-times"
+            styleClass="secondary-action"
+            [disabled]="!text.trim() || loading"
+            (onClick)="clearText()"
+          ></p-button>
+          <p-button
+            icon="pi pi-cog"
+            [outlined]="true"
+            [rounded]="true"
+            severity="secondary"
+            (onClick)="showOptionsDialog()"
+            pTooltip="Analiz seçenekleri"
+          ></p-button>
         </div>
       </div>
 
@@ -141,6 +144,7 @@
 
       <app-sentence-list [sentences]="result.sentences"></app-sentence-list>
     </div>
+  </div>
   </div>
 </div>
 

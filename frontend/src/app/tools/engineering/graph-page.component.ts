@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { Graph2dComponent } from '../../calculator/graph2d.component';
 import { Graph3dComponent } from '../../calculator/graph3d.component';
+import { PageHeaderComponent } from '../../shared';
 
 @Component({
   selector: 'app-graph-page',
@@ -16,14 +17,20 @@ import { Graph3dComponent } from '../../calculator/graph3d.component';
     TabPanel,
     Graph2dComponent,
     Graph3dComponent,
+    PageHeaderComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="graph-page">
-      <div class="page-header">
-        <h1>Grafik Çizimi</h1>
-        <p class="meta">Matematiksel fonksiyonları 2D ve 3D olarak görselleştirin</p>
-      </div>
+      <app-page-header
+        title="Grafik Çizimi"
+        description="Matematiksel fonksiyonları 2D ve 3D olarak görselleştirin"
+        [breadcrumbs]="[
+          { label: 'Araçlar', route: '/tools' },
+          { label: 'Mühendislik', route: '/tools/engineering' },
+          { label: 'Grafik Çizimi' }
+        ]"
+      />
 
       <p-tabs value="0">
         <p-tablist>
@@ -58,37 +65,20 @@ import { Graph3dComponent } from '../../calculator/graph3d.component';
     .graph-page {
       display: flex;
       flex-direction: column;
-      gap: 24px;
-    }
-
-    .page-header {
-      margin-bottom: 8px;
-    }
-
-    .page-header h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--ink);
-      margin: 0 0 8px;
-    }
-
-    .page-header .meta {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
+      gap: 16px;
     }
 
     :host ::ng-deep {
       .p-tablist {
         border-bottom: 1px solid var(--stroke);
-        margin-bottom: 24px;
+        margin-bottom: 16px;
       }
 
       .p-tab {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 12px 20px;
+        gap: 6px;
+        padding: 10px 16px;
         font-weight: 600;
         color: var(--muted);
         transition: all 0.2s ease;
@@ -109,10 +99,6 @@ import { Graph3dComponent } from '../../calculator/graph3d.component';
     }
 
     @media (max-width: 768px) {
-      .page-header h1 {
-        font-size: 1.4rem;
-      }
-
       :host ::ng-deep .p-tab {
         padding: 10px 12px;
         font-size: 0.9rem;

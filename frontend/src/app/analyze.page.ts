@@ -17,6 +17,7 @@ import { Tag } from "primeng/tag";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "primeng/tabs";
 import { Dialog } from "primeng/dialog";
 import { Tooltip } from "primeng/tooltip";
+import { PageHeaderComponent } from "./shared";
 
 @Component({
   selector: "app-analyze-page",
@@ -40,6 +41,7 @@ import { Tooltip } from "primeng/tooltip";
     TabPanel,
     Dialog,
     Tooltip,
+    PageHeaderComponent,
   ],
   templateUrl: "./analyze.page.html",
   styleUrls: ["./analyze.page.scss"],

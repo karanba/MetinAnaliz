@@ -3,11 +3,17 @@
   width: 100%;
 }
 
+.analyze-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 // Main Layout
 .page-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
   margin: 0 auto;
 }
@@ -15,7 +21,7 @@
 // Tablet layout
 @media (min-width: 768px) {
   .page-layout {
-    gap: 28px;
+    gap: 20px;
   }
 }
 
