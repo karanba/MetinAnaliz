@@ -16,7 +16,7 @@
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: clamp(24px, 4vw, 48px) clamp(16px, 3vw, 40px);
+  padding: 16px clamp(16px, 2vw, 24px);
 
   // Ensure routed content fills available space
   > router-outlet + * {
@@ -384,7 +384,7 @@
   }
 
   .main-content {
-    padding: clamp(32px, 5vw, 56px) clamp(24px, 3.5vw, 48px);
+    padding: 20px clamp(24px, 2.5vw, 32px);
   }
 }
 
@@ -398,7 +398,7 @@
   }
 
   .main-content {
-    padding: clamp(40px, 6vw, 64px) clamp(40px, 4vw, 64px);
+    padding: 24px clamp(32px, 3vw, 48px);
   }
 }
 
@@ -412,7 +412,7 @@
   }
 
   .main-content {
-    padding: clamp(48px, 6vw, 72px) clamp(80px, 8vw, 120px);
+    padding: 24px clamp(48px, 4vw, 80px);
   }
 }
 

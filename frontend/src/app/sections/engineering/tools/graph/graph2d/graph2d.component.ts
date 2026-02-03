@@ -7,6 +7,7 @@ import {
   signal,
   inject,
   ChangeDetectionStrategy,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Card } from 'primeng/card';
 import { Select } from 'primeng/select';
 import { Message } from 'primeng/message';
+import { Tooltip } from 'primeng/tooltip';
 import { ExpressionEvaluatorService } from '../../../../../services/expression-evaluator.service';
 
 declare const Plotly: any;
@@ -28,7 +30,7 @@ interface PlotData {
 @Component({
   selector: 'app-graph2d',
   standalone: true,
-  imports: [CommonModule, FormsModule, Button, InputText, InputNumber, Card, Select, Message],
+  imports: [CommonModule, FormsModule, Button, InputText, InputNumber, Card, Select, Message, Tooltip],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './graph2d.component.html',
   styleUrls: ['./graph2d.component.scss'],
@@ -43,6 +45,8 @@ export class Graph2dComponent implements AfterViewInit, OnDestroy {
   xMin = -10;
   xMax = 10;
   samples = 500;
+
+  isFullscreen = signal(false);
 
   sampleOptions = [
     { label: 'Düşük (100)', value: 100 },
@@ -64,6 +68,26 @@ export class Graph2dComponent implements AfterViewInit, OnDestroy {
 
   error = signal<string | null>(null);
   hasPlot = signal(false);
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.isFullscreen()) {
+      this.isFullscreen.set(false);
+      this.resizePlot();
+    }
+  }
+
+  toggleFullscreen(): void {
+    this.isFullscreen.update(v => !v);
+    // Give time for DOM to update before resizing
+    setTimeout(() => this.resizePlot(), 50);
+  }
+
+  private resizePlot(): void {
+    if (this.plotlyLoaded && this.plotContainer?.nativeElement) {
+      Plotly.Plots.resize(this.plotContainer.nativeElement);
+    }
+  }
 
   async ngAfterViewInit(): Promise<void> {
     await this.loadPlotly();

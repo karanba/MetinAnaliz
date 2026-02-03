@@ -1,5 +1,5 @@
-<div class="graph2d-container">
-  <p-card class="controls-card">
+<div class="graph2d-container" [class.fullscreen]="isFullscreen()">
+  <p-card class="controls-card" [class.hidden]="isFullscreen()">
     <div class="controls-header">
       <h3><i class="pi pi-chart-line"></i> 2D Grafik</h3>
       <p class="meta">f(x) formatında fonksiyon girin</p>
@@ -90,6 +90,16 @@
   </p-card>
 
   <p-card class="plot-card">
+    <div class="plot-header">
+      <p-button
+        [icon]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+        [rounded]="true"
+        [text]="true"
+        [pTooltip]="isFullscreen() ? 'Küçült (ESC)' : 'Tam Ekran'"
+        tooltipPosition="left"
+        (onClick)="toggleFullscreen()"
+      />
+    </div>
     <div #plotContainer class="plot-container"></div>
     @if (!hasPlot()) {
       <div class="empty-plot">

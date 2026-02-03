@@ -7,6 +7,7 @@ import {
   signal,
   inject,
   ChangeDetectionStrategy,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -16,6 +17,7 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Card } from 'primeng/card';
 import { Select } from 'primeng/select';
 import { Message } from 'primeng/message';
+import { Tooltip } from 'primeng/tooltip';
 import { ExpressionEvaluatorService } from '../../../../../services/expression-evaluator.service';
 
 declare const Plotly: any;
@@ -23,7 +25,7 @@ declare const Plotly: any;
 @Component({
   selector: 'app-graph3d',
   standalone: true,
-  imports: [CommonModule, FormsModule, Button, InputText, InputNumber, Card, Select, Message],
+  imports: [CommonModule, FormsModule, Button, InputText, InputNumber, Card, Select, Message, Tooltip],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './graph3d.component.html',
   styleUrls: ['./graph3d.component.scss'],
@@ -41,6 +43,8 @@ export class Graph3dComponent implements AfterViewInit, OnDestroy {
   yMax = 5;
   resolution = 50;
   colorscale = 'Viridis';
+
+  isFullscreen = signal(false);
 
   resolutionOptions = [
     { label: 'Düşük (25)', value: 25 },
@@ -71,6 +75,25 @@ export class Graph3dComponent implements AfterViewInit, OnDestroy {
 
   error = signal<string | null>(null);
   hasPlot = signal(false);
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.isFullscreen()) {
+      this.isFullscreen.set(false);
+      this.resizePlot();
+    }
+  }
+
+  toggleFullscreen(): void {
+    this.isFullscreen.update(v => !v);
+    setTimeout(() => this.resizePlot(), 50);
+  }
+
+  private resizePlot(): void {
+    if (this.plotlyLoaded && this.plotContainer?.nativeElement) {
+      Plotly.Plots.resize(this.plotContainer.nativeElement);
+    }
+  }
 
   async ngAfterViewInit(): Promise<void> {
     await this.loadPlotly();
