@@ -6,6 +6,7 @@ import { HelpUsagePageComponent } from './help-usage.page';
 import { HelpFaqPageComponent } from './help-faq.page';
 import { CalculatorPageComponent } from './calculator/calculator-page.component';
 import { GraphPageComponent } from './tools/engineering/graph-page.component';
+import { StlViewerComponent } from './tools/engineering/stl-viewer/stl-viewer.component';
 import { ToolsPageComponent } from './tools/tools-page.component';
 import { EngineeringPageComponent } from './tools/engineering/engineering-page.component';
 import { LanguagePageComponent } from './tools/language/language-page.component';
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'tools/engineering', component: EngineeringPageComponent },
   { path: 'tools/engineering/calculator', component: CalculatorPageComponent },
   { path: 'tools/engineering/graph', component: GraphPageComponent },
+  { path: 'tools/engineering/stl-viewer', component: StlViewerComponent },
 
   // Help
   {

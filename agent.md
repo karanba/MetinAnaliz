@@ -27,7 +27,19 @@
 
 #### `/tools/engineering` - Engineering Tools
 - Lists engineering/calculation tools
-- Currently includes: Hesap Makinesi (Calculator), Grafik Çizimi (Graph)
+- Currently includes: Hesap Makinesi (Calculator), Grafik Çizimi (Graph), STL Görüntüleyici (STL Viewer)
+
+### STL Viewer (`/tools/engineering/stl-viewer`)
+- 3D STL file viewer using Three.js
+- Features:
+  - Drag & drop or file picker upload
+  - OrbitControls for rotation/zoom/pan
+  - View modes: Solid / Wireframe
+  - Customizable model and background colors
+  - Grid and axes helpers (toggleable)
+  - Auto-rotate option
+  - Screenshot export
+  - Model statistics: triangles, vertices, dimensions, volume, surface area
 
 ### Design System
 
@@ -43,7 +55,8 @@
 - Breadcrumb: 0.8rem
 
 ### Routes
-```
+
+```text
 /                    → redirects to /tools
 /tools               → ToolsPageComponent
 /tools/language      → LanguagePageComponent
@@ -51,4 +64,5 @@
 /tools/engineering   → EngineeringPageComponent
 /tools/engineering/calculator → CalculatorPageComponent
 /tools/engineering/graph → GraphPageComponent
+/tools/engineering/stl-viewer → StlViewerComponent
 ```

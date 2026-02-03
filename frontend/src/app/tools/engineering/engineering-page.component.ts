@@ -66,6 +66,13 @@ export class EngineeringPageComponent {
       icon: 'pi-chart-line',
       route: '/tools/engineering/graph',
       color: 'sun'
+    },
+    {
+      title: 'STL Görüntüleyici',
+      description: '3D STL dosyalarını görüntüleyin, ölçün ve analiz edin',
+      icon: 'pi-box',
+      route: '/tools/engineering/stl-viewer',
+      color: 'accent'
     }
   ];
 }
