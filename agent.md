@@ -66,3 +66,11 @@
 /tools/engineering/graph → GraphPageComponent
 /tools/engineering/stl-viewer → StlViewerComponent
 ```
+
+### Build System
+
+- **Builder**: `@angular-devkit/build-angular:application` (esbuild)
+- **Configurations**:
+  - `production`: optimized build with output hashing
+  - `development`: source maps enabled, no optimization
+- **Default**: `ng build` uses production, `ng serve` uses development
