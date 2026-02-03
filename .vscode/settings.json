@@ -1,4 +1,11 @@
 {
   "angular.enable-strict-mode-prompt": false,
-  "cSpell.words": ["getenv"]
+  "cSpell.words": [
+    "adsense",
+    "getenv",
+    "plotly",
+    "primeicons",
+    "primeng",
+    "primeuix"
+  ]
 }

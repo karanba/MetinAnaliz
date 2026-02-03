@@ -19,9 +19,12 @@
     "decimal.js": "^10.6.0",
     "ng2-adsense": "^14.0.0",
     "plotly.js-dist-min": "^3.3.1",
+    "postcss": "^8.5.6",
     "primeicons": "^7.0.0",
     "primeng": "^21.0.0",
     "rxjs": "^7.8.1",
+    "tailwindcss": "^4.1.18",
+    "tailwindcss-primeui": "^0.6.1",
     "three": "^0.182.0",
     "tslib": "^2.6.2",
     "zone.js": "^0.15.0"
