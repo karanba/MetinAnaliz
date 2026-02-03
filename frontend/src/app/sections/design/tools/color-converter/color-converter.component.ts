@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, ViewChild, ElementRef, AfterViewInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../../../components/shared';
@@ -32,7 +32,9 @@ type HarmonyType = 'complementary' | 'analogous' | 'triadic' | 'split-complement
   templateUrl: './color-converter.component.html',
   styleUrls: ['./color-converter.component.scss'],
 })
-export class ColorConverterComponent {
+export class ColorConverterComponent implements AfterViewInit {
+  @ViewChild('colorWheel') colorWheelCanvas!: ElementRef<HTMLCanvasElement>;
+
   // Main color state
   hexColor = signal('#1F7A8C');
 
@@ -73,17 +75,172 @@ export class ColorConverterComponent {
   });
   cmykOutput = computed(() => {
     const { c, m, y, k } = this.cmyk();
-    return `cmyk(${Math.round(c)}%, ${Math.round(m)}%, ${Math.round(y)}%, ${Math.round(k)}%)`;
+    return `cmyk(${Math.round(c)}%, ${Math.round(m)}%, ${Math.round(k)}%)`;
   });
 
   // Palette colors
   palette = computed(() => this.generatePalette(this.hexColor(), this.selectedHarmony()));
+
+  // Harmony angles for wheel markers
+  harmonyAngles = computed(() => this.getHarmonyAngles(this.hsl().h, this.selectedHarmony()));
 
   // Contrast ratio
   contrastRatio = computed(() => this.calculateContrast(this.foregroundColor(), this.backgroundColor()));
   wcagAA = computed(() => this.contrastRatio() >= 4.5);
   wcagAAA = computed(() => this.contrastRatio() >= 7);
   wcagAALarge = computed(() => this.contrastRatio() >= 3);
+
+  private wheelSize = 280;
+  private wheelCtx: CanvasRenderingContext2D | null = null;
+
+  constructor() {
+    // Effect to redraw wheel when color or harmony changes
+    effect(() => {
+      const _ = this.hexColor();
+      const __ = this.selectedHarmony();
+      this.drawColorWheel();
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.initColorWheel();
+  }
+
+  private initColorWheel(): void {
+    const canvas = this.colorWheelCanvas?.nativeElement;
+    if (!canvas) return;
+
+    canvas.width = this.wheelSize;
+    canvas.height = this.wheelSize;
+    this.wheelCtx = canvas.getContext('2d');
+    this.drawColorWheel();
+  }
+
+  private drawColorWheel(): void {
+    const ctx = this.wheelCtx;
+    if (!ctx) return;
+
+    const size = this.wheelSize;
+    const centerX = size / 2;
+    const centerY = size / 2;
+    const outerRadius = size / 2 - 10;
+    const innerRadius = outerRadius - 40;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, size, size);
+
+    // Draw color wheel ring
+    for (let angle = 0; angle < 360; angle += 1) {
+      const startAngle = (angle - 1) * Math.PI / 180;
+      const endAngle = (angle + 1) * Math.PI / 180;
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+      ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+      ctx.closePath();
+
+      const hsl = `hsl(${angle}, 100%, 50%)`;
+      ctx.fillStyle = hsl;
+      ctx.fill();
+    }
+
+    // Draw center with current color
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, innerRadius - 10, 0, Math.PI * 2);
+    ctx.fillStyle = this.hexColor();
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw harmony markers
+    const hsl = this.hsl();
+    const angles = this.harmonyAngles();
+    const markerRadius = (outerRadius + innerRadius) / 2;
+
+    angles.forEach((angle, index) => {
+      const rad = (angle - 90) * Math.PI / 180;
+      const x = centerX + markerRadius * Math.cos(rad);
+      const y = centerY + markerRadius * Math.sin(rad);
+
+      // Marker circle
+      ctx.beginPath();
+      ctx.arc(x, y, index === 0 ? 14 : 10, 0, Math.PI * 2);
+
+      // Fill with the harmony color
+      const markerHsl = { h: angle, s: hsl.s, l: hsl.l };
+      ctx.fillStyle = this.rgbToHex(this.hslToRgb(markerHsl));
+      ctx.fill();
+
+      // Border
+      ctx.strokeStyle = index === 0 ? '#ffffff' : 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = index === 0 ? 3 : 2;
+      ctx.stroke();
+
+      // Shadow for main marker
+      if (index === 0) {
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+    });
+  }
+
+  onWheelClick(event: MouseEvent): void {
+    const canvas = this.colorWheelCanvas?.nativeElement;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left - this.wheelSize / 2;
+    const y = event.clientY - rect.top - this.wheelSize / 2;
+
+    const distance = Math.sqrt(x * x + y * y);
+    const outerRadius = this.wheelSize / 2 - 10;
+    const innerRadius = outerRadius - 40;
+
+    // Check if click is within the wheel ring
+    if (distance >= innerRadius && distance <= outerRadius) {
+      let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
+      if (angle < 0) angle += 360;
+
+      const hsl = this.hsl();
+      const newHsl = { h: angle, s: hsl.s, l: hsl.l };
+      this.hexColor.set(this.rgbToHex(this.hslToRgb(newHsl)));
+    }
+  }
+
+  private getHarmonyAngles(hue: number, harmony: HarmonyType): number[] {
+    const angles: number[] = [hue];
+
+    switch (harmony) {
+      case 'complementary':
+        angles.push((hue + 180) % 360);
+        break;
+      case 'analogous':
+        angles.unshift((hue - 30 + 360) % 360);
+        angles.push((hue + 30) % 360);
+        break;
+      case 'triadic':
+        angles.push((hue + 120) % 360);
+        angles.push((hue + 240) % 360);
+        break;
+      case 'split-complementary':
+        angles.push((hue + 150) % 360);
+        angles.push((hue + 210) % 360);
+        break;
+      case 'tetradic':
+        angles.push((hue + 90) % 360);
+        angles.push((hue + 180) % 360);
+        angles.push((hue + 270) % 360);
+        break;
+      case 'monochromatic':
+        // For monochromatic, just show the main hue
+        break;
+    }
+
+    return angles;
+  }
 
   // Color picker change
   onColorChange(event: Event): void {
@@ -113,7 +270,7 @@ export class ColorConverterComponent {
   }
 
   // Color conversion functions
-  private hexToRgb(hex: string): RGB {
+  hexToRgb(hex: string): RGB {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
       r: parseInt(result[1], 16),
@@ -122,13 +279,13 @@ export class ColorConverterComponent {
     } : { r: 0, g: 0, b: 0 };
   }
 
-  private rgbToHex(rgb: RGB): string {
+  rgbToHex(rgb: RGB): string {
     return '#' + [rgb.r, rgb.g, rgb.b]
       .map(x => x.toString(16).padStart(2, '0'))
       .join('');
   }
 
-  private rgbToHsl(rgb: RGB): HSL {
+  rgbToHsl(rgb: RGB): HSL {
     const r = rgb.r / 255;
     const g = rgb.g / 255;
     const b = rgb.b / 255;
@@ -152,7 +309,7 @@ export class ColorConverterComponent {
     return { h: h * 360, s: s * 100, l: l * 100 };
   }
 
-  private hslToRgb(hsl: HSL): RGB {
+  hslToRgb(hsl: HSL): RGB {
     const h = hsl.h / 360;
     const s = hsl.s / 100;
     const l = hsl.l / 100;
