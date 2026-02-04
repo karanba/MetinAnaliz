@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Tag } from 'primeng/tag';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Tooltip } from 'primeng/tooltip';
 import { Menu } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
+import { ToolRegistryService } from './services/tool-registry.service';
 
 @Component({
   selector: 'app-root',
@@ -16,36 +16,18 @@ import { MenuItem } from 'primeng/api';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  private toolRegistry = inject(ToolRegistryService);
+
   infoDialogVisible = false;
   mobileMenuVisible = false;
 
-  engineeringTools: MenuItem[] = [
-    {
-      label: 'Hesap Makinesi',
-      icon: 'pi pi-calculator',
-      command: () => this.router.navigate(['/tools/engineering/calculator'])
-    },
-    {
-      label: 'Grafik Çizimi',
-      icon: 'pi pi-chart-line',
-      command: () => this.router.navigate(['/tools/engineering/graph'])
-    },
-    {
-      label: 'STL Görüntüleyici',
-      icon: 'pi pi-box',
-      command: () => this.router.navigate(['/tools/engineering/stl-viewer'])
-    }
-  ];
+  // Navigation menus from central registry
+  languageTools = this.toolRegistry.getMenuItems('language');
+  engineeringTools = this.toolRegistry.getMenuItems('engineering');
+  designTools = this.toolRegistry.getMenuItems('design');
 
-  languageTools: MenuItem[] = [
-    {
-      label: 'Metin Analizi',
-      icon: 'pi pi-file-edit',
-      command: () => this.router.navigate(['/tools/language/text-analysis'])
-    }
-  ];
-
-  constructor(private router: Router) {}
+  // Section data for mobile nav and info dialog
+  sections = this.toolRegistry.sections;
 
   showInfoDialog(): void {
     this.infoDialogVisible = true;
@@ -59,11 +41,15 @@ export class AppComponent {
     this.mobileMenuVisible = false;
   }
 
-  isEngineeringActive(): boolean {
-    return this.router.url.startsWith('/tools/engineering');
+  isLanguageActive(): boolean {
+    return this.toolRegistry.isSectionActive('language');
   }
 
-  isLanguageActive(): boolean {
-    return this.router.url.startsWith('/tools/language');
+  isEngineeringActive(): boolean {
+    return this.toolRegistry.isSectionActive('engineering');
+  }
+
+  isDesignActive(): boolean {
+    return this.toolRegistry.isSectionActive('design');
   }
 }

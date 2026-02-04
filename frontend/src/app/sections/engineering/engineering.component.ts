@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../components/shared';
+import { PageHeaderComponent, ToolCardComponent } from '../../components/shared';
+import { ToolRegistryService } from '../../services/tool-registry.service';
 
 @Component({
   selector: 'app-engineering',
@@ -11,27 +12,7 @@ import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../componen
   styleUrls: ['./engineering.component.scss'],
 })
 export class EngineeringComponent {
-  tools: ToolInfo[] = [
-    {
-      title: 'Hesap Makinesi',
-      description: 'Bilimsel hesaplamalar ve matematiksel ifadeler için gelişmiş hesap makinesi',
-      icon: 'pi-calculator',
-      route: '/tools/engineering/calculator',
-      color: 'accent'
-    },
-    {
-      title: 'Grafik Çizimi',
-      description: 'Matematiksel fonksiyonları 2D ve 3D olarak görselleştirin',
-      icon: 'pi-chart-line',
-      route: '/tools/engineering/graph',
-      color: 'sun'
-    },
-    {
-      title: 'STL Görüntüleyici',
-      description: '3D STL dosyalarını görüntüleyin, ölçün ve analiz edin',
-      icon: 'pi-box',
-      route: '/tools/engineering/stl-viewer',
-      color: 'accent'
-    }
-  ];
+  private toolRegistry = inject(ToolRegistryService);
+
+  tools = this.toolRegistry.getToolInfoByCategory('engineering');
 }

@@ -1,14 +1,10 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ToolInfo } from '../../../models/tool.models';
 
-export interface ToolInfo {
-  title: string;
-  description: string;
-  icon: string;
-  route: string;
-  color?: 'accent' | 'sun';
-}
+// Re-export ToolInfo for backward compatibility
+export { ToolInfo } from '../../../models/tool.models';
 
 @Component({
   selector: 'app-tool-card',

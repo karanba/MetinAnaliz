@@ -27,6 +27,16 @@
         <p-menu #engineeringMenu [model]="engineeringTools" [popup]="true" appendTo="body"></p-menu>
       </div>
 
+      <!-- Design Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isDesignActive()">
+        <button class="nav-dropdown-trigger" (click)="designMenu.toggle($event)">
+          <i class="pi pi-palette"></i>
+          <span>Tasarım Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #designMenu [model]="designTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
       <a routerLink="/help" routerLinkActive="active" class="nav-link">
         <i class="pi pi-question-circle"></i>
         <span>Yardım</span>
@@ -51,25 +61,17 @@
   <!-- Mobile Navigation -->
   @if (mobileMenuVisible) {
     <div class="mobile-nav" (click)="closeMobileMenu()">
-      <div class="mobile-nav-section">
-        <span class="mobile-nav-label">Dil Araçları</span>
-        <a routerLink="/tools/language/text-analysis" class="mobile-nav-link">
-          <i class="pi pi-file-edit"></i>
-          Metin Analizi
-        </a>
-      </div>
-
-      <div class="mobile-nav-section">
-        <span class="mobile-nav-label">Mühendislik Araçları</span>
-        <a routerLink="/tools/engineering/calculator" class="mobile-nav-link">
-          <i class="pi pi-calculator"></i>
-          Hesap Makinesi
-        </a>
-        <a routerLink="/tools/engineering/graph" class="mobile-nav-link">
-          <i class="pi pi-chart-line"></i>
-          Grafik Çizimi
-        </a>
-      </div>
+      @for (section of sections(); track section.id) {
+        <div class="mobile-nav-section">
+          <span class="mobile-nav-label">{{ section.title }}</span>
+          @for (tool of section.tools; track tool.id) {
+            <a [routerLink]="tool.route" class="mobile-nav-link">
+              <i class="pi pi-{{ tool.icon }}"></i>
+              {{ tool.title }}
+            </a>
+          }
+        </div>
+      }
 
       <div class="mobile-nav-section">
         <a routerLink="/help" class="mobile-nav-link">
@@ -92,7 +94,7 @@
     <div class="footer-content">
       <div class="footer-left">
         <span class="footer-title">Araç Kutusu</span>
-        <span class="footer-subtitle">Dil ve mühendislik araçları platformu</span>
+        <span class="footer-subtitle">Dil, mühendislik ve tasarım araçları platformu</span>
       </div>
       <div class="footer-right">
         <p-tag value="Beta" icon="pi pi-bolt" severity="info" [style]="{ fontSize: '0.8rem' }"></p-tag>
@@ -114,32 +116,22 @@
     <div class="info-section">
       <h3><i class="pi pi-info-circle"></i> Hakkında</h3>
       <p>
-        Araç Kutusu, dil ve mühendislik alanlarında çeşitli araçlar sunan bir platformdur.
+        Araç Kutusu, dil, mühendislik ve tasarım alanlarında çeşitli araçlar sunan bir platformdur.
       </p>
     </div>
 
-    <div class="info-section">
-      <h3><i class="pi pi-language"></i> Dil Araçları</h3>
-      <div class="features-list">
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>Türkçe metin analizi ve okunabilirlik hesaplama</span>
+    @for (section of sections(); track section.id) {
+      <div class="info-section">
+        <h3><i class="pi pi-{{ section.icon }}"></i> {{ section.title }}</h3>
+        <div class="features-list">
+          @for (tool of section.tools; track tool.id) {
+            <div class="feature-item">
+              <i class="pi pi-check-circle"></i>
+              <span>{{ tool.title }} - {{ tool.description }}</span>
+            </div>
+          }
         </div>
       </div>
-    </div>
-
-    <div class="info-section">
-      <h3><i class="pi pi-cog"></i> Mühendislik Araçları</h3>
-      <div class="features-list">
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>Bilimsel hesap makinesi</span>
-        </div>
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>2D ve 3D fonksiyon grafik çizimi</span>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </p-dialog>

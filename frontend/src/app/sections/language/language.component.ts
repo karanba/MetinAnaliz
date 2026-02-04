@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../components/shared';
+import { PageHeaderComponent, ToolCardComponent } from '../../components/shared';
+import { ToolRegistryService } from '../../services/tool-registry.service';
 
 @Component({
   selector: 'app-language',
@@ -11,13 +12,7 @@ import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../componen
   styleUrls: ['./language.component.scss'],
 })
 export class LanguageComponent {
-  tools: ToolInfo[] = [
-    {
-      title: 'Metin Analizi',
-      description: 'Metinlerin okunabilirlik ve karmaşıklık analizini yapın. Kelime, cümle ve hece sayılarını hesaplayın.',
-      icon: 'pi-file-edit',
-      route: '/tools/language/text-analysis',
-      color: 'accent'
-    }
-  ];
+  private toolRegistry = inject(ToolRegistryService);
+
+  tools = this.toolRegistry.getToolInfoByCategory('language');
 }

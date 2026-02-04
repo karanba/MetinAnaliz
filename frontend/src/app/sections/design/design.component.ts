@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../components/shared';
+import { PageHeaderComponent, ToolCardComponent } from '../../components/shared';
+import { ToolRegistryService } from '../../services/tool-registry.service';
 
 @Component({
   selector: 'app-design',
@@ -11,13 +12,7 @@ import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../componen
   styleUrls: ['./design.component.scss'],
 })
 export class DesignComponent {
-  tools: ToolInfo[] = [
-    {
-      title: 'Renk Dönüştürücü',
-      description: 'Renk formatları arası dönüşüm, palet oluşturma ve kontrast kontrolü',
-      icon: 'pi-palette',
-      route: '/tools/design/color-converter',
-      color: 'sun'
-    }
-  ];
+  private toolRegistry = inject(ToolRegistryService);
+
+  tools = this.toolRegistry.getToolInfoByCategory('design');
 }

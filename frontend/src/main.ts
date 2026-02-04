@@ -7,6 +7,10 @@ import Lara from "@primeuix/themes/lara";
 import { routes } from "./app/app.routes";
 import { AppComponent } from "./app/app.component";
 
+// Leaflet marker icon fix
+import { initLeafletIcons } from "./app/config/leaflet.config";
+initLeafletIcons();
+
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),

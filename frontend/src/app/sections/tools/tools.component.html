@@ -5,7 +5,7 @@
     [breadcrumbs]="[{ label: 'Araçlar' }]"
   />
 
-  @for (group of toolsCatalog; track group.section) {
+  @for (group of toolsCatalog(); track group.section) {
     <section class="category-section">
       <div class="category-header">
         <div class="category-info">
