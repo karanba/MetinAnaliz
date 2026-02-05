@@ -25,6 +25,7 @@ export class AppComponent {
   languageTools = this.toolRegistry.getMenuItems('language');
   engineeringTools = this.toolRegistry.getMenuItems('engineering');
   designTools = this.toolRegistry.getMenuItems('design');
+  geoTools = this.toolRegistry.getMenuItems('geo');
 
   // Section data for mobile nav and info dialog
   sections = this.toolRegistry.sections;
@@ -51,5 +52,9 @@ export class AppComponent {
 
   isDesignActive(): boolean {
     return this.toolRegistry.isSectionActive('design');
+  }
+
+  isGeoActive(): boolean {
+    return this.toolRegistry.isSectionActive('geo');
   }
 }

@@ -4,7 +4,7 @@
  */
 
 /** Tool kategorileri */
-export type ToolCategory = 'language' | 'engineering' | 'design';
+export type ToolCategory = 'language' | 'engineering' | 'design' | 'geo';
 
 /** Tool renk teması */
 export type ToolColor = 'accent' | 'sun';

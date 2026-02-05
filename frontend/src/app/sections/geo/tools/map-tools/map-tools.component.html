@@ -1,0 +1,225 @@
+<div class="map-tools-page">
+  <app-page-header
+    title="Harita"
+    description="İnteraktif harita, mesafe ve alan ölçümü, koordinat bulma"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Harita Araçları', route: '/tools/geo' },
+      { label: 'Harita' }
+    ]"
+  />
+
+  <div class="map-container-wrapper">
+    <!-- Toolbar -->
+    <div class="map-toolbar">
+      <!-- Layer Selector -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Katman:</span>
+        <p-selectButton
+          [options]="layerOptions"
+          [ngModel]="selectedLayer()"
+          (ngModelChange)="onLayerChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          size="small"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Draw Tools -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Çizim:</span>
+        @for (option of drawOptions; track option.value) {
+          <p-button
+            [icon]="option.icon"
+            [severity]="selectedDrawMode() === option.value ? 'primary' : 'secondary'"
+            [outlined]="selectedDrawMode() !== option.value"
+            [pTooltip]="option.tooltip"
+            tooltipPosition="bottom"
+            (onClick)="onDrawModeChange(option.value)"
+            size="small"
+          />
+        }
+        <p-button
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          pTooltip="Çizimleri temizle"
+          tooltipPosition="bottom"
+          (onClick)="clearDrawings()"
+          size="small"
+          [disabled]="drawnItems().length === 0"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- View Controls -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-plus"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="Yakınlaştır"
+          tooltipPosition="bottom"
+          (onClick)="zoomIn()"
+          size="small"
+        />
+        <p-button
+          icon="pi pi-minus"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="Uzaklaştır"
+          tooltipPosition="bottom"
+          (onClick)="zoomOut()"
+          size="small"
+        />
+        <p-button
+          icon="pi pi-home"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="Başlangıç görünümü"
+          tooltipPosition="bottom"
+          (onClick)="resetView()"
+          size="small"
+        />
+        <p-button
+          icon="pi pi-compass"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="Konumumu bul"
+          tooltipPosition="bottom"
+          (onClick)="locateMe()"
+          size="small"
+        />
+      </div>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- Export -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-download"
+          label="GeoJSON"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="GeoJSON olarak indir"
+          tooltipPosition="bottom"
+          (onClick)="exportGeoJSON()"
+          size="small"
+          [disabled]="drawnItems().length === 0"
+        />
+        <p-button
+          icon="pi pi-copy"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="GeoJSON'u kopyala"
+          tooltipPosition="bottom"
+          (onClick)="copyGeoJSON()"
+          size="small"
+          [disabled]="drawnItems().length === 0"
+        />
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="map-content">
+      <!-- Map -->
+      <div class="map-area">
+        <app-base-map
+          [showCoordinates]="true"
+          (mapReady)="onMapReady($event)"
+        />
+      </div>
+
+      <!-- Side Panel -->
+      @if (measurements().length > 0 && showMeasurements()) {
+        <div class="side-panel">
+          <p-panel header="Ölçümler" [toggleable]="true">
+            <div class="measurements-list">
+              @for (measurement of measurements(); track $index) {
+                <div class="measurement-item">
+                  <i class="pi" [ngClass]="measurement.type === 'distance' ? 'pi-arrows-h' : 'pi-stop'"></i>
+                  <span class="measurement-type">
+                    {{ measurement.type === 'distance' ? 'Mesafe' : 'Alan' }}:
+                  </span>
+                  <span class="measurement-value">{{ measurement.formatted }}</span>
+                </div>
+              }
+            </div>
+
+            <p-divider />
+
+            <div class="panel-footer">
+              <span class="item-count">{{ totalMeasurements() }} ölçüm</span>
+            </div>
+          </p-panel>
+
+          @if (drawnItems().length > 0) {
+            <p-panel header="Çizimler" [toggleable]="true" class="drawings-panel">
+              <div class="drawings-list">
+                @for (item of drawnItems(); track $index) {
+                  <div class="drawing-item">
+                    <i class="pi" [ngClass]="{
+                      'pi-map-marker': item.type === 'marker',
+                      'pi-minus': item.type === 'polyline',
+                      'pi-stop': item.type === 'polygon' || item.type === 'rectangle',
+                      'pi-circle': item.type === 'circle'
+                    }"></i>
+                    <span class="drawing-type">
+                      @switch (item.type) {
+                        @case ('marker') { Nokta }
+                        @case ('polyline') { Çizgi }
+                        @case ('polygon') { Poligon }
+                        @case ('circle') { Daire }
+                        @case ('rectangle') { Dikdörtgen }
+                      }
+                    </span>
+                  </div>
+                }
+              </div>
+
+              <p-divider />
+
+              <div class="panel-footer">
+                <span class="item-count">{{ drawnItems().length }} çizim</span>
+              </div>
+            </p-panel>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Status Bar -->
+    <div class="map-statusbar">
+      <div class="status-left">
+        @if (isDrawActive()) {
+          <span class="status-item active">
+            <i class="pi pi-pencil"></i>
+            Çizim modu aktif
+          </span>
+        }
+        @if (drawnItems().length > 0) {
+          <span class="status-item">
+            <i class="pi pi-shapes"></i>
+            {{ drawnItems().length }} çizim
+          </span>
+        }
+        @if (measurements().length > 0) {
+          <span class="status-item">
+            <i class="pi pi-calculator"></i>
+            {{ measurements().length }} ölçüm
+          </span>
+        }
+      </div>
+      <div class="status-right">
+        <span class="status-item hint">
+          <i class="pi pi-info-circle"></i>
+          Çizim için araç seçin, haritaya tıklayın
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

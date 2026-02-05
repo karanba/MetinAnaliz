@@ -37,6 +37,16 @@
         <p-menu #designMenu [model]="designTools" [popup]="true" appendTo="body"></p-menu>
       </div>
 
+      <!-- Geo Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isGeoActive()">
+        <button class="nav-dropdown-trigger" (click)="geoMenu.toggle($event)">
+          <i class="pi pi-map"></i>
+          <span>Harita Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #geoMenu [model]="geoTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
       <a routerLink="/help" routerLinkActive="active" class="nav-link">
         <i class="pi pi-question-circle"></i>
         <span>Yardım</span>

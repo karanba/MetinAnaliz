@@ -95,6 +95,45 @@ export class ToolRegistryService {
           keywords: ['renk', 'rgb', 'hex', 'hsl', 'palet', 'kontrast']
         }
       ]
+    },
+    {
+      id: 'geo',
+      title: 'Harita Araçları',
+      description: 'Coğrafi analiz ve görselleştirme araçları',
+      icon: 'map',
+      route: '/tools/geo',
+      tools: [
+        {
+          id: 'map-tools',
+          title: 'Harita',
+          description: 'İnteraktif harita, mesafe ve alan ölçümü, koordinat bulma',
+          icon: 'map',
+          route: '/tools/geo/map-tools',
+          color: 'accent',
+          category: 'geo',
+          keywords: ['harita', 'ölçüm', 'mesafe', 'alan', 'koordinat', 'konum']
+        },
+        {
+          id: 'earthquake',
+          title: 'Deprem Bilgi Sistemi',
+          description: 'Dünya genelinde gerçek zamanlı deprem verileri ve harita görselleştirmesi',
+          icon: 'wave-pulse',
+          route: '/tools/geo/earthquake',
+          color: 'sun',
+          category: 'geo',
+          keywords: ['deprem', 'sismik', 'earthquake', 'usgs', 'magnitude']
+        },
+        {
+          id: 'airports',
+          title: 'Havaalanları',
+          description: 'Dünya genelinde havaalanı bilgileri ve harita üzerinde görüntüleme',
+          icon: 'send',
+          route: '/tools/geo/airports',
+          color: 'accent',
+          category: 'geo',
+          keywords: ['havaalanı', 'airport', 'uçuş', 'iata', 'icao']
+        }
+      ]
     }
   ]);
 

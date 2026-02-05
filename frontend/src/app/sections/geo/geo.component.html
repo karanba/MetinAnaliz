@@ -1,0 +1,16 @@
+<div class="geo-page">
+  <app-page-header
+    title="Harita Araçları"
+    description="Coğrafi analiz ve görselleştirme araçları"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Harita' }
+    ]"
+  />
+
+  <div class="tools-grid">
+    @for (tool of tools; track tool.route) {
+      <app-tool-card [tool]="tool" />
+    }
+  </div>
+</div>

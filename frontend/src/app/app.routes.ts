@@ -12,6 +12,8 @@ import { EngineeringComponent } from './sections/engineering/engineering.compone
 import { LanguageComponent } from './sections/language/language.component';
 import { DesignComponent } from './sections/design/design.component';
 import { ColorConverterComponent } from './sections/design/tools/color-converter/color-converter.component';
+import { GeoComponent } from './sections/geo/geo.component';
+import { MapToolsComponent } from './sections/geo/tools/map-tools/map-tools.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tools', pathMatch: 'full' },
@@ -32,6 +34,10 @@ export const routes: Routes = [
   // Design Tools
   { path: 'tools/design', component: DesignComponent },
   { path: 'tools/design/color-converter', component: ColorConverterComponent },
+
+  // Geo Tools (Harita Araçları)
+  { path: 'tools/geo', component: GeoComponent },
+  { path: 'tools/geo/map-tools', component: MapToolsComponent },
 
   // Help
   {

@@ -450,11 +450,11 @@ docs/map-components.md oluştur:
 ## ÇALIŞMA SIRASI
 
 1. ✅ Phase 1.1 - Leaflet kurulumu (TAMAMLANDI)
-2. ⬜ Phase 1.2 - Reusable map components
-3. ⬜ Phase 1.3 - Layer service
-4. ⬜ Phase 1.4 - Plugin service
-5. ⬜ Phase 2.1 - Geo section
-6. ⬜ Phase 2.2 - Map tools component
+2. ✅ Phase 1.2 - Reusable map components (TAMAMLANDI)
+3. ✅ Phase 1.3 - Layer service (TAMAMLANDI)
+4. ✅ Phase 1.4 - Plugin service (TAMAMLANDI)
+5. ✅ Phase 2.1 - Geo section (TAMAMLANDI)
+6. ✅ Phase 2.2 - Map tools component (TAMAMLANDI)
 7. ⬜ Phase 3.1 - Backend earthquake router
 8. ⬜ Phase 3.2 - Backend cache service
 9. ⬜ Phase 3.3 - Frontend earthquake service
