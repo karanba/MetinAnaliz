@@ -13,7 +13,8 @@
       "WebFetch(domain:earthquake.usgs.gov)",
       "Bash(.venv/Scripts/pip install:*)",
       "Bash(.venv/Scripts/python:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git merge:*)"
     ]
   }
 }
