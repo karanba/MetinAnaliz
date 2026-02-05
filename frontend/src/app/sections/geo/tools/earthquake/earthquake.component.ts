@@ -149,6 +149,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   private mapBounds = signal<L.LatLngBounds | null>(null);
   sourceSettingsOpen = signal<boolean>(false);
   settingsTab = signal<"sources" | "magnitude">("sources");
+  recentAnimationMinutes = signal<number>(60);
   private userLocationMarker: L.Marker | null = null;
 
   // Computed
@@ -233,6 +234,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
       // Read signal to subscribe to changes
       this.sourceFilteredEarthquakes();
       this.magnitudeLegend();
+      this.recentAnimationMinutes();
       this.updateMarkers();
     });
   }
@@ -326,6 +328,9 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   private createMarker(quake: EarthquakeFeature): L.CircleMarker {
     const [lng, lat, depth] = quake.geometry.coordinates;
     const mag = quake.properties.mag;
+    const isRecent =
+      Date.now() - quake.properties.time <
+      this.recentAnimationMinutes() * 60 * 1000;
 
     const marker = L.circleMarker([lat, lng], {
       radius: this.earthquakeService.getMarkerRadius(mag),
@@ -334,6 +339,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
       weight: 1,
       opacity: 1,
       fillOpacity: 0.8,
+      className: isRecent ? "recent-quake" : "",
     });
 
     // Popup content

@@ -312,6 +312,21 @@
 
       @if (settingsTab() === 'magnitude') {
         <div class="magnitude-settings">
+          <div class="animation-settings">
+            <span class="section-title">Yakın Deprem Animasyonu</span>
+            <div class="animation-row">
+              <span class="animation-label">Süre (dakika)</span>
+              <input
+                type="number"
+                min="5"
+                max="240"
+                step="5"
+                [ngModel]="recentAnimationMinutes()"
+                (ngModelChange)="recentAnimationMinutes.set($event)"
+              />
+            </div>
+          </div>
+
           <div class="legend-grid">
             @for (item of magnitudeLegend(); track item.key) {
               <div class="legend-row">

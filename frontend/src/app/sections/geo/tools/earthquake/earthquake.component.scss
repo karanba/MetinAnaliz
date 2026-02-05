@@ -120,6 +120,33 @@
   gap: 8px;
 }
 
+.animation-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background: var(--surface-50);
+}
+
+.animation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.animation-row input[type="number"] {
+  width: 90px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  font-size: 0.75rem;
+}
+
 .section-title {
   font-size: 0.8rem;
   font-weight: 600;
@@ -609,6 +636,34 @@
         opacity: 0;
       }
     }
+  }
+}
+
+// Subtle animation for recent quakes (last 1 hour)
+:host ::ng-deep .recent-quake {
+  animation: quake-ripple 2.4s ease-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
+}
+
+@keyframes quake-ripple {
+  0% {
+    transform: scale(1);
+    stroke-opacity: 0.9;
+    fill-opacity: 0.85;
+  }
+  60% {
+    transform: scale(1.35);
+    stroke-opacity: 0.35;
+    fill-opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    stroke-opacity: 0;
+    fill-opacity: 0.6;
   }
 }
 
