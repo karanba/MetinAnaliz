@@ -1,8 +1,8 @@
 .airports-page {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: calc(100vh - 120px);
+  height: calc(100vh - 120px);
+  min-height: 0;
   position: relative;
 }
 
@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
   background: var(--surface-ground);
   border-radius: 12px;
   overflow: hidden;
@@ -106,7 +107,7 @@
 .airports-content {
   display: flex;
   flex: 1;
-  min-height: 500px;
+  min-height: 0;
   position: relative;
 }
 
@@ -159,6 +160,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .panel-header-fixed {
