@@ -26,11 +26,24 @@ export interface PDFConversionResult {
 }
 
 /**
+ * PDF birleştirme sonucu
+ */
+export interface PDFMergeResult {
+  success: boolean;
+  file_id: string;
+  output_name: string | null;
+  total_pages: number;
+  merged_count: number;
+  error: string | null;
+}
+
+/**
  * PDF yapılandırma bilgisi
  */
 export interface PDFConfig {
   max_file_size_mb: number;
   max_file_size_bytes: number;
+  max_files_per_request: number;
   allowed_types: string[];
   allowed_extensions: string[];
 }
@@ -65,8 +78,11 @@ export class PDFService {
 
   // State signals
   private readonly _selectedFile = signal<File | null>(null);
+  private readonly _selectedFiles = signal<File[]>([]); // For merge operation
   private readonly _validationResult = signal<PDFValidationResult | null>(null);
+  private readonly _validationResults = signal<PDFValidationResult[]>([]); // For merge operation
   private readonly _conversionResult = signal<PDFConversionResult | null>(null);
+  private readonly _mergeResult = signal<PDFMergeResult | null>(null);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
   private readonly _uploadProgress = signal<number>(0);
@@ -116,8 +132,11 @@ export class PDFService {
 
   // Public readonly signals
   readonly selectedFile = this._selectedFile.asReadonly();
+  readonly selectedFiles = this._selectedFiles.asReadonly(); // For merge
   readonly validationResult = this._validationResult.asReadonly();
+  readonly validationResults = this._validationResults.asReadonly(); // For merge
   readonly conversionResult = this._conversionResult.asReadonly();
+  readonly mergeResult = this._mergeResult.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly uploadProgress = this._uploadProgress.asReadonly();
@@ -143,6 +162,14 @@ export class PDFService {
   });
 
   readonly maxFileSizeMB = computed(() => this._config()?.max_file_size_mb ?? 50);
+  readonly maxFilesPerRequest = computed(() => this._config()?.max_files_per_request ?? 3);
+  readonly selectedFilesCount = computed(() => this._selectedFiles().length);
+  readonly canAddMoreFiles = computed(() => this._selectedFiles().length < this.maxFilesPerRequest());
+  readonly allFilesValidated = computed(() => {
+    const files = this._selectedFiles();
+    const results = this._validationResults();
+    return files.length > 0 && files.length === results.length && results.every(r => r.is_valid);
+  });
 
   constructor() {
     this.loadConfig();
@@ -160,6 +187,7 @@ export class PDFService {
           return [{
             max_file_size_mb: 50,
             max_file_size_bytes: 50 * 1024 * 1024,
+            max_files_per_request: 3,
             allowed_types: ['application/pdf'],
             allowed_extensions: ['.pdf']
           }];
@@ -293,6 +321,175 @@ export class PDFService {
     });
   }
 
+  // ============ MERGE METHODS ============
+
+  /**
+   * Birleştirme için dosya ekle
+   */
+  addFileForMerge(file: File): boolean {
+    if (!this.canAddMoreFiles()) {
+      this._error.set(`En fazla ${this.maxFilesPerRequest()} dosya ekleyebilirsiniz`);
+      return false;
+    }
+    if (!this.isFileTypeValid(file)) {
+      this._error.set('Sadece PDF dosyaları eklenebilir');
+      return false;
+    }
+    if (!this.isFileSizeValid(file)) {
+      this._error.set(`Dosya boyutu ${this.maxFileSizeMB()} MB'dan küçük olmalı`);
+      return false;
+    }
+
+    const currentFiles = this._selectedFiles();
+    this._selectedFiles.set([...currentFiles, file]);
+    this._error.set(null);
+    return true;
+  }
+
+  /**
+   * Birleştirme listesinden dosya kaldır
+   */
+  removeFileFromMerge(index: number): void {
+    const currentFiles = this._selectedFiles();
+    const currentResults = this._validationResults();
+
+    if (index >= 0 && index < currentFiles.length) {
+      this._selectedFiles.set(currentFiles.filter((_, i) => i !== index));
+      this._validationResults.set(currentResults.filter((_, i) => i !== index));
+    }
+  }
+
+  /**
+   * Birleştirme listesindeki dosyaları yeniden sırala
+   */
+  reorderFilesForMerge(fromIndex: number, toIndex: number): void {
+    const files = [...this._selectedFiles()];
+    const results = [...this._validationResults()];
+
+    const [movedFile] = files.splice(fromIndex, 1);
+    files.splice(toIndex, 0, movedFile);
+
+    if (results.length > 0) {
+      const [movedResult] = results.splice(fromIndex, 1);
+      results.splice(toIndex, 0, movedResult);
+      this._validationResults.set(results);
+    }
+
+    this._selectedFiles.set(files);
+  }
+
+  /**
+   * Tüm dosyaları doğrula (birleştirme için)
+   */
+  validateFilesForMerge(): Observable<PDFValidationResult[]> {
+    const files = this._selectedFiles();
+    if (files.length < 2) {
+      return throwError(() => new Error('En az 2 dosya seçilmeli'));
+    }
+
+    this._loading.set(true);
+    this._error.set(null);
+    this._validationResults.set([]);
+
+    // Validate each file sequentially
+    const validations: Observable<PDFValidationResult>[] = files.map(file => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return this.http.post<PDFValidationResult>(`${this.apiUrl}/validate`, formData);
+    });
+
+    return new Observable(subscriber => {
+      const results: PDFValidationResult[] = [];
+      let index = 0;
+
+      const validateNext = () => {
+        if (index >= validations.length) {
+          this._validationResults.set(results);
+          this._loading.set(false);
+          subscriber.next(results);
+          subscriber.complete();
+          return;
+        }
+
+        validations[index].subscribe({
+          next: (result) => {
+            results.push(result);
+            if (!result.is_valid) {
+              this._error.set(`${files[index].name}: ${result.error}`);
+            }
+            index++;
+            validateNext();
+          },
+          error: (err) => {
+            this._loading.set(false);
+            this._error.set(`${files[index].name}: Doğrulama hatası`);
+            subscriber.error(err);
+          }
+        });
+      };
+
+      validateNext();
+    });
+  }
+
+  /**
+   * PDF'leri birleştir
+   */
+  mergePDFs(outputName: string = 'merged.pdf'): Observable<PDFMergeResult> {
+    const files = this._selectedFiles();
+    if (files.length < 2) {
+      return throwError(() => new Error('En az 2 dosya seçilmeli'));
+    }
+
+    this._loading.set(true);
+    this._error.set(null);
+    this._uploadProgress.set(0);
+
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+    formData.append('output_name', outputName);
+
+    return this.http.post<PDFMergeResult>(`${this.apiUrl}/merge`, formData, {
+      reportProgress: true,
+      observe: 'events'
+    }).pipe(
+      map(event => {
+        if (event.type === HttpEventType.UploadProgress && event.total) {
+          this._uploadProgress.set(Math.round(100 * event.loaded / event.total));
+          return null as any;
+        } else if (event.type === HttpEventType.Response) {
+          return event.body as PDFMergeResult;
+        }
+        return null as any;
+      }),
+      tap(result => {
+        if (result) {
+          this._mergeResult.set(result);
+          this._loading.set(false);
+          if (!result.success) {
+            this._error.set(result.error);
+          }
+        }
+      }),
+      catchError(err => {
+        this._loading.set(false);
+        this._error.set(err.error?.detail || err.message || 'Birleştirme hatası');
+        return throwError(() => err);
+      })
+    );
+  }
+
+  /**
+   * Birleştirme state'ini temizle
+   */
+  clearMergeFiles(): void {
+    this._selectedFiles.set([]);
+    this._validationResults.set([]);
+    this._mergeResult.set(null);
+    this._error.set(null);
+    this._uploadProgress.set(0);
+  }
+
   /**
    * Wizard adımını değiştir
    */
@@ -355,8 +552,11 @@ export class PDFService {
    */
   reset(): void {
     this._selectedFile.set(null);
+    this._selectedFiles.set([]);
     this._validationResult.set(null);
+    this._validationResults.set([]);
     this._conversionResult.set(null);
+    this._mergeResult.set(null);
     this._loading.set(false);
     this._error.set(null);
     this._uploadProgress.set(0);

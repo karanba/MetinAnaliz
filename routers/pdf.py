@@ -15,6 +15,7 @@ from services.pdf_service import (
     PDFValidationError,
     PDFConversionError,
     PDF_MAX_FILE_SIZE_MB,
+    PDF_MAX_FILES_PER_REQUEST,
 )
 
 router = APIRouter(prefix="/pdf", tags=["pdf"])
@@ -46,6 +47,15 @@ class StatsResponse(BaseModel):
 class CleanupResponse(BaseModel):
     cleaned_count: int
     message: str
+
+
+class MergeResponse(BaseModel):
+    success: bool
+    file_id: str
+    output_name: str | None = None
+    total_pages: int = 0
+    merged_count: int = 0
+    error: str | None = None
 
 
 @router.post("/validate", response_model=ValidationResponse)
@@ -133,16 +143,86 @@ async def convert_to_word(
     return ConversionResponse(**result.to_dict())
 
 
+@router.post("/merge", response_model=MergeResponse)
+async def merge_pdfs(
+    files: list[UploadFile] = File(..., description="Birleştirilecek PDF dosyaları"),
+    output_name: str = Form(default="merged.pdf", description="Çıktı dosya adı"),
+) -> MergeResponse:
+    """
+    Birden fazla PDF dosyasını birleştir.
+
+    Dosyalar sırayla birleştirilir. Maksimum dosya sayısı: PDF_MAX_FILES_PER_REQUEST
+
+    Args:
+        files: PDF dosyaları listesi (2-N arası)
+        output_name: Çıktı dosya adı
+
+    Returns:
+        Birleştirme sonucu (success, file_id, output_name, total_pages, merged_count, error)
+    """
+    # Check file count
+    if len(files) < 2:
+        return MergeResponse(
+            success=False,
+            file_id="",
+            error="En az 2 dosya gerekli",
+        )
+
+    if len(files) > PDF_MAX_FILES_PER_REQUEST:
+        return MergeResponse(
+            success=False,
+            file_id="",
+            error=f"En fazla {PDF_MAX_FILES_PER_REQUEST} dosya birleştirilebilir",
+        )
+
+    # Read and validate all files
+    file_contents: list[tuple[bytes, str]] = []
+
+    for file in files:
+        try:
+            content = await file.read()
+        except Exception as e:
+            return MergeResponse(
+                success=False,
+                file_id="",
+                error=f"Dosya okunamadı ({file.filename}): {e}",
+            )
+
+        # Validate each file
+        validation = await pdf_service.validate_pdf(
+            content=content,
+            filename=file.filename or "unknown.pdf",
+            content_type=file.content_type,
+        )
+
+        if not validation.is_valid:
+            return MergeResponse(
+                success=False,
+                file_id="",
+                error=f"Geçersiz dosya ({file.filename}): {validation.error}",
+            )
+
+        file_contents.append((content, file.filename or "unknown.pdf"))
+
+    # Merge
+    result = await pdf_service.merge_pdfs(
+        files=file_contents,
+        output_name=output_name,
+    )
+
+    return MergeResponse(**result.to_dict())
+
+
 @router.get("/download/{file_id}")
 async def download_converted_file(file_id: str) -> Response:
     """
-    Dönüştürülmüş dosyayı indir.
+    Dönüştürülmüş veya birleştirilmiş dosyayı indir.
 
     Args:
-        file_id: Dönüşüm sonucu dönen file_id
+        file_id: İşlem sonucu dönen file_id
 
     Returns:
-        DOCX dosyası
+        DOCX veya PDF dosyası
     """
     result = await pdf_service.get_converted_file(file_id)
 
@@ -157,9 +237,15 @@ async def download_converted_file(file_id: str) -> Response:
     # Delete file after download (one-time download)
     await pdf_service.delete_converted_file(file_id)
 
+    # Determine media type based on file extension
+    if filename.lower().endswith('.pdf'):
+        media_type = "application/pdf"
+    else:
+        media_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+
     return Response(
         content=content,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        media_type=media_type,
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"',
         },
@@ -205,6 +291,7 @@ async def get_config() -> dict[str, Any]:
     return {
         "max_file_size_mb": PDF_MAX_FILE_SIZE_MB,
         "max_file_size_bytes": PDF_MAX_FILE_SIZE_MB * 1024 * 1024,
+        "max_files_per_request": PDF_MAX_FILES_PER_REQUEST,
         "allowed_types": ["application/pdf"],
         "allowed_extensions": [".pdf"],
     }

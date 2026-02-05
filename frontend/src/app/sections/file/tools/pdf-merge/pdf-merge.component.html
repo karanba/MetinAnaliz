@@ -1,0 +1,372 @@
+<div class="pdf-merge-page">
+  <app-page-header
+    title="PDF Birleştir"
+    description="Birden fazla PDF dosyasını tek bir dosyada birleştirin"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Dosya Araçları', route: '/tools/file' },
+      { label: 'PDF Birleştir' }
+    ]"
+  />
+
+  <p-card styleClass="wizard-card">
+    <div class="wizard-container">
+      <!-- Steps indicator -->
+      <div class="steps-wrapper">
+        <p-steps
+          [model]="steps"
+          [activeIndex]="currentStep()"
+          [readonly]="true"
+          styleClass="pdf-steps"
+        />
+      </div>
+
+      <!-- Step content -->
+      <div class="step-content">
+        <!-- Step 0: File Selection -->
+        @if (currentStep() === 0) {
+          <div class="step-panel file-select-panel">
+            <h3>PDF Dosyalarını Seçin</h3>
+            <p class="step-description">
+              Birleştirmek istediğiniz PDF dosyalarını sürükleyip bırakın veya seçin.
+              <br>
+              <strong>En az 2, en fazla {{ maxFilesPerRequest() }} dosya</strong> seçebilirsiniz.
+              Maksimum dosya boyutu: <strong>{{ maxFileSizeMB() }} MB</strong>
+            </p>
+
+            <!-- File list -->
+            @if (selectedFiles().length > 0) {
+              <div class="selected-files-list">
+                @for (file of selectedFiles(); track file.name; let i = $index) {
+                  <div class="file-item">
+                    <div class="file-icon">
+                      <i class="pi pi-file-pdf"></i>
+                    </div>
+                    <div class="file-details">
+                      <span class="file-name">{{ file.name }}</span>
+                      <span class="file-size">{{ formatFileSize(file.size) }}</span>
+                    </div>
+                    <p-button
+                      icon="pi pi-times"
+                      severity="danger"
+                      [outlined]="true"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="removeFile(i)"
+                      pTooltip="Kaldır"
+                      tooltipPosition="left"
+                    />
+                  </div>
+                }
+              </div>
+
+              <div class="file-summary">
+                <p-tag icon="pi pi-file" [value]="selectedFiles().length + ' dosya'" />
+                <p-tag icon="pi pi-database" [value]="totalFileSizeFormatted()" severity="secondary" />
+              </div>
+            }
+
+            <!-- Drop zone (show when can add more) -->
+            @if (canAddMoreFiles()) {
+              <div
+                class="drop-zone"
+                [class.drag-over]="isDragOver()"
+                [class.has-files]="selectedFiles().length > 0"
+                (dragenter)="onDragEnter($event)"
+                (dragleave)="onDragLeave($event)"
+                (drop)="onDrop($event)"
+              >
+                <i class="pi pi-file-pdf drop-icon"></i>
+                <span class="drop-text">PDF dosyalarını buraya sürükleyin</span>
+                <span class="drop-or">veya</span>
+                <p-fileUpload
+                  mode="basic"
+                  accept=".pdf,application/pdf"
+                  [maxFileSize]="maxFileSizeMB() * 1024 * 1024"
+                  [multiple]="true"
+                  chooseLabel="Dosya Seç"
+                  chooseIcon="pi pi-upload"
+                  (onSelect)="onFileSelect($event)"
+                  [auto]="false"
+                  styleClass="upload-button"
+                />
+              </div>
+            } @else {
+              <p-message severity="info" text="Maksimum dosya sayısına ulaşıldı." />
+            }
+          </div>
+        }
+
+        <!-- Step 1: Validation -->
+        @if (currentStep() === 1) {
+          <div class="step-panel validation-panel">
+            <h3>Dosya Doğrulama</h3>
+            <p class="step-description">
+              Dosyalarınız güvenlik ve format açısından kontrol ediliyor.
+            </p>
+
+            @if (loading()) {
+              <div class="validation-loading">
+                <p-progressSpinner strokeWidth="4" />
+                <span>Dosyalar doğrulanıyor...</span>
+              </div>
+            } @else {
+              <div class="validation-results">
+                @for (file of selectedFiles(); track file.name; let i = $index) {
+                  <div class="validation-item" [class.valid]="validationResults()[i]?.is_valid" [class.invalid]="validationResults()[i] && !validationResults()[i]?.is_valid">
+                    <div class="validation-icon">
+                      @if (validationResults()[i]?.is_valid) {
+                        <i class="pi pi-check-circle"></i>
+                      } @else if (validationResults()[i]) {
+                        <i class="pi pi-times-circle"></i>
+                      } @else {
+                        <i class="pi pi-clock"></i>
+                      }
+                    </div>
+                    <div class="validation-details">
+                      <span class="file-name">{{ file.name }}</span>
+                      @if (validationResults()[i]?.page_count) {
+                        <span class="page-count">{{ validationResults()[i]?.page_count }} sayfa</span>
+                      }
+                      @if (validationResults()[i]?.error) {
+                        <span class="error-text">{{ validationResults()[i]?.error }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              @if (allFilesValidated()) {
+                <div class="validation-summary">
+                  <p-tag icon="pi pi-check" value="Tüm dosyalar doğrulandı" severity="success" />
+                  <p-tag icon="pi pi-file" [value]="totalPages() + ' toplam sayfa'" severity="info" />
+                </div>
+              }
+            }
+          </div>
+        }
+
+        <!-- Step 2: Reorder -->
+        @if (currentStep() === 2) {
+          <div class="step-panel reorder-panel">
+            <h3>Sıralama</h3>
+            <p class="step-description">
+              Dosyaları sürükleyerek birleştirme sırasını belirleyin.
+              İlk dosya birleşik PDF'in başında yer alacaktır.
+            </p>
+
+            <div class="reorder-list" cdkDropList (cdkDropListDropped)="onFileDrop($event)">
+              @for (file of selectedFiles(); track file.name; let i = $index) {
+                <div class="reorder-item" cdkDrag>
+                  <div class="drag-handle" cdkDragHandle>
+                    <i class="pi pi-bars"></i>
+                  </div>
+                  <div class="order-number">{{ i + 1 }}</div>
+                  <div class="file-icon">
+                    <i class="pi pi-file-pdf"></i>
+                  </div>
+                  <div class="file-details">
+                    <span class="file-name">{{ file.name }}</span>
+                    <span class="page-count">{{ validationResults()[i]?.page_count ?? 0 }} sayfa</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="output-settings">
+              <label for="outputName">Çıktı Dosya Adı</label>
+              <div class="output-input">
+                <input
+                  pInputText
+                  id="outputName"
+                  [(ngModel)]="outputFileName"
+                  placeholder="merged.pdf"
+                />
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Step 3: Consent -->
+        @if (currentStep() === 3) {
+          <div class="step-panel consent-panel">
+            <h3>Kullanım Koşulları</h3>
+            <p class="step-description">
+              Devam etmeden önce aşağıdaki koşulları kabul etmeniz gerekmektedir.
+            </p>
+
+            <div class="consent-box">
+              <div class="consent-item">
+                <i class="pi pi-server"></i>
+                <div>
+                  <strong>Sunucu İşleme</strong>
+                  <p>PDF dosyalarınız birleştirmek üzere sunucumuza yüklenir.</p>
+                </div>
+              </div>
+
+              <div class="consent-item">
+                <i class="pi pi-trash"></i>
+                <div>
+                  <strong>Otomatik Silme</strong>
+                  <p>Dosyalarınız işlem tamamlandıktan sonra 15 dakika içinde otomatik olarak silinir.</p>
+                </div>
+              </div>
+
+              <div class="consent-item">
+                <i class="pi pi-lock"></i>
+                <div>
+                  <strong>Gizlilik</strong>
+                  <p>Dosyalarınız şifreli bağlantı üzerinden iletilir ve üçüncü taraflarla paylaşılmaz.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="merge-preview">
+              <h4>Birleştirme Özeti</h4>
+              <div class="preview-details">
+                <div class="detail-item">
+                  <span class="detail-label">Dosya Sayısı:</span>
+                  <span class="detail-value">{{ selectedFiles().length }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Toplam Sayfa:</span>
+                  <span class="detail-value">{{ totalPages() }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Çıktı Dosyası:</span>
+                  <span class="detail-value">{{ outputFileName() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="consent-checkbox">
+              <p-checkbox
+                [ngModel]="userConsent()"
+                (ngModelChange)="onConsentChange($event)"
+                [binary]="true"
+                inputId="consent"
+              />
+              <label for="consent">
+                Yukarıdaki koşulları okudum ve kabul ediyorum.
+              </label>
+            </div>
+          </div>
+        }
+
+        <!-- Step 4: Merge & Download -->
+        @if (currentStep() === 4) {
+          <div class="step-panel merge-panel">
+            <h3>Birleştirme</h3>
+
+            @if (loading()) {
+              <div class="merge-progress">
+                <p-progressSpinner strokeWidth="4" />
+                <span>Dosyalar birleştiriliyor...</span>
+                @if (uploadProgress() > 0 && uploadProgress() < 100) {
+                  <p-progressBar [value]="uploadProgress()" [showValue]="true" />
+                }
+              </div>
+            } @else if (mergeResult()?.success) {
+              <div class="merge-success">
+                <i class="pi pi-check-circle"></i>
+                <span>Birleştirme tamamlandı!</span>
+              </div>
+
+              <div class="result-details">
+                <div class="detail-item">
+                  <span class="detail-label">Birleştirilen Dosya:</span>
+                  <span class="detail-value">{{ mergeResult()?.merged_count }} PDF</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Toplam Sayfa:</span>
+                  <span class="detail-value">{{ mergeResult()?.total_pages }}</span>
+                </div>
+              </div>
+
+              <div class="download-section">
+                <p class="download-info">
+                  Dosyanız hazır: <strong>{{ mergeResult()?.output_name }}</strong>
+                </p>
+                <p-button
+                  label="İndir"
+                  icon="pi pi-download"
+                  (onClick)="downloadResult()"
+                  size="large"
+                />
+              </div>
+
+              <div class="new-merge">
+                <p-button
+                  label="Yeni Birleştirme"
+                  icon="pi pi-refresh"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="startOver()"
+                />
+              </div>
+            } @else if (mergeResult() && !mergeResult()?.success) {
+              <div class="merge-error">
+                <i class="pi pi-times-circle"></i>
+                <span>Birleştirme başarısız</span>
+              </div>
+              <p-message severity="error" [text]="mergeResult()?.error ?? 'Bilinmeyen hata'" />
+
+              <div class="retry-section">
+                <p-button
+                  label="Tekrar Dene"
+                  icon="pi pi-refresh"
+                  severity="secondary"
+                  (onClick)="startMerge()"
+                />
+                <p-button
+                  label="Baştan Başla"
+                  icon="pi pi-arrow-left"
+                  severity="secondary"
+                  [outlined]="true"
+                  (onClick)="startOver()"
+                />
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Error message -->
+        @if (error() && currentStep() !== 4) {
+          <div class="global-error">
+            <p-message severity="error" [text]="error()!" />
+          </div>
+        }
+      </div>
+
+      <!-- Navigation buttons -->
+      <div class="wizard-navigation">
+        @if (currentStep() > 0 && currentStep() < 4) {
+          <p-button
+            label="Geri"
+            icon="pi pi-arrow-left"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="prevStep()"
+          />
+        }
+
+        <div class="nav-spacer"></div>
+
+        @if (currentStep() < 4) {
+          <p-button
+            [label]="currentStep() === 3 ? 'Birleştir' : 'İleri'"
+            [icon]="currentStep() === 3 ? 'pi pi-cog' : 'pi pi-arrow-right'"
+            iconPos="right"
+            [disabled]="
+              (currentStep() === 0 && selectedFiles().length < 2) ||
+              (currentStep() === 1 && !allFilesValidated()) ||
+              (currentStep() === 3 && !userConsent()) ||
+              loading()
+            "
+            (onClick)="nextStep()"
+          />
+        }
+      </div>
+    </div>
+  </p-card>
+</div>

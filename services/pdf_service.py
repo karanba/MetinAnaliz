@@ -24,6 +24,13 @@ try:
 except ImportError:
     PDF2DOCX_AVAILABLE = False
 
+# PDF merge library
+try:
+    from pypdf import PdfReader, PdfWriter
+    PYPDF_AVAILABLE = True
+except ImportError:
+    PYPDF_AVAILABLE = False
+
 # Environment configuration
 PDF_MAX_FILE_SIZE_MB = int(os.getenv("PDF_MAX_FILE_SIZE_MB", "50"))
 PDF_MAX_FILES_PER_REQUEST = int(os.getenv("PDF_MAX_FILES_PER_REQUEST", "10"))
@@ -96,6 +103,36 @@ class ConversionResult:
             "file_id": self.file_id,
             "original_name": self.original_name,
             "output_name": self.output_name,
+            "error": self.error,
+        }
+
+
+class MergeResult:
+    """PDF birleştirme sonucu."""
+
+    def __init__(
+        self,
+        success: bool,
+        file_id: str,
+        output_name: str | None = None,
+        total_pages: int = 0,
+        merged_count: int = 0,
+        error: str | None = None,
+    ):
+        self.success = success
+        self.file_id = file_id
+        self.output_name = output_name
+        self.total_pages = total_pages
+        self.merged_count = merged_count
+        self.error = error
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "success": self.success,
+            "file_id": self.file_id,
+            "output_name": self.output_name,
+            "total_pages": self.total_pages,
+            "merged_count": self.merged_count,
             "error": self.error,
         }
 
@@ -328,6 +365,125 @@ class PDFService:
         finally:
             cv.close()
 
+    async def merge_pdfs(
+        self,
+        files: list[tuple[bytes, str]],
+        output_name: str = "merged.pdf",
+    ) -> MergeResult:
+        """
+        Birden fazla PDF dosyasını birleştir.
+
+        Args:
+            files: Liste of (content, filename) tuples
+            output_name: Çıktı dosya adı
+
+        Returns:
+            MergeResult with file_id for download
+        """
+        if not PYPDF_AVAILABLE:
+            return MergeResult(
+                success=False,
+                file_id="",
+                error="pypdf kütüphanesi yüklü değil",
+            )
+
+        # Check file count limit
+        if len(files) > PDF_MAX_FILES_PER_REQUEST:
+            return MergeResult(
+                success=False,
+                file_id="",
+                error=f"En fazla {PDF_MAX_FILES_PER_REQUEST} dosya birleştirilebilir",
+            )
+
+        if len(files) < 2:
+            return MergeResult(
+                success=False,
+                file_id="",
+                error="En az 2 dosya gerekli",
+            )
+
+        # Generate unique file ID
+        file_id = str(uuid.uuid4())
+        safe_output_name = self.sanitize_filename(output_name)
+        if not safe_output_name.lower().endswith('.pdf'):
+            safe_output_name += '.pdf'
+
+        # Create file paths for inputs
+        input_paths: list[Path] = []
+        output_path = self._temp_dir / f"{file_id}_merged.pdf"
+
+        try:
+            # Save input files
+            for idx, (content, filename) in enumerate(files):
+                input_path = self._temp_dir / f"{file_id}_input_{idx}.pdf"
+                async with aiofiles.open(input_path, "wb") as f:
+                    await f.write(content)
+                input_paths.append(input_path)
+
+            # Merge in thread pool (pypdf is sync)
+            loop = asyncio.get_event_loop()
+            total_pages = await loop.run_in_executor(
+                None,
+                self._sync_merge_pdfs,
+                [str(p) for p in input_paths],
+                str(output_path),
+            )
+
+            # Verify output exists
+            if not output_path.exists():
+                raise PDFConversionError("Birleştirme başarısız - çıktı dosyası oluşturulamadı")
+
+            # Register file for cleanup
+            self._file_registry[file_id] = {
+                "input_paths": [str(p) for p in input_paths],
+                "output_path": str(output_path),
+                "output_name": safe_output_name,
+                "created_at": datetime.utcnow(),
+            }
+
+            return MergeResult(
+                success=True,
+                file_id=file_id,
+                output_name=safe_output_name,
+                total_pages=total_pages,
+                merged_count=len(files),
+            )
+
+        except Exception as e:
+            # Cleanup on error
+            for path in input_paths + [output_path]:
+                try:
+                    if path.exists():
+                        await aiofiles.os.remove(path)
+                except Exception:
+                    pass
+
+            return MergeResult(
+                success=False,
+                file_id=file_id,
+                error=str(e),
+            )
+
+    def _sync_merge_pdfs(
+        self,
+        input_paths: list[str],
+        output_path: str,
+    ) -> int:
+        """Senkron PDF birleştirme (thread pool'da çalışır)."""
+        writer = PdfWriter()
+        total_pages = 0
+
+        for input_path in input_paths:
+            reader = PdfReader(input_path)
+            for page in reader.pages:
+                writer.add_page(page)
+                total_pages += 1
+
+        with open(output_path, "wb") as f:
+            writer.write(f)
+
+        return total_pages
+
     async def get_converted_file(self, file_id: str) -> tuple[bytes, str] | None:
         """
         Dönüştürülmüş dosyayı al.
@@ -356,8 +512,28 @@ class PDFService:
 
         metadata = self._file_registry.pop(file_id)
 
-        for key in ["input_path", "output_path"]:
-            path = Path(metadata.get(key, ""))
+        # Handle single input_path (conversion)
+        if "input_path" in metadata:
+            path = Path(metadata["input_path"])
+            try:
+                if path.exists():
+                    await aiofiles.os.remove(path)
+            except Exception:
+                pass
+
+        # Handle multiple input_paths (merge)
+        if "input_paths" in metadata:
+            for input_path in metadata["input_paths"]:
+                path = Path(input_path)
+                try:
+                    if path.exists():
+                        await aiofiles.os.remove(path)
+                except Exception:
+                    pass
+
+        # Delete output file
+        if "output_path" in metadata:
+            path = Path(metadata["output_path"])
             try:
                 if path.exists():
                     await aiofiles.os.remove(path)
