@@ -1,0 +1,16 @@
+<div class="engineering-page">
+  <app-page-header
+    title="Mühendislik Araçları"
+    description="Hesaplama ve görselleştirme araçları"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Mühendislik' }
+    ]"
+  />
+
+  <div class="tools-grid">
+    @for (tool of tools; track tool.route) {
+      <app-tool-card [tool]="tool" />
+    }
+  </div>
+</div>

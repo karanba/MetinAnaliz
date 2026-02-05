@@ -1,12 +1,67 @@
 <div class="app-shell">
   <nav class="top-nav">
-    <a class="brand" routerLink="/text-analyze">
-      <img src="assets/logo.svg" alt="Metin Analiz logo" />
-      <span>Metin Analiz</span>
+    <a class="brand" routerLink="/">
+      <img src="assets/logo.svg" alt="Araç Kutusu logo" />
+      <span>Araç Kutusu</span>
     </a>
-    <div class="nav-links">
-      <a routerLink="/text-analyze" routerLinkActive="active">Metin Analizi</a>
-      <a routerLink="/help" routerLinkActive="active">Yardım</a>
+
+    <!-- Desktop Navigation -->
+    <div class="nav-links desktop-nav">
+      <!-- Language Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isLanguageActive()">
+        <button class="nav-dropdown-trigger" (click)="languageMenu.toggle($event)">
+          <i class="pi pi-language"></i>
+          <span>Dil Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #languageMenu [model]="languageTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <!-- Engineering Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isEngineeringActive()">
+        <button class="nav-dropdown-trigger" (click)="engineeringMenu.toggle($event)">
+          <i class="pi pi-cog"></i>
+          <span>Mühendislik Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #engineeringMenu [model]="engineeringTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <!-- Design Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isDesignActive()">
+        <button class="nav-dropdown-trigger" (click)="designMenu.toggle($event)">
+          <i class="pi pi-palette"></i>
+          <span>Tasarım Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #designMenu [model]="designTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <!-- Geo Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isGeoActive()">
+        <button class="nav-dropdown-trigger" (click)="geoMenu.toggle($event)">
+          <i class="pi pi-map"></i>
+          <span>Harita Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #geoMenu [model]="geoTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <!-- File Tools Dropdown -->
+      <div class="nav-dropdown" [class.active]="isFileActive()">
+        <button class="nav-dropdown-trigger" (click)="fileMenu.toggle($event)">
+          <i class="pi pi-file"></i>
+          <span>Dosya Araçları</span>
+          <i class="pi pi-chevron-down chevron"></i>
+        </button>
+        <p-menu #fileMenu [model]="fileTools" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <a routerLink="/help" routerLinkActive="active" class="nav-link">
+        <i class="pi pi-question-circle"></i>
+        <span>Yardım</span>
+      </a>
+
       <p-button
         icon="pi pi-info-circle"
         [text]="true"
@@ -16,7 +71,40 @@
         pTooltip="Platform bilgileri"
       ></p-button>
     </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+      <i class="pi" [ngClass]="mobileMenuVisible ? 'pi-times' : 'pi-bars'"></i>
+    </button>
   </nav>
+
+  <!-- Mobile Navigation -->
+  @if (mobileMenuVisible) {
+    <div class="mobile-nav" (click)="closeMobileMenu()">
+      @for (section of sections(); track section.id) {
+        <div class="mobile-nav-section">
+          <span class="mobile-nav-label">{{ section.title }}</span>
+          @for (tool of section.tools; track tool.id) {
+            <a [routerLink]="tool.route" class="mobile-nav-link">
+              <i class="pi pi-{{ tool.icon }}"></i>
+              {{ tool.title }}
+            </a>
+          }
+        </div>
+      }
+
+      <div class="mobile-nav-section">
+        <a routerLink="/help" class="mobile-nav-link">
+          <i class="pi pi-question-circle"></i>
+          Yardım
+        </a>
+        <button class="mobile-nav-link" (click)="showInfoDialog(); $event.stopPropagation()">
+          <i class="pi pi-info-circle"></i>
+          Platform Bilgileri
+        </button>
+      </div>
+    </div>
+  }
 
   <div class="main-content">
     <router-outlet />
@@ -25,11 +113,11 @@
   <footer class="page-footer">
     <div class="footer-content">
       <div class="footer-left">
-        <span class="footer-title">Dil Araçları Platformu</span>
-        <span class="footer-subtitle">Türkçe metin analizi ve YOD hesaplama</span>
+        <span class="footer-title">Araç Kutusu</span>
+        <span class="footer-subtitle">Dil, mühendislik, tasarım ve dosya araçları platformu</span>
       </div>
       <div class="footer-right">
-        <p-tag value="Metin Analizi" icon="pi pi-bolt" severity="info" [style]="{ fontSize: '0.8rem' }"></p-tag>
+        <p-tag value="Beta" icon="pi pi-bolt" severity="info" [style]="{ fontSize: '0.8rem' }"></p-tag>
       </div>
     </div>
   </footer>
@@ -40,7 +128,7 @@
   header="Platform Bilgileri"
   [(visible)]="infoDialogVisible"
   [modal]="true"
-  [style]="{ width: '600px' }"
+  [style]="{ width: '600px', maxWidth: '95vw' }"
   [draggable]="false"
   [resizable]="false"
 >
@@ -48,53 +136,22 @@
     <div class="info-section">
       <h3><i class="pi pi-info-circle"></i> Hakkında</h3>
       <p>
-        Metin Analizi bu platformdaki ilk araç. Yakında farklı analiz araçları ve sayfalar ile genişleyecek.
+        Araç Kutusu, dil, mühendislik ve tasarım alanlarında çeşitli araçlar sunan bir platformdur.
       </p>
     </div>
 
-    <div class="info-section">
-      <h3><i class="pi pi-cog"></i> Teknoloji</h3>
-      <p>Altyapı detayları sade tutulmuştur.</p>
-    </div>
-
-    <div class="info-section">
-      <h3><i class="pi pi-bolt"></i> Aktif Araç: Metin Analizi</h3>
-      <p class="tool-description">Türkçe metin çözümleri ve YOD değeri hesaplama</p>
-      <div class="features-list">
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>Cümle, kelime ve hece sayımı</span>
-        </div>
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>YOD (Okunabilirlik) değeri hesaplama</span>
-        </div>
-        <div class="feature-item">
-          <i class="pi pi-check-circle"></i>
-          <span>Hece dağılımı analizi</span>
+    @for (section of sections(); track section.id) {
+      <div class="info-section">
+        <h3><i class="pi pi-{{ section.icon }}"></i> {{ section.title }}</h3>
+        <div class="features-list">
+          @for (tool of section.tools; track tool.id) {
+            <div class="feature-item">
+              <i class="pi pi-check-circle"></i>
+              <span>{{ tool.title }} - {{ tool.description }}</span>
+            </div>
+          }
         </div>
       </div>
-    </div>
-
-    <div class="info-section">
-      <h3><i class="pi pi-download"></i> Dışa Aktarma Formatları</h3>
-      <div class="export-formats">
-        <div class="format-item">
-          <i class="pi pi-file"></i>
-          <strong>CSV</strong>
-          <span>Tablo formatı</span>
-        </div>
-        <div class="format-item">
-          <i class="pi pi-file-edit"></i>
-          <strong>TXT</strong>
-          <span>Düz metin</span>
-        </div>
-        <div class="format-item">
-          <i class="pi pi-file-pdf"></i>
-          <strong>PDF</strong>
-          <span>Raporlama</span>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </p-dialog>

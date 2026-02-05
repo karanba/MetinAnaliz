@@ -1,0 +1,381 @@
+<div class="earthquake-page">
+  <app-page-header
+    title="Deprem Bilgi Sistemi"
+    description="Dünya genelinde gerçek zamanlı deprem verileri ve harita görselleştirmesi"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Harita Araçları', route: '/tools/geo' },
+      { label: 'Deprem' }
+    ]"
+  />
+
+  <div class="earthquake-container">
+    <!-- Toolbar -->
+    <div class="earthquake-toolbar">
+      <!-- Time Presets -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Zaman:</span>
+        <p-selectButton
+          [options]="timePresets"
+          [ngModel]="selectedPreset()"
+          (ngModelChange)="onPresetChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          size="small"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Magnitude Filter -->
+      <div class="toolbar-group magnitude-group">
+        <span class="toolbar-label">Min. Büyüklük: {{ minMagnitude() }}</span>
+        <p-slider
+          [ngModel]="minMagnitude()"
+          (ngModelChange)="minMagnitude.set($event)"
+          (onSlideEnd)="onMagnitudeChange()"
+          [min]="0"
+          [max]="8"
+          [step]="0.5"
+          styleClass="magnitude-slider"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Layer Selector -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Katman:</span>
+        <p-selectButton
+          [options]="layerOptions"
+          [ngModel]="selectedLayer()"
+          (ngModelChange)="onLayerChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          size="small"
+        />
+      </div>
+
+      <!-- Auto Refresh -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Otomatik:</span>
+        <p-toggleswitch
+          [ngModel]="autoRefresh()"
+          (ngModelChange)="autoRefresh.set($event); onAutoRefreshChange()"
+          pTooltip="60 saniyede bir güncelle"
+          tooltipPosition="bottom"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Viewport Filter -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Harita Filtre:</span>
+        <p-toggleswitch
+          [ngModel]="filterByViewport()"
+          (ngModelChange)="filterByViewport.set($event)"
+          pTooltip="Sadece görünür alanı göster"
+          tooltipPosition="bottom"
+        />
+      </div>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- Find My Location -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-compass"
+          pTooltip="Konumumu Bul"
+          tooltipPosition="bottom"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="findMyLocation()"
+          size="small"
+        />
+      </div>
+
+      <!-- Refresh Button -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-refresh"
+          label="Yenile"
+          severity="secondary"
+          [outlined]="true"
+          [loading]="loading()"
+          (onClick)="refresh()"
+          size="small"
+        />
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="earthquake-content">
+      <!-- Map -->
+      <div class="map-area">
+        <app-base-map
+          [showCoordinates]="true"
+          (mapReady)="onMapReady($event)"
+          (viewChange)="onViewChange($event)"
+        />
+
+        <div class="settings-button">
+          <p-button
+            icon="pi pi-cog"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="sourceSettingsOpen.set(true)"
+            pTooltip="Veri Kaynakları"
+            tooltipPosition="left"
+            size="small"
+          />
+        </div>
+
+        <!-- Loading overlay -->
+        @if (loading()) {
+          <div class="loading-overlay">
+            <p-progressSpinner strokeWidth="4" />
+          </div>
+        }
+
+        <!-- Error message -->
+        @if (error()) {
+          <div class="error-overlay">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ error() }}</span>
+            <p-button
+              label="Tekrar Dene"
+              size="small"
+              (onClick)="refresh()"
+            />
+          </div>
+        }
+      </div>
+
+      <!-- Side Panel - Earthquake List -->
+      @if (showList() && earthquakes().length > 0) {
+        <div class="side-panel">
+          <div class="panel-header-fixed">
+            <div class="panel-title">
+              <span>Son Depremler</span>
+              <p-tag [value]="filteredEarthquakes().length + ' / ' + count()" severity="info" />
+            </div>
+          </div>
+
+          <!-- Search and Sort Controls -->
+          <div class="list-controls">
+            <div class="search-box">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                pInputText
+                [ngModel]="listSearchQuery()"
+                (ngModelChange)="listSearchQuery.set($event)"
+                placeholder="Konum ara..."
+                class="search-input"
+              />
+            </div>
+            <div class="sort-controls">
+              <p-select
+                [options]="sortOptions"
+                [ngModel]="sortField()"
+                (ngModelChange)="onSortChange($event)"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="sort-select"
+              />
+              <p-button
+                [icon]="sortDirection() === 'asc' ? 'pi pi-sort-amount-up' : 'pi pi-sort-amount-down'"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="toggleSortDirection()"
+                size="small"
+                pTooltip="{{ sortDirection() === 'asc' ? 'Artan' : 'Azalan' }}"
+                tooltipPosition="left"
+              />
+            </div>
+          </div>
+
+          <!-- Scrollable List -->
+          <div class="earthquake-list-container">
+            <div class="earthquake-list">
+              @for (quake of filteredEarthquakes().slice(0, 100); track quake.id) {
+                <div
+                  class="earthquake-item"
+                  (click)="zoomToQuake(quake)"
+                  [class.significant]="quake.properties.sig >= 600"
+                >
+                  <div class="quake-magnitude">
+                    <p-tag
+                      [value]="'M' + quake.properties.mag.toFixed(1)"
+                      [severity]="getMagnitudeSeverity(quake.properties.mag)"
+                    />
+                    <p-tag
+                      class="source-tag"
+                      [value]="quake.properties.source || 'USGS'"
+                      severity="secondary"
+                    />
+                  </div>
+                  <div class="quake-info">
+                    <span class="quake-place">{{ quake.properties.place }}</span>
+                    <span class="quake-time">
+                      {{ earthquakeService.formatTimeAgo(quake.properties.time) }}
+                      · {{ earthquakeService.formatDepth(quake.geometry.coordinates[2]) }}
+                    </span>
+                  </div>
+                  <i class="pi pi-chevron-right"></i>
+                </div>
+              } @empty {
+                <div class="empty-list">
+                  <i class="pi pi-info-circle"></i>
+                  <span>Sonuç bulunamadı</span>
+                </div>
+              }
+            </div>
+
+            @if (filteredEarthquakes().length > 100) {
+              <div class="list-footer">
+                <span class="more-count">
+                  ve {{ filteredEarthquakes().length - 100 }} deprem daha...
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <p-dialog
+      header="Ayarlar"
+      [visible]="sourceSettingsOpen()"
+      (onHide)="sourceSettingsOpen.set(false)"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [showHeader]="true"
+      [style]="{ width: '360px', maxWidth: '92vw', minHeight: '420px' }"
+    >
+      <ng-template pTemplate="header">
+        <div class="settings-header">
+          <i class="pi pi-cog"></i>
+          <span>Ayarlar</span>
+        </div>
+      </ng-template>
+
+      <div class="settings-tabs">
+        <p-selectButton
+          [options]="settingsTabs"
+          [ngModel]="settingsTab()"
+          (ngModelChange)="settingsTab.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          size="small"
+        />
+      </div>
+
+      @if (settingsTab() === 'sources') {
+        <div class="sources-dialog">
+          <div class="source-choice-list">
+            @for (option of sourceOptions; track option.value) {
+              <label class="source-choice">
+                <input
+                  type="checkbox"
+                  [checked]="selectedSources().includes(option.value)"
+                  (change)="toggleSourceSelection(option.value, $event.target.checked)"
+                />
+                <span>{{ option.label }}</span>
+              </label>
+            }
+          </div>
+          <div class="sources-status">
+            @if (sourceStatusEntries().length > 0) {
+              @for (entry of sourceStatusEntries(); track entry[0]) {
+                <div class="source-status-item" [class.failed]="!entry[1].ok">
+                  <span class="source-name">{{ entry[0] }}</span>
+                  <span class="source-state">
+                    {{ entry[1].ok ? 'OK' : 'Hata' }}
+                  </span>
+                  @if (!entry[1].ok && entry[1].error) {
+                    <span class="source-error">{{ entry[1].error }}</span>
+                  }
+                </div>
+              }
+            } @else {
+              <div class="source-status-item empty">Kaynak durumu alınamadı.</div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (settingsTab() === 'magnitude') {
+        <div class="magnitude-settings">
+          <div class="animation-settings">
+            <span class="section-title">Yakın Deprem Animasyonu</span>
+            <div class="animation-row">
+              <span class="animation-label">Süre (dakika)</span>
+              <input
+                type="number"
+                min="5"
+                max="240"
+                step="5"
+                [ngModel]="recentAnimationMinutes()"
+                (ngModelChange)="recentAnimationMinutes.set($event)"
+              />
+            </div>
+          </div>
+
+          <div class="legend-grid">
+            @for (item of magnitudeLegend(); track item.key) {
+              <div class="legend-row">
+                <span class="legend-label">{{ item.label }}</span>
+                <input
+                  type="color"
+                  [ngModel]="item.color"
+                  (ngModelChange)="updateLegendColor(item.key, $event)"
+                />
+                <span
+                  class="legend-preview"
+                  [style.background]="item.color"
+                ></span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </p-dialog>
+
+    <!-- Status Bar -->
+    <div class="earthquake-statusbar">
+      <div class="status-left">
+        <span class="status-item">
+          <i class="pi pi-map-marker"></i>
+          {{ count() }} deprem
+        </span>
+        @if (maxMagnitude() > 0) {
+          <span class="status-item">
+            <i class="pi pi-bolt"></i>
+            En büyük: M{{ maxMagnitude().toFixed(1) }}
+          </span>
+        }
+      </div>
+      <div class="status-right">
+        @if (lastUpdated()) {
+          <span class="status-item">
+            <i class="pi pi-clock"></i>
+            Son güncelleme: {{ lastUpdated()!.toLocaleTimeString('tr-TR') }}
+          </span>
+        }
+        @if (autoRefresh()) {
+          <span class="status-item auto-refresh-active">
+            <i class="pi pi-sync pi-spin"></i>
+            Otomatik güncelleme aktif
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+
+</div>

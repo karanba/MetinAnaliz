@@ -1,0 +1,16 @@
+<div class="design-page">
+  <app-page-header
+    title="Tasarım Araçları"
+    description="Renk, tipografi ve görsel tasarım araçları"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Tasarım' }
+    ]"
+  />
+
+  <div class="tools-grid">
+    @for (tool of tools; track tool.route) {
+      <app-tool-card [tool]="tool" />
+    }
+  </div>
+</div>

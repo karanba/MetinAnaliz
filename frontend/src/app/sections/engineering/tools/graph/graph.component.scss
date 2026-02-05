@@ -1,0 +1,55 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.graph-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+:host ::ng-deep {
+  .p-tablist {
+    border-bottom: 1px solid var(--stroke);
+    margin-bottom: 16px;
+  }
+
+  .p-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--ink);
+    }
+
+    &[data-p-active="true"] {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  :host ::ng-deep .p-tab {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+
+    span {
+      display: none;
+    }
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+}

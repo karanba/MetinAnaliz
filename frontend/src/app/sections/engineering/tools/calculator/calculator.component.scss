@@ -1,0 +1,577 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.calculator-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+// Calculator Layout
+.calculator-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1200px) {
+  .calculator-layout {
+    grid-template-columns: minmax(400px, 500px) 1fr;
+    gap: 32px;
+  }
+}
+
+// Calculator Section
+.calculator-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.calculator-card {
+  align-self: start;
+}
+
+.card-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--stroke);
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.header-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-title-row h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+// Display Section
+.display-section {
+  margin-bottom: 16px;
+}
+
+.expression-input-wrapper {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.expression-input {
+  flex: 1;
+  font-size: 1.2rem;
+  font-family: "Source Code Pro", "Consolas", monospace;
+  padding: 14px 16px;
+  border: 2px solid var(--stroke);
+  border-radius: 12px;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+}
+
+:host ::ng-deep .evaluate-btn {
+  background: linear-gradient(135deg, #176b7a, #0f5560);
+  border: none;
+  width: 48px;
+  height: 48px;
+
+  &:hover {
+    background: linear-gradient(135deg, #1a869c, #125f6b);
+  }
+}
+
+.result-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(31, 122, 140, 0.08), rgba(246, 170, 28, 0.05));
+  border-radius: 12px;
+  border: 1px solid rgba(31, 122, 140, 0.2);
+}
+
+.result-label {
+  font-size: 1.3rem;
+  color: var(--muted);
+}
+
+.result-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: "Source Code Pro", "Consolas", monospace;
+  color: var(--accent-strong);
+  flex: 1;
+  word-break: break-all;
+}
+
+.copy-btn {
+  flex-shrink: 0;
+}
+
+:host ::ng-deep .error-message {
+  margin-top: 12px;
+  width: 100%;
+}
+
+// Settings Bar
+.settings-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--stroke);
+  margin-bottom: 12px;
+}
+
+.setting-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+}
+
+.setting-item.example-select {
+  flex: 1;
+  min-width: 150px;
+}
+
+:host ::ng-deep {
+  .p-selectbutton {
+    .p-button {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+  }
+
+  .precision-select {
+    width: 130px;
+  }
+}
+
+// Memory Display
+.memory-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  transition: all 0.2s ease;
+
+  &.has-value {
+    background: rgba(31, 122, 140, 0.08);
+    color: var(--accent-strong);
+  }
+}
+
+.memory-label {
+  font-weight: 600;
+}
+
+.memory-value {
+  font-family: "Source Code Pro", monospace;
+}
+
+// Button Grid Base
+.calc-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: var(--accent);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Memory Buttons
+.memory-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.memory-btn {
+  background: #f8f9fa;
+  font-size: 0.85rem;
+  padding: 8px;
+  color: var(--accent-strong);
+
+  &:hover {
+    background: rgba(31, 122, 140, 0.1);
+  }
+}
+
+// Scientific Buttons
+.scientific-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.function-btn {
+  background: #f0f7f9;
+  font-size: 0.85rem;
+  padding: 10px 8px;
+  color: var(--accent-strong);
+
+  &:hover {
+    background: rgba(31, 122, 140, 0.15);
+  }
+}
+
+// Main Buttons
+.main-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.number-btn {
+  background: #ffffff;
+  font-size: 1.2rem;
+}
+
+.operator-btn {
+  background: #fff8e7;
+  color: #c77800;
+
+  &:hover {
+    background: #fff0cc;
+  }
+}
+
+.action-btn {
+  background: #fff1f0;
+  color: #cf1322;
+
+  &:hover {
+    background: #ffe7e6;
+  }
+}
+
+.equals-btn {
+  background: linear-gradient(135deg, #176b7a, #0f5560);
+  color: #ffffff;
+  border: none;
+
+  &:hover {
+    background: linear-gradient(135deg, #1a869c, #125f6b);
+  }
+}
+
+// Side Section
+.side-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.history-card {
+  max-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--stroke);
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--ink);
+
+    i {
+      color: var(--accent);
+    }
+  }
+}
+
+.empty-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  opacity: 0.6;
+
+  i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--stroke);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--muted);
+    }
+  }
+}
+
+.history-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(31, 122, 140, 0.08);
+    border-color: rgba(31, 122, 140, 0.2);
+  }
+}
+
+.history-expression {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.9rem;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.history-result {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.85rem;
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+// Info Card
+.info-card {
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    margin: 0 0 16px;
+    color: var(--ink);
+
+    i {
+      color: var(--accent);
+    }
+  }
+}
+
+.tips-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.8;
+
+  li {
+    margin-bottom: 6px;
+  }
+
+  strong {
+    color: var(--ink);
+  }
+}
+
+// Shortcuts Dialog
+.shortcuts-content {
+  padding: 8px 0;
+}
+
+.shortcuts-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--stroke);
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--ink);
+    background: #f8f9fa;
+  }
+
+  td {
+    color: var(--muted);
+  }
+
+  kbd {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #f0f0f0;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-family: "Source Code Pro", monospace;
+    font-size: 0.85rem;
+    color: var(--ink);
+  }
+}
+
+// Mobile Responsive
+@media (max-width: 768px) {
+
+  .header-title-row h2 {
+    font-size: 1.2rem;
+  }
+
+  .expression-input {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .result-value {
+    font-size: 1.2rem;
+  }
+
+  .settings-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .setting-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .scientific-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .calc-btn {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .function-btn {
+    font-size: 0.75rem;
+    padding: 8px 4px;
+  }
+
+  .main-buttons {
+    gap: 8px;
+  }
+
+  .number-btn {
+    font-size: 1rem;
+  }
+
+  :host ::ng-deep .p-tab {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+
+    span {
+      display: none;
+    }
+
+    i {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+// Tablet
+@media (min-width: 769px) and (max-width: 1199px) {
+  .calculator-layout {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .scientific-buttons {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

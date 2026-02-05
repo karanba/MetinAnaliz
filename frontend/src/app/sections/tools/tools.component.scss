@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.tools-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// Category Section
+.category-section {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--stroke);
+}
+
+.category-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(31, 122, 140, 0.12) 0%, rgba(31, 122, 140, 0.04) 100%);
+  border-radius: 12px;
+
+  i {
+    font-size: 1.25rem;
+    color: var(--accent);
+  }
+}
+
+.category-text {
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 2px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: 0;
+  }
+}
+
+.category-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(31, 122, 140, 0.08);
+
+    i {
+      transform: translateX(2px);
+    }
+  }
+
+  i {
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+  }
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .tools-page {
+    gap: 16px;
+  }
+
+  .category-section {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .category-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .category-icon {
+    width: 40px;
+    height: 40px;
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+
+  .category-text {
+    h2 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  .category-link {
+    align-self: flex-end;
+  }
+
+  .tools-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}

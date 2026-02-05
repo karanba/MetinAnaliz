@@ -1,0 +1,16 @@
+<div class="file-page">
+  <app-page-header
+    title="Dosya Araçları"
+    description="PDF dönüştürme, birleştirme ve dosya işlemleri"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Dosya' }
+    ]"
+  />
+
+  <div class="tools-grid">
+    @for (tool of tools; track tool.route) {
+      <app-tool-card [tool]="tool" />
+    }
+  </div>
+</div>

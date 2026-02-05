@@ -1,0 +1,17 @@
+<div class="help-layout">
+  <p-card class="help-menu">
+    <ng-template pTemplate="title">Yardım</ng-template>
+    <ng-template pTemplate="subtitle">Metin Analizi rehberi</ng-template>
+
+    <nav class="menu-links">
+      <a routerLink="/help/overview" routerLinkActive="active">Metin analizi nedir?</a>
+      <a routerLink="/help/usage" routerLinkActive="active">Nasıl kullanılır?</a>
+      <a routerLink="/help/faq" routerLinkActive="active">Sıkça Sorulan Sorular</a>
+    </nav>
+
+  </p-card>
+
+  <div class="help-content-area">
+    <router-outlet></router-outlet>
+  </div>
+</div>

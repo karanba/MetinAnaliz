@@ -1,0 +1,770 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.earthquake-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  --legend-bottom-offset: 40px;
+}
+
+.earthquake-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--surface-ground);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+// Toolbar
+.earthquake-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
+  flex-wrap: wrap;
+
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &.magnitude-group {
+      min-width: 200px;
+
+      .magnitude-slider {
+        width: 120px;
+      }
+    }
+  }
+
+  .toolbar-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color-secondary);
+    white-space: nowrap;
+  }
+
+  .toolbar-spacer {
+    flex: 1;
+  }
+
+  ::ng-deep {
+    .p-selectbutton {
+      .p-button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    .p-slider {
+      width: 120px;
+
+      .p-slider-range {
+        background: var(--primary-color);
+      }
+    }
+
+    .p-inputswitch {
+      margin-left: 4px;
+    }
+
+    .p-divider.p-divider-vertical {
+      margin: 0;
+      padding: 0 4px;
+      height: 24px;
+
+      &::before {
+        border-left-color: var(--surface-border);
+      }
+    }
+  }
+}
+
+// Main content
+.earthquake-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+// Sources Settings
+.settings-button {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1001;
+}
+
+.sources-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.magnitude-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.animation-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  background: var(--surface-50);
+}
+
+.animation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.animation-row input[type="number"] {
+  width: 90px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  font-size: 0.75rem;
+}
+
+.section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.legend-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.legend-label {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.legend-preview {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.settings-tabs {
+  margin-top: 4px;
+  margin-bottom: 10px;
+  ::ng-deep .p-selectbutton .p-button {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.source-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.source-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-color);
+  background: var(--surface-50);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+
+.source-choice input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--primary-color);
+}
+
+.sources-status {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.source-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border-radius: 10px;
+  background: var(--surface-50);
+  font-size: 0.72rem;
+  color: var(--text-color-secondary);
+
+  .source-name {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .source-state {
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--surface-100);
+    font-size: 0.65rem;
+    letter-spacing: 0.2px;
+  }
+
+  .source-error {
+    color: var(--red-600);
+    font-size: 0.65rem;
+  }
+
+  &.failed .source-state {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--red-600);
+  }
+
+  &.empty {
+    color: var(--text-color-secondary);
+  }
+}
+
+.map-area {
+  flex: 1;
+  position: relative;
+
+  app-base-map {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+// Prevent base map min-height from forcing page scroll
+:host ::ng-deep app-base-map .map-wrapper {
+  min-height: 0;
+}
+
+// Loading & Error overlays
+.loading-overlay,
+.error-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.error-overlay {
+  color: var(--red-600);
+
+  i {
+    font-size: 2rem;
+  }
+
+  span {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+
+// Side Panel
+.side-panel {
+  width: 320px;
+  background: var(--surface-card);
+  border-left: 1px solid var(--surface-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.panel-header-fixed {
+  padding: 12px 16px;
+  background: var(--surface-50);
+  border-bottom: 1px solid var(--surface-border);
+  flex-shrink: 0;
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    span {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// List controls (search + sort)
+.list-controls {
+  padding: 12px;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    i {
+      position: absolute;
+      left: 10px;
+      color: var(--text-color-secondary);
+      font-size: 0.85rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding-left: 32px;
+      font-size: 0.85rem;
+    }
+  }
+
+  .sort-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    ::ng-deep .sort-select {
+      flex: 1;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// Scrollable list container
+.earthquake-list-container {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  color: var(--text-color-secondary);
+  gap: 8px;
+
+  i {
+    font-size: 1.5rem;
+  }
+
+  span {
+    font-size: 0.85rem;
+  }
+}
+
+.earthquake-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.earthquake-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--surface-border);
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &.significant {
+    background: rgba(239, 68, 68, 0.05);
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+  }
+
+  .quake-magnitude {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .source-tag {
+      font-size: 0.65rem;
+      opacity: 0.9;
+    }
+  }
+
+  .quake-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .quake-place {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .quake-time {
+    font-size: 0.75rem;
+    color: var(--text-color-secondary);
+  }
+
+  i.pi-chevron-right {
+    color: var(--text-color-secondary);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+}
+
+.list-footer {
+  padding: 12px 16px;
+  text-align: center;
+  border-top: 1px solid var(--surface-border);
+  background: var(--surface-50);
+
+  .more-count {
+    font-size: 0.8rem;
+    color: var(--text-color-secondary);
+  }
+}
+
+// Status Bar
+.earthquake-statusbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--surface-card);
+  border-top: 1px solid var(--surface-border);
+  font-size: 0.8rem;
+
+  .status-left,
+  .status-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-color-secondary);
+
+    i {
+      font-size: 0.85rem;
+    }
+
+    &.auto-refresh-active {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+  }
+}
+
+// Magnitude Legend
+.magnitude-legend {
+  position: absolute;
+  bottom: var(--legend-bottom-offset);
+  left: 260px;
+  width: 240px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 8px 10px;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+
+  .legend-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    font-size: 0.7rem;
+    color: var(--text-color);
+    background: var(--surface-50);
+    padding: 3px 6px;
+    border-radius: 10px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+
+    &.minor {
+      background: #22c55e;
+    }
+    &.light {
+      background: #eab308;
+    }
+    &.moderate {
+      background: #f59e0b;
+    }
+    &.strong {
+      background: #ea580c;
+    }
+    &.major {
+      background: #dc2626;
+    }
+  }
+}
+
+// User location marker
+:host ::ng-deep {
+  .user-location-marker {
+    .pulse-marker {
+      position: relative;
+      width: 20px;
+      height: 20px;
+    }
+
+    .pulse-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .pulse-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      background: var(--primary-color);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: pulse-animation 1.5s infinite;
+    }
+
+    @keyframes pulse-animation {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+      }
+    }
+  }
+}
+
+// Subtle animation for recent quakes (last 1 hour)
+:host ::ng-deep .recent-quake {
+  animation: quake-ripple 2.4s ease-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
+}
+
+@keyframes quake-ripple {
+  0% {
+    transform: scale(1);
+    stroke-opacity: 0.9;
+    fill-opacity: 0.85;
+  }
+  60% {
+    transform: scale(1.35);
+    stroke-opacity: 0.35;
+    fill-opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.6);
+    stroke-opacity: 0;
+    fill-opacity: 0.6;
+  }
+}
+
+// Popup styles (global)
+:host ::ng-deep {
+  .earthquake-popup {
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .popup-details {
+      margin-bottom: 8px;
+
+      p {
+        margin: 4px 0;
+        font-size: 0.85rem;
+
+        strong {
+          color: var(--text-color-secondary);
+        }
+      }
+    }
+
+    a {
+      font-size: 0.85rem;
+      color: var(--primary-color);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .side-panel {
+    display: none;
+  }
+
+  .magnitude-legend {
+    bottom: calc(var(--legend-bottom-offset) - 20px);
+    left: 8px;
+    padding: 8px 12px;
+
+    .legend-items {
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .earthquake-toolbar {
+    padding: 8px 12px;
+    gap: 8px;
+
+    .toolbar-label {
+      display: none;
+    }
+
+    .toolbar-group {
+      gap: 4px;
+
+      &.magnitude-group {
+        min-width: auto;
+
+        .magnitude-slider {
+          width: 80px;
+        }
+      }
+    }
+
+    ::ng-deep {
+      .p-selectbutton .p-button {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.8rem;
+      }
+
+      .p-divider.p-divider-vertical {
+        display: none;
+      }
+    }
+  }
+
+  .earthquake-statusbar {
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 12px;
+
+    .status-left,
+    .status-right {
+      gap: 12px;
+    }
+  }
+
+  .magnitude-legend {
+    .legend-title {
+      display: none;
+    }
+  }
+}

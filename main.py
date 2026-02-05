@@ -5,15 +5,20 @@ import io
 import math
 import os
 import re
+from contextlib import asynccontextmanager
 from pathlib import Path
 from enum import Enum
-from typing import Dict, List, Protocol
+from typing import AsyncIterator, Dict, List, Protocol
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+
+from routers import earthquake, pdf
+from services.earthquake_cache import earthquake_cache
+from services.pdf_service import pdf_service
 
 # Load environment variables
 load_dotenv()
@@ -371,7 +376,22 @@ EXPORTERS: Dict[ExportFormat, Exporter] = {
 }
 
 
-app = FastAPI(title="Metin Analiz API")
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Application lifespan handler."""
+    # Startup
+    await pdf_service.initialize()
+    yield
+    # Shutdown - cleanup resources
+    await pdf_service.shutdown()
+    await earthquake_cache.close()
+
+
+app = FastAPI(title="Metin Analiz API", lifespan=lifespan)
+
+# Include routers
+app.include_router(earthquake.router)
+app.include_router(pdf.router)
 
 # Configure CORS - Controls which domains can access the API
 app.add_middleware(

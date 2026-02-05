@@ -1,0 +1,34 @@
+<div class="graph-page">
+  <app-page-header
+    title="Grafik Çizimi"
+    description="Matematiksel fonksiyonları 2D ve 3D olarak görselleştirin"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Mühendislik', route: '/tools/engineering' },
+      { label: 'Grafik Çizimi' }
+    ]"
+  />
+
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">
+        <i class="pi pi-chart-line"></i>
+        <span>2D Grafik</span>
+      </p-tab>
+      <p-tab value="1">
+        <i class="pi pi-box"></i>
+        <span>3D Grafik</span>
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <app-graph2d></app-graph2d>
+      </p-tabpanel>
+
+      <p-tabpanel value="1">
+        <app-graph3d></app-graph3d>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

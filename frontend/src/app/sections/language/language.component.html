@@ -1,0 +1,16 @@
+<div class="language-page">
+  <app-page-header
+    title="Dil Araçları"
+    description="Metin analizi ve dil işleme araçları"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Dil' }
+    ]"
+  />
+
+  <div class="tools-grid">
+    @for (tool of tools; track tool.route) {
+      <app-tool-card [tool]="tool" />
+    }
+  </div>
+</div>

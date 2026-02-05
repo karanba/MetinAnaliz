@@ -1,0 +1,287 @@
+<div class="airports-page">
+  <app-page-header
+    title="Havaalanları"
+    description="Dünya genelinde havaalanı bilgileri ve harita üzerinde görüntüleme"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Harita Araçları', route: '/tools/geo' },
+      { label: 'Havaalanları' }
+    ]"
+  />
+
+  <div class="airports-container">
+    <!-- Toolbar -->
+    <div class="airports-toolbar">
+      <!-- Country Filter -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Ülke:</span>
+        <p-select
+          [options]="countries()"
+          [ngModel]="selectedCountry()"
+          (ngModelChange)="onCountryChange($event)"
+          optionLabel="code"
+          optionValue="code"
+          placeholder="Tümü"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="code"
+          styleClass="country-select"
+        >
+          <ng-template let-country pTemplate="item">
+            <div class="country-option">
+              <span class="country-code">{{ country.code }}</span>
+              <span class="country-count">({{ country.count }})</span>
+            </div>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Type Filter -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Tip:</span>
+        <p-multiselect
+          [options]="typeOptions"
+          [ngModel]="selectedTypes()"
+          (ngModelChange)="onTypesChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Tip seçin"
+          [maxSelectedLabels]="2"
+          selectedItemsLabel="{0} tip seçili"
+          styleClass="type-multiselect"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Search -->
+      <div class="toolbar-group search-group">
+        <span class="toolbar-label">Ara:</span>
+        <input
+          type="text"
+          pInputText
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          (keyup.enter)="onSearchChange()"
+          (blur)="onSearchChange()"
+          placeholder="İsim, IATA, ICAO..."
+          class="search-input"
+        />
+      </div>
+
+      <p-divider layout="vertical" />
+
+      <!-- Layer Selector -->
+      <div class="toolbar-group">
+        <span class="toolbar-label">Katman:</span>
+        <p-selectButton
+          [options]="layerOptions"
+          [ngModel]="selectedLayer()"
+          (ngModelChange)="onLayerChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          size="small"
+        />
+      </div>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- Find My Location -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-compass"
+          pTooltip="Konumumu Bul"
+          tooltipPosition="bottom"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="findMyLocation()"
+          size="small"
+        />
+      </div>
+
+      <!-- Reset -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-refresh"
+          label="Sıfırla"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="resetFilters()"
+          size="small"
+        />
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="airports-content">
+      <!-- Map -->
+      <div class="map-area">
+        <app-base-map
+          [showCoordinates]="true"
+          (mapReady)="onMapReady($event)"
+        />
+
+        <!-- Loading overlay -->
+        @if (loading()) {
+          <div class="loading-overlay">
+            <p-progressSpinner strokeWidth="4" />
+            <span>Havaalanları yükleniyor...</span>
+          </div>
+        }
+
+        <!-- Error message -->
+        @if (error()) {
+          <div class="error-overlay">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ error() }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Side Panel - Airport List -->
+      @if (showList() && filteredAirports().length > 0) {
+        <div class="side-panel">
+          <div class="panel-header-fixed">
+            <div class="panel-title">
+              <span>Havaalanları</span>
+              <p-tag [value]="sortedAirports().length + ' / ' + totalCount()" severity="info" />
+            </div>
+          </div>
+
+          <!-- Search and Sort Controls -->
+          <div class="list-controls">
+            <div class="search-box">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                pInputText
+                [ngModel]="listSearchQuery()"
+                (ngModelChange)="listSearchQuery.set($event)"
+                placeholder="Listede ara..."
+                class="search-input"
+              />
+            </div>
+            <div class="sort-controls">
+              <p-select
+                [options]="sortOptions"
+                [ngModel]="sortField()"
+                (ngModelChange)="onSortFieldChange($event)"
+                optionLabel="label"
+                optionValue="value"
+                styleClass="sort-select"
+              />
+              <p-button
+                [icon]="sortDirection() === 'asc' ? 'pi pi-sort-alpha-down' : 'pi pi-sort-alpha-up'"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="toggleSortDirection()"
+                size="small"
+                pTooltip="{{ sortDirection() === 'asc' ? 'A-Z' : 'Z-A' }}"
+                tooltipPosition="left"
+              />
+            </div>
+          </div>
+
+          <!-- Scrollable List -->
+          <div class="airport-list-container">
+            <div class="airport-list">
+              @for (airport of sortedAirports().slice(0, 100); track airport.id) {
+                <div
+                  class="airport-item"
+                  (click)="zoomToAirport(airport)"
+                >
+                  <div class="airport-codes">
+                    @if (airport.iata_code) {
+                      <p-tag
+                        [value]="airport.iata_code"
+                        [severity]="getTypeSeverity(airport.type)"
+                      />
+                    } @else {
+                      <p-tag
+                        [value]="airport.ident"
+                        severity="secondary"
+                      />
+                    }
+                  </div>
+                  <div class="airport-info">
+                    <span class="airport-name">{{ airport.name }}</span>
+                    <span class="airport-location">
+                      {{ airport.municipality || airport.iso_region }}
+                      · {{ airport.iso_country }}
+                    </span>
+                  </div>
+                  <i class="pi pi-chevron-right"></i>
+                </div>
+              } @empty {
+                <div class="empty-list">
+                  <i class="pi pi-info-circle"></i>
+                  <span>Sonuç bulunamadı</span>
+                </div>
+              }
+            </div>
+
+            @if (sortedAirports().length > 100) {
+              <div class="list-footer">
+                <span class="more-count">
+                  ve {{ sortedAirports().length - 100 }} havaalanı daha...
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Status Bar -->
+    <div class="airports-statusbar">
+      <div class="status-left">
+        <span class="status-item">
+          <i class="pi pi-building"></i>
+          {{ filteredCount() }} havaalanı gösteriliyor
+        </span>
+        @if (selectedCountry()) {
+          <span class="status-item">
+            <i class="pi pi-flag"></i>
+            {{ selectedCountry() }}
+          </span>
+        }
+      </div>
+      <div class="status-right">
+        <span class="status-item">
+          <i class="pi pi-database"></i>
+          Toplam: {{ totalCount() }} havaalanı
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="type-legend">
+    <span class="legend-title">Tip</span>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-dot large"></span>
+        <span>Büyük</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot medium"></span>
+        <span>Orta</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot small"></span>
+        <span>Küçük</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot heliport"></span>
+        <span>Heliport</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot seaplane"></span>
+        <span>Deniz</span>
+      </div>
+    </div>
+  </div>
+</div>
