@@ -17,6 +17,7 @@ import {
   MapLayerService,
   BaseLayerName,
 } from "../../../../services/map/map-layer.service";
+import { MapPluginService } from "../../../../services/map/map-plugin.service";
 import {
   EarthquakeService,
   EarthquakeFeature,
@@ -34,6 +35,7 @@ import { ProgressSpinner } from "primeng/progressspinner";
 import { InputText } from "primeng/inputtext";
 import { Select } from "primeng/select";
 import { MultiSelect } from "primeng/multiselect";
+import { Dialog } from "primeng/dialog";
 import * as L from "leaflet";
 
 interface TimePresetOption {
@@ -74,6 +76,7 @@ interface SortOption {
     InputText,
     Select,
     MultiSelect,
+    Dialog,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./earthquake.component.html",
@@ -83,6 +86,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   @ViewChild(BaseMapComponent) baseMap!: BaseMapComponent;
 
   private mapLayerService = inject(MapLayerService);
+  private mapPluginService = inject(MapPluginService);
   readonly earthquakeService = inject(EarthquakeService);
 
   private map: L.Map | null = null;
@@ -111,11 +115,24 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
     { label: "Derinlik", value: "depth" },
   ];
 
+  magnitudeLegend = signal([
+    { key: "minor", label: "< 4", color: "#22c55e", min: 0, max: 3.999 },
+    { key: "light", label: "4-5", color: "#eab308", min: 4, max: 4.999 },
+    { key: "moderate", label: "5-6", color: "#f59e0b", min: 5, max: 5.999 },
+    { key: "strong", label: "6-7", color: "#ea580c", min: 6, max: 6.999 },
+    { key: "major", label: "7+", color: "#dc2626", min: 7, max: 10 },
+  ]);
+
   // Source options
   sourceOptions = [
     { label: "USGS", value: "USGS" },
     { label: "Kandilli", value: "Kandilli" },
     { label: "EMSC", value: "EMSC" },
+  ];
+
+  settingsTabs = [
+    { label: "Veri Kaynakları", value: "sources" },
+    { label: "Büyüklük Renkleri", value: "magnitude" },
   ];
 
   // State
@@ -130,7 +147,8 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   selectedSources = signal<string[]>(["USGS", "Kandilli", "EMSC"]);
   filterByViewport = signal<boolean>(true);
   private mapBounds = signal<L.LatLngBounds | null>(null);
-  sourcePanelExpanded = signal<boolean>(true);
+  sourceSettingsOpen = signal<boolean>(false);
+  settingsTab = signal<"sources" | "magnitude">("sources");
   private userLocationMarker: L.Marker | null = null;
 
   // Computed
@@ -214,6 +232,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
       if (!this.mapReady()) return;
       // Read signal to subscribe to changes
       this.sourceFilteredEarthquakes();
+      this.magnitudeLegend();
       this.updateMarkers();
     });
   }
@@ -221,6 +240,10 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.earthquakeService.stopAutoRefresh();
     this.markersLayer.clearLayers();
+    if (this.map) {
+      this.mapPluginService.disableAll(this.map);
+    }
+    this.mapPluginService.reset();
   }
 
   onMapReady(map: L.Map): void {
@@ -228,6 +251,9 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
 
     // Apply initial base layer
     this.mapLayerService.applyBaseLayer(map, this.selectedLayer());
+
+    // Enable draw toolbar
+    this.mapPluginService.enableDraw(map);
 
     // Add markers layer
     this.markersLayer.addTo(map);
@@ -303,7 +329,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
 
     const marker = L.circleMarker([lat, lng], {
       radius: this.earthquakeService.getMarkerRadius(mag),
-      fillColor: this.earthquakeService.getMagnitudeCssColor(mag),
+      fillColor: this.getMagnitudeColor(mag),
       color: "#ffffff",
       weight: 1,
       opacity: 1,
@@ -372,6 +398,30 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
     if (mag >= 5) return "warn";
     if (mag >= 4) return "info";
     return "success";
+  }
+
+  getMagnitudeColor(mag: number): string {
+    const items = this.magnitudeLegend();
+    const found = items.find((item) => mag >= item.min && mag <= item.max);
+    return found?.color ?? "#22c55e";
+  }
+
+  updateLegendColor(key: string, color: string): void {
+    this.magnitudeLegend.update((items) =>
+      items.map((item) => (item.key === key ? { ...item, color } : item)),
+    );
+  }
+
+  toggleSourceSelection(source: string, checked: boolean): void {
+    if (checked) {
+      const next = new Set(this.selectedSources());
+      next.add(source);
+      this.selectedSources.set(Array.from(next));
+    } else {
+      this.selectedSources.set(
+        this.selectedSources().filter((value) => value !== source),
+      );
+    }
   }
 
   // Track by function for ngFor

@@ -142,9 +142,11 @@ export class MapPluginService {
         if (shape === 'Polygon' || shape === 'Rectangle') {
           const area = this.calculateArea(layer);
           this._measurements.update(m => [...m, area]);
+          this.bindMeasurementTooltip(layer, area.formatted);
         } else if (shape === 'Line') {
           const distance = this.calculateDistance(layer);
           this._measurements.update(m => [...m, distance]);
+          this.bindMeasurementTooltip(layer, distance.formatted);
         }
       });
     });
@@ -301,6 +303,19 @@ export class MapPluginService {
       return `${(sqMeters / 10000).toFixed(2)} ha`;
     }
     return `${sqMeters.toFixed(1)} m²`;
+  }
+
+  private bindMeasurementTooltip(layer: L.Layer, text: string): void {
+    if (!text) return;
+    const anyLayer = layer as any;
+    if (anyLayer.bindTooltip) {
+      anyLayer.bindTooltip(text, {
+        permanent: true,
+        direction: 'center',
+        className: 'measure-tooltip',
+        opacity: 0.95
+      });
+    }
   }
 
   // ============ GEOCODER PLUGIN ============

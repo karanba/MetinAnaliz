@@ -1,7 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .map-tools-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
+  flex: 1;
   min-height: 0;
 }
 
@@ -87,6 +94,11 @@
     position: absolute;
     inset: 0;
   }
+}
+
+// Prevent base map min-height from forcing page scroll
+:host ::ng-deep app-base-map .map-wrapper {
+  min-height: 0;
 }
 
 // Side Panel

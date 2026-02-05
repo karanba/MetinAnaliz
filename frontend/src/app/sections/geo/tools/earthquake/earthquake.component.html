@@ -121,52 +121,16 @@
           (viewChange)="onViewChange($event)"
         />
 
-        <div class="sources-panel" [class.expanded]="sourcePanelExpanded()">
-          <div class="panel-header">
-            <span>Veri Kaynakları</span>
-            <button
-              type="button"
-              class="panel-toggle"
-              (click)="sourcePanelExpanded.set(!sourcePanelExpanded())"
-              [attr.aria-expanded]="sourcePanelExpanded()"
-              title="Paneli Küçült/Büyüt"
-            >
-              <i class="pi" [ngClass]="sourcePanelExpanded() ? 'pi-chevron-down' : 'pi-chevron-up'"></i>
-            </button>
-          </div>
-          <div class="panel-content">
-            <div class="sources-controls">
-              <p-multiSelect
-                [options]="sourceOptions"
-                [ngModel]="selectedSources()"
-                (ngModelChange)="selectedSources.set($event)"
-                optionLabel="label"
-                optionValue="value"
-                [showToggleAll]="true"
-                placeholder="Kaynak seç"
-                display="chip"
-                styleClass="source-select"
-                [appendTo]="'body'"
-              />
-            </div>
-            <div class="sources-status">
-              @if (sourceStatusEntries().length > 0) {
-                @for (entry of sourceStatusEntries(); track entry[0]) {
-                  <div class="source-status-item" [class.failed]="!entry[1].ok">
-                    <span class="source-name">{{ entry[0] }}</span>
-                    <span class="source-state">
-                      {{ entry[1].ok ? 'OK' : 'Hata' }}
-                    </span>
-                    @if (!entry[1].ok && entry[1].error) {
-                      <span class="source-error">{{ entry[1].error }}</span>
-                    }
-                  </div>
-                }
-              } @else {
-                <div class="source-status-item empty">Kaynak durumu alınamadı.</div>
-              }
-            </div>
-          </div>
+        <div class="settings-button">
+          <p-button
+            icon="pi pi-cog"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="sourceSettingsOpen.set(true)"
+            pTooltip="Veri Kaynakları"
+            tooltipPosition="left"
+            size="small"
+          />
         </div>
 
         <!-- Loading overlay -->
@@ -283,6 +247,91 @@
       }
     </div>
 
+    <p-dialog
+      header="Ayarlar"
+      [visible]="sourceSettingsOpen()"
+      (onHide)="sourceSettingsOpen.set(false)"
+      [modal]="true"
+      [draggable]="false"
+      [resizable]="false"
+      [showHeader]="true"
+      [style]="{ width: '360px', maxWidth: '92vw', minHeight: '420px' }"
+    >
+      <ng-template pTemplate="header">
+        <div class="settings-header">
+          <i class="pi pi-cog"></i>
+          <span>Ayarlar</span>
+        </div>
+      </ng-template>
+
+      <div class="settings-tabs">
+        <p-selectButton
+          [options]="settingsTabs"
+          [ngModel]="settingsTab()"
+          (ngModelChange)="settingsTab.set($event)"
+          optionLabel="label"
+          optionValue="value"
+          [allowEmpty]="false"
+          size="small"
+        />
+      </div>
+
+      @if (settingsTab() === 'sources') {
+        <div class="sources-dialog">
+          <div class="source-choice-list">
+            @for (option of sourceOptions; track option.value) {
+              <label class="source-choice">
+                <input
+                  type="checkbox"
+                  [checked]="selectedSources().includes(option.value)"
+                  (change)="toggleSourceSelection(option.value, $event.target.checked)"
+                />
+                <span>{{ option.label }}</span>
+              </label>
+            }
+          </div>
+          <div class="sources-status">
+            @if (sourceStatusEntries().length > 0) {
+              @for (entry of sourceStatusEntries(); track entry[0]) {
+                <div class="source-status-item" [class.failed]="!entry[1].ok">
+                  <span class="source-name">{{ entry[0] }}</span>
+                  <span class="source-state">
+                    {{ entry[1].ok ? 'OK' : 'Hata' }}
+                  </span>
+                  @if (!entry[1].ok && entry[1].error) {
+                    <span class="source-error">{{ entry[1].error }}</span>
+                  }
+                </div>
+              }
+            } @else {
+              <div class="source-status-item empty">Kaynak durumu alınamadı.</div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (settingsTab() === 'magnitude') {
+        <div class="magnitude-settings">
+          <div class="legend-grid">
+            @for (item of magnitudeLegend(); track item.key) {
+              <div class="legend-row">
+                <span class="legend-label">{{ item.label }}</span>
+                <input
+                  type="color"
+                  [ngModel]="item.color"
+                  (ngModelChange)="updateLegendColor(item.key, $event)"
+                />
+                <span
+                  class="legend-preview"
+                  [style.background]="item.color"
+                ></span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </p-dialog>
+
     <!-- Status Bar -->
     <div class="earthquake-statusbar">
       <div class="status-left">
@@ -314,30 +363,4 @@
     </div>
   </div>
 
-  <!-- Legend -->
-  <div class="magnitude-legend">
-    <span class="legend-title">Büyüklük</span>
-    <div class="legend-items">
-      <div class="legend-item">
-        <span class="legend-dot minor"></span>
-        <span>&lt; 4</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot light"></span>
-        <span>4-5</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot moderate"></span>
-        <span>5-6</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot strong"></span>
-        <span>6-7</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot major"></span>
-        <span>7+</span>
-      </div>
-    </div>
-  </div>
 </div>

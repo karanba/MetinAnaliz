@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../../../components/shared';
 import { BaseMapComponent } from '../../../../components/map';
 import { MapLayerService, BaseLayerName } from '../../../../services/map/map-layer.service';
+import { MapPluginService } from '../../../../services/map/map-plugin.service';
 import { AirportService, Airport, AirportType } from '../../../../services/airport.service';
 import { Button } from 'primeng/button';
 import { SelectButton } from 'primeng/selectbutton';
@@ -72,6 +73,7 @@ export class AirportsComponent implements OnInit, OnDestroy {
   @ViewChild(BaseMapComponent) baseMap!: BaseMapComponent;
 
   private mapLayerService = inject(MapLayerService);
+  private mapPluginService = inject(MapPluginService);
   readonly airportService = inject(AirportService);
 
   private map: L.Map | null = null;
@@ -170,6 +172,10 @@ export class AirportsComponent implements OnInit, OnDestroy {
     if (this.markerCluster) {
       this.markerCluster.clearLayers();
     }
+    if (this.map) {
+      this.mapPluginService.disableAll(this.map);
+    }
+    this.mapPluginService.reset();
   }
 
   onMapReady(map: L.Map): void {
@@ -177,6 +183,9 @@ export class AirportsComponent implements OnInit, OnDestroy {
 
     // Apply initial base layer
     this.mapLayerService.applyBaseLayer(map, this.selectedLayer());
+
+    // Enable draw toolbar
+    this.mapPluginService.enableDraw(map);
 
     // Initialize marker cluster
     this.markerCluster = L.markerClusterGroup({

@@ -120,6 +120,8 @@ import { MapConfig, DEFAULT_MAP_CONFIG } from '../map.models';
 })
 export class BaseMapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
+  private resizeObserver: ResizeObserver | null = null;
+  private windowResizeHandler: (() => void) | null = null;
 
   /** Harita yapılandırması */
   @Input() config: MapConfig = DEFAULT_MAP_CONFIG;
@@ -146,6 +148,14 @@ export class BaseMapComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (this.windowResizeHandler) {
+      window.removeEventListener('resize', this.windowResizeHandler);
+      this.windowResizeHandler = null;
+    }
     this.mapService.destroy();
   }
 
@@ -160,6 +170,27 @@ export class BaseMapComponent implements AfterViewInit, OnDestroy {
 
     // Emit ready event
     this.mapReady.emit(map);
+
+    // Ensure tiles render correctly on container size changes
+    this.setupResizeHandling(map);
+  }
+
+  private setupResizeHandling(map: L.Map): void {
+    const invalidate = () => map.invalidateSize({ animate: false });
+
+    // Initial invalidate after render
+    setTimeout(invalidate, 0);
+    setTimeout(invalidate, 250);
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        invalidate();
+      });
+      this.resizeObserver.observe(this.mapContainer.nativeElement);
+    }
+
+    this.windowResizeHandler = () => invalidate();
+    window.addEventListener('resize', this.windowResizeHandler);
   }
 
   private setupEventHandlers(map: L.Map): void {

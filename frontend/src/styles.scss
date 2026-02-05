@@ -290,3 +290,14 @@ html {
     }
   }
 }
+
+.measure-tooltip {
+  background: rgba(28, 27, 34, 0.85);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
