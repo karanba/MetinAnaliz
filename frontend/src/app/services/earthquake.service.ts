@@ -58,6 +58,10 @@ export interface EarthquakeProperties {
   type: string;
   /** Title for display */
   title: string;
+  /** Data source label */
+  source?: 'USGS' | 'Kandilli' | string;
+  /** Match group for duplicates across sources */
+  match_group?: string;
 }
 
 /**
@@ -85,6 +89,7 @@ export interface EarthquakeResponse {
     status: number;
     api: string;
     count: number;
+    sources?: Record<string, { ok: boolean; error?: string }>;
   };
   features: EarthquakeFeature[];
   bbox?: number[];
@@ -123,6 +128,7 @@ export class EarthquakeService {
   private readonly _error = signal<string | null>(null);
   private readonly _lastUpdated = signal<Date | null>(null);
   private readonly _currentPreset = signal<TimePreset>('today');
+  private readonly _sourceStatus = signal<Record<string, { ok: boolean; error?: string }>>({});
 
   // Auto-refresh
   private refreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -133,6 +139,7 @@ export class EarthquakeService {
   readonly error = this._error.asReadonly();
   readonly lastUpdated = this._lastUpdated.asReadonly();
   readonly currentPreset = this._currentPreset.asReadonly();
+  readonly sourceStatus = this._sourceStatus.asReadonly();
 
   // Computed signals
   readonly count = computed(() => this._earthquakes().length);
@@ -188,6 +195,7 @@ export class EarthquakeService {
         next: (response) => {
           this._earthquakes.set(response.features);
           this._lastUpdated.set(new Date());
+          this._sourceStatus.set(response.metadata?.sources ?? {});
           this._loading.set(false);
         },
         error: (err) => {

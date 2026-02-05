@@ -38,6 +38,12 @@ uvicorn main:app
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/analyze -ContentType "application/json" -Body '{"text":"Merhaba dünya! Bugün hava güzel mi?"}'
 ```
 
+Deprem verileri:
+- `GET /earthquakes` endpoint'i USGS + Kandilli (KOERI) + EMSC verilerini birleştirir.
+- Her `feature.properties.source` alanı `"USGS"`, `"Kandilli"` veya `"EMSC"` değerini taşır.
+- Eşleşen kayıtlar için `feature.properties.match_group` ortak bir grup etiketi içerir.
+- `metadata.sources` alanında her kaynağın durum bilgisi (`ok`/`error`) bulunur.
+
 ## Frontend (Angular SPA)
 
 Geliştirme sunucusu (proxy ile):

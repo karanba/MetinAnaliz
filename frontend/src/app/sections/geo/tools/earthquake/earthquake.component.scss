@@ -1,9 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 .earthquake-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
+  flex: 1;
   min-height: 0;
   position: relative;
+  --legend-bottom-offset: 260px;
 }
 
 .earthquake-container {
@@ -92,6 +100,132 @@
   position: relative;
 }
 
+// Sources Panel
+// Sources Panel (bottom-left)
+.sources-panel {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  width: 240px;
+  max-height: 260px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  transition:
+    max-height 0.2s ease,
+    box-shadow 0.2s ease;
+  z-index: 1001;
+
+  &.expanded {
+    max-height: 260px;
+  }
+
+  &:not(.expanded) {
+    max-height: 40px;
+  }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-color);
+  background: var(--surface-50);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.panel-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-card);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color-secondary);
+}
+
+.panel-content {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+}
+
+.sources-panel:not(.expanded) .panel-content {
+  display: none;
+}
+
+.sources-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  ::ng-deep .source-select {
+    min-width: 200px;
+    font-size: 0.75rem;
+  }
+}
+
+:host ::ng-deep .p-multiselect-panel {
+  z-index: 2000;
+}
+
+.sources-status {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.source-status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 6px;
+  border-radius: 10px;
+  background: var(--surface-50);
+  font-size: 0.72rem;
+  color: var(--text-color-secondary);
+
+  .source-name {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .source-state {
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--surface-100);
+    font-size: 0.65rem;
+    letter-spacing: 0.2px;
+  }
+
+  .source-error {
+    color: var(--red-600);
+    font-size: 0.65rem;
+  }
+
+  &.failed .source-state {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--red-600);
+  }
+
+  &.empty {
+    color: var(--text-color-secondary);
+  }
+}
+
 .map-area {
   flex: 1;
   position: relative;
@@ -100,6 +234,11 @@
     position: absolute;
     inset: 0;
   }
+}
+
+// Prevent base map min-height from forcing page scroll
+:host ::ng-deep app-base-map .map-wrapper {
+  min-height: 0;
 }
 
 // Loading & Error overlays
@@ -258,6 +397,14 @@
 
   .quake-magnitude {
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    .source-tag {
+      font-size: 0.65rem;
+      opacity: 0.9;
+    }
   }
 
   .quake-info {
@@ -338,40 +485,44 @@
 // Magnitude Legend
 .magnitude-legend {
   position: absolute;
-  bottom: 60px;
+  bottom: var(--legend-bottom-offset);
   left: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  width: 240px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 8px 10px;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
 
   .legend-title {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text-color-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: var(--text-color);
     margin-bottom: 8px;
     display: block;
   }
 
   .legend-items {
     display: flex;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 0.75rem;
+    gap: 1px;
+    font-size: 0.7rem;
     color: var(--text-color);
+    background: var(--surface-50);
+    padding: 3px 6px;
+    border-radius: 10px;
   }
 
   .legend-dot {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.8);
 
@@ -482,7 +633,7 @@
   }
 
   .magnitude-legend {
-    bottom: 50px;
+    bottom: calc(var(--legend-bottom-offset) - 20px);
     left: 8px;
     padding: 8px 12px;
 
