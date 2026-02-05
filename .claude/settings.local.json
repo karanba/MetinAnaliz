@@ -10,7 +10,10 @@
       "Bash(git commit:*)",
       "Bash(tree:*)",
       "Bash(dir:*)",
-      "WebFetch(domain:earthquake.usgs.gov)"
+      "WebFetch(domain:earthquake.usgs.gov)",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python:*)",
+      "Bash(curl:*)"
     ]
   }
 }

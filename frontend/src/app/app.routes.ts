@@ -14,6 +14,8 @@ import { DesignComponent } from './sections/design/design.component';
 import { ColorConverterComponent } from './sections/design/tools/color-converter/color-converter.component';
 import { GeoComponent } from './sections/geo/geo.component';
 import { MapToolsComponent } from './sections/geo/tools/map-tools/map-tools.component';
+import { EarthquakeComponent } from './sections/geo/tools/earthquake/earthquake.component';
+import { AirportsComponent } from './sections/geo/tools/airports/airports.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tools', pathMatch: 'full' },
@@ -38,6 +40,8 @@ export const routes: Routes = [
   // Geo Tools (Harita Araçları)
   { path: 'tools/geo', component: GeoComponent },
   { path: 'tools/geo/map-tools', component: MapToolsComponent },
+  { path: 'tools/geo/earthquake', component: EarthquakeComponent },
+  { path: 'tools/geo/airports', component: AirportsComponent },
 
   // Help
   {
