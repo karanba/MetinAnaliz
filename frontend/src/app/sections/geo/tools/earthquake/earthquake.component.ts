@@ -123,10 +123,14 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   // Filtered and sorted earthquakes for the list
   filteredEarthquakes = computed(() => {
     let quakes = [...this.earthquakeService.earthquakes()];
-    const query = this.normalizeSearchText(this.listSearchQuery());
+    const rawQuery = this.listSearchQuery();
+    const minMagFilter = this.parseMinMagnitude(rawQuery);
+    const query = this.normalizeSearchText(rawQuery);
 
     // Filter by search query
-    if (query) {
+    if (minMagFilter !== null) {
+      quakes = quakes.filter(q => q.properties.mag >= minMagFilter);
+    } else if (query) {
       quakes = quakes.filter(q =>
         this.normalizeSearchText(q.properties.place).includes(query) ||
         q.properties.mag.toString().includes(query)
@@ -383,5 +387,13 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
       .replace(/ç/g, 'c')
       .replace(/Ç/g, 'c')
       .trim();
+  }
+
+  private parseMinMagnitude(value: string | null | undefined): number | null {
+    if (!value) return null;
+    const match = value.match(/min[_\s-]?magnitude\s*=\s*([0-9]+(?:\.[0-9]+)?)/i);
+    if (!match) return null;
+    const parsed = Number(match[1]);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 }

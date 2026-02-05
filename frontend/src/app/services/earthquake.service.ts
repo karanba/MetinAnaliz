@@ -228,6 +228,7 @@ export class EarthquakeService {
       start_time: startTime.toISOString(),
       end_time: now.toISOString(),
       min_magnitude: minMagnitude,
+      limit: 5000,
     });
   }
 
