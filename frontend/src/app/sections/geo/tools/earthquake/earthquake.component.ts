@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   signal,
   computed,
+  effect,
   ViewChild,
   OnInit,
   OnDestroy,
@@ -77,6 +78,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
 
   private map: L.Map | null = null;
   private markersLayer: L.LayerGroup = L.layerGroup();
+  private mapReady = signal<boolean>(false);
 
   // Time preset options
   timePresets: TimePresetOption[] = [
@@ -121,12 +123,12 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   // Filtered and sorted earthquakes for the list
   filteredEarthquakes = computed(() => {
     let quakes = [...this.earthquakeService.earthquakes()];
-    const query = this.listSearchQuery().toLowerCase().trim();
+    const query = this.normalizeSearchText(this.listSearchQuery());
 
     // Filter by search query
     if (query) {
       quakes = quakes.filter(q =>
-        q.properties.place?.toLowerCase().includes(query) ||
+        this.normalizeSearchText(q.properties.place).includes(query) ||
         q.properties.mag.toString().includes(query)
       );
     }
@@ -160,6 +162,16 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
     this.earthquakeService.fetchPreset('today', this.minMagnitude());
   }
 
+  constructor() {
+    // Keep markers in sync with data + map readiness
+    effect(() => {
+      if (!this.mapReady()) return;
+      // Read signal to subscribe to changes
+      this.earthquakes();
+      this.updateMarkers();
+    });
+  }
+
   ngOnDestroy(): void {
     this.earthquakeService.stopAutoRefresh();
     this.markersLayer.clearLayers();
@@ -176,6 +188,8 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
 
     // Set initial view to show the world
     map.setView([20, 0], 2);
+
+    this.mapReady.set(true);
 
     // Watch for earthquake updates
     this.updateMarkers();
@@ -350,5 +364,24 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
     } else {
       alert('Tarayıcınız konum özelliğini desteklemiyor.');
     }
+  }
+
+  private normalizeSearchText(value: string | null | undefined): string {
+    if (!value) return '';
+    return value
+      .toLocaleLowerCase('tr')
+      .replace(/ı/g, 'i')
+      .replace(/İ/g, 'i')
+      .replace(/ş/g, 's')
+      .replace(/Ş/g, 's')
+      .replace(/ğ/g, 'g')
+      .replace(/Ğ/g, 'g')
+      .replace(/ü/g, 'u')
+      .replace(/Ü/g, 'u')
+      .replace(/ö/g, 'o')
+      .replace(/Ö/g, 'o')
+      .replace(/ç/g, 'c')
+      .replace(/Ç/g, 'c')
+      .trim();
   }
 }
