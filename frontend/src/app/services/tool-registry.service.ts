@@ -134,6 +134,25 @@ export class ToolRegistryService {
           keywords: ['havaalanı', 'airport', 'uçuş', 'iata', 'icao']
         }
       ]
+    },
+    {
+      id: 'file',
+      title: 'Dosya Araçları',
+      description: 'PDF dönüştürme, birleştirme ve dosya işlemleri',
+      icon: 'file',
+      route: '/tools/file',
+      tools: [
+        {
+          id: 'pdf-tools',
+          title: 'PDF Araçları',
+          description: 'PDF dosyalarını Word formatına dönüştürün, birleştirin veya bölün',
+          icon: 'file-pdf',
+          route: '/tools/file/pdf-tools',
+          color: 'sun',
+          category: 'file',
+          keywords: ['pdf', 'word', 'docx', 'dönüştür', 'convert', 'birleştir', 'merge']
+        }
+      ]
     }
   ]);
 

@@ -1,0 +1,340 @@
+<div class="pdf-tools-page">
+  <app-page-header
+    title="PDF Araçları"
+    description="PDF dosyalarını Word formatına dönüştürün"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Dosya Araçları', route: '/tools/file' },
+      { label: 'PDF Araçları' }
+    ]"
+  />
+
+  <p-card styleClass="wizard-card">
+    <div class="wizard-container">
+    <!-- Steps indicator -->
+    <div class="steps-wrapper">
+      <p-steps
+        [model]="steps"
+        [activeIndex]="currentStep()"
+        [readonly]="true"
+        styleClass="pdf-steps"
+      />
+    </div>
+
+    <!-- Step content -->
+    <div class="step-content">
+      <!-- Step 0: File Selection -->
+      @if (currentStep() === 0) {
+        <div class="step-panel file-select-panel">
+          <h3>PDF Dosyası Seçin</h3>
+          <p class="step-description">
+            Dönüştürmek istediğiniz PDF dosyasını sürükleyip bırakın veya seçin.
+            Maksimum dosya boyutu: <strong>{{ maxFileSizeMB() }} MB</strong>
+          </p>
+
+          @if (!selectedFile()) {
+            <div
+              class="drop-zone"
+              [class.drag-over]="isDragOver()"
+              (dragenter)="onDragEnter($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <i class="pi pi-file-pdf drop-icon"></i>
+              <span class="drop-text">PDF dosyasını buraya sürükleyin</span>
+              <span class="drop-or">veya</span>
+              <p-fileUpload
+                mode="basic"
+                accept=".pdf,application/pdf"
+                [maxFileSize]="maxFileSizeMB() * 1024 * 1024"
+                chooseLabel="Dosya Seç"
+                chooseIcon="pi pi-upload"
+                (onSelect)="onFileSelect($event)"
+                [auto]="false"
+                styleClass="upload-button"
+              />
+            </div>
+          } @else {
+            <div class="file-info">
+              <div class="file-icon">
+                <i class="pi pi-file-pdf"></i>
+              </div>
+              <div class="file-details">
+                <span class="file-name">{{ selectedFile()?.name }}</span>
+                <span class="file-size">{{ fileSizeFormatted() }}</span>
+              </div>
+              <p-button
+                icon="pi pi-times"
+                severity="danger"
+                [outlined]="true"
+                [rounded]="true"
+                (onClick)="removeFile()"
+                pTooltip="Dosyayı Kaldır"
+                tooltipPosition="left"
+              />
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Step 1: Validation -->
+      @if (currentStep() === 1) {
+        <div class="step-panel validation-panel">
+          <h3>Dosya Doğrulama</h3>
+          <p class="step-description">
+            Dosyanız güvenlik ve format açısından kontrol ediliyor.
+          </p>
+
+          @if (loading()) {
+            <div class="validation-loading">
+              <p-progressSpinner strokeWidth="4" />
+              <span>Dosya doğrulanıyor...</span>
+            </div>
+          } @else if (validationResult()) {
+            @if (validationResult()?.is_valid) {
+              <div class="validation-success">
+                <i class="pi pi-check-circle"></i>
+                <span>Dosya başarıyla doğrulandı</span>
+              </div>
+
+              <div class="validation-details">
+                <div class="detail-item">
+                  <span class="detail-label">Dosya Adı:</span>
+                  <span class="detail-value">{{ validationResult()?.file_name }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Dosya Boyutu:</span>
+                  <span class="detail-value">{{ pdfService.formatFileSize(validationResult()?.file_size ?? 0) }}</span>
+                </div>
+                @if (validationResult()?.page_count) {
+                  <div class="detail-item">
+                    <span class="detail-label">Sayfa Sayısı:</span>
+                    <span class="detail-value">{{ validationResult()?.page_count }}</span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="validation-error">
+                <i class="pi pi-times-circle"></i>
+                <span>Doğrulama başarısız</span>
+              </div>
+              <p-message severity="error" [text]="validationResult()?.error ?? 'Bilinmeyen hata'" />
+            }
+          }
+        </div>
+      }
+
+      <!-- Step 2: Options -->
+      @if (currentStep() === 2) {
+        <div class="step-panel options-panel">
+          <h3>Dönüştürme Seçenekleri</h3>
+          <p class="step-description">
+            Dönüştürme ayarlarını belirleyin.
+          </p>
+
+          <div class="options-form">
+            <div class="option-group">
+              <p-checkbox
+                [(ngModel)]="convertAllPages"
+                [binary]="true"
+                inputId="allPages"
+                (onChange)="onConvertAllPagesChange()"
+              />
+              <label for="allPages">Tüm sayfaları dönüştür</label>
+            </div>
+
+            @if (!convertAllPages()) {
+              <div class="page-range">
+                <div class="range-input">
+                  <label for="startPage">Başlangıç Sayfası</label>
+                  <p-inputNumber
+                    [(ngModel)]="startPage"
+                    inputId="startPage"
+                    [min]="0"
+                    [max]="(pageCount() || 1) - 1"
+                    [showButtons]="true"
+                  />
+                </div>
+                <div class="range-input">
+                  <label for="endPage">Bitiş Sayfası (opsiyonel)</label>
+                  <p-inputNumber
+                    [(ngModel)]="endPage"
+                    inputId="endPage"
+                    [min]="startPage()"
+                    [max]="pageCount() || undefined"
+                    [showButtons]="true"
+                    placeholder="Son sayfa"
+                  />
+                </div>
+              </div>
+            }
+
+            <div class="output-info">
+              <p-tag icon="pi pi-file-word" value="Çıktı: DOCX (Microsoft Word)" severity="info" />
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Step 3: Consent -->
+      @if (currentStep() === 3) {
+        <div class="step-panel consent-panel">
+          <h3>Kullanım Koşulları</h3>
+          <p class="step-description">
+            Devam etmeden önce aşağıdaki koşulları kabul etmeniz gerekmektedir.
+          </p>
+
+          <div class="consent-box">
+            <div class="consent-item">
+              <i class="pi pi-server"></i>
+              <div>
+                <strong>Sunucu İşleme</strong>
+                <p>PDF dosyanız işlenmek üzere sunucumuza yüklenir.</p>
+              </div>
+            </div>
+
+            <div class="consent-item">
+              <i class="pi pi-trash"></i>
+              <div>
+                <strong>Otomatik Silme</strong>
+                <p>Dosyalarınız işlem tamamlandıktan sonra 15 dakika içinde otomatik olarak silinir.</p>
+              </div>
+            </div>
+
+            <div class="consent-item">
+              <i class="pi pi-lock"></i>
+              <div>
+                <strong>Gizlilik</strong>
+                <p>Dosyalarınız şifreli bağlantı üzerinden iletilir ve üçüncü taraflarla paylaşılmaz.</p>
+              </div>
+            </div>
+
+            <div class="consent-item">
+              <i class="pi pi-exclamation-triangle"></i>
+              <div>
+                <strong>Kalite Uyarısı</strong>
+                <p>Dönüştürme kalitesi PDF içeriğine bağlı olarak değişebilir. Karmaşık görseller veya özel fontlar tam olarak aktarılamayabilir.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="consent-checkbox">
+            <p-checkbox
+              [ngModel]="userConsent()"
+              (ngModelChange)="onConsentChange($event)"
+              [binary]="true"
+              inputId="consent"
+            />
+            <label for="consent">
+              Yukarıdaki koşulları okudum ve kabul ediyorum.
+            </label>
+          </div>
+        </div>
+      }
+
+      <!-- Step 4: Convert & Download -->
+      @if (currentStep() === 4) {
+        <div class="step-panel convert-panel">
+          <h3>Dönüştürme</h3>
+
+          @if (loading()) {
+            <div class="conversion-progress">
+              <p-progressSpinner strokeWidth="4" />
+              <span>Dosya dönüştürülüyor...</span>
+              @if (uploadProgress() > 0 && uploadProgress() < 100) {
+                <p-progressBar [value]="uploadProgress()" [showValue]="true" />
+              }
+            </div>
+          } @else if (conversionResult()?.success) {
+            <div class="conversion-success">
+              <i class="pi pi-check-circle"></i>
+              <span>Dönüştürme tamamlandı!</span>
+            </div>
+
+            <div class="download-section">
+              <p class="download-info">
+                Dosyanız hazır: <strong>{{ conversionResult()?.output_name }}</strong>
+              </p>
+              <p-button
+                label="İndir"
+                icon="pi pi-download"
+                (onClick)="downloadResult()"
+                size="large"
+              />
+            </div>
+
+            <div class="new-conversion">
+              <p-button
+                label="Yeni Dönüştürme"
+                icon="pi pi-refresh"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="startOver()"
+              />
+            </div>
+          } @else if (conversionResult() && !conversionResult()?.success) {
+            <div class="conversion-error">
+              <i class="pi pi-times-circle"></i>
+              <span>Dönüştürme başarısız</span>
+            </div>
+            <p-message severity="error" [text]="conversionResult()?.error ?? 'Bilinmeyen hata'" />
+
+            <div class="retry-section">
+              <p-button
+                label="Tekrar Dene"
+                icon="pi pi-refresh"
+                severity="secondary"
+                (onClick)="startConversion()"
+              />
+              <p-button
+                label="Baştan Başla"
+                icon="pi pi-arrow-left"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="startOver()"
+              />
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Error message -->
+      @if (error() && currentStep() !== 4) {
+        <div class="global-error">
+          <p-message severity="error" [text]="error()!" />
+        </div>
+      }
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="wizard-navigation">
+      @if (currentStep() > 0 && currentStep() < 4) {
+        <p-button
+          label="Geri"
+          icon="pi pi-arrow-left"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="prevStep()"
+        />
+      }
+
+      <div class="nav-spacer"></div>
+
+      @if (currentStep() < 4) {
+        <p-button
+          [label]="currentStep() === 3 ? 'Dönüştür' : 'İleri'"
+          [icon]="currentStep() === 3 ? 'pi pi-cog' : 'pi pi-arrow-right'"
+          iconPos="right"
+          [disabled]="
+            (currentStep() === 0 && !selectedFile()) ||
+            (currentStep() === 1 && !validationResult()?.is_valid) ||
+            (currentStep() === 3 && !userConsent()) ||
+            loading()
+          "
+          (onClick)="nextStep()"
+        />
+      }
+    </div>
+  </div>
+  </p-card>
+</div>

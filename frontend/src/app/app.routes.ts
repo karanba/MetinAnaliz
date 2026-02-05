@@ -16,6 +16,8 @@ import { GeoComponent } from './sections/geo/geo.component';
 import { MapToolsComponent } from './sections/geo/tools/map-tools/map-tools.component';
 import { EarthquakeComponent } from './sections/geo/tools/earthquake/earthquake.component';
 import { AirportsComponent } from './sections/geo/tools/airports/airports.component';
+import { FileComponent } from './sections/file/file.component';
+import { PDFToolsComponent } from './sections/file/tools/pdf-tools/pdf-tools.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tools', pathMatch: 'full' },
@@ -42,6 +44,10 @@ export const routes: Routes = [
   { path: 'tools/geo/map-tools', component: MapToolsComponent },
   { path: 'tools/geo/earthquake', component: EarthquakeComponent },
   { path: 'tools/geo/airports', component: AirportsComponent },
+
+  // File Tools (Dosya Araçları)
+  { path: 'tools/file', component: FileComponent },
+  { path: 'tools/file/pdf-tools', component: PDFToolsComponent },
 
   // Help
   {

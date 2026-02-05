@@ -16,8 +16,9 @@ from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-from routers import earthquake
+from routers import earthquake, pdf
 from services.earthquake_cache import earthquake_cache
+from services.pdf_service import pdf_service
 
 # Load environment variables
 load_dotenv()
@@ -379,8 +380,10 @@ EXPORTERS: Dict[ExportFormat, Exporter] = {
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Application lifespan handler."""
     # Startup
+    await pdf_service.initialize()
     yield
     # Shutdown - cleanup resources
+    await pdf_service.shutdown()
     await earthquake_cache.close()
 
 
@@ -388,6 +391,7 @@ app = FastAPI(title="Metin Analiz API", lifespan=lifespan)
 
 # Include routers
 app.include_router(earthquake.router)
+app.include_router(pdf.router)
 
 # Configure CORS - Controls which domains can access the API
 app.add_middleware(
