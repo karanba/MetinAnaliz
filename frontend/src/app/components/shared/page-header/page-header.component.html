@@ -1,22 +1,20 @@
 <div class="header-wrapper" [class.with-ad]="showAd()">
-  <div class="page-header">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      @for (item of breadcrumbs(); track item.label; let last = $last) {
-        @if (item.route && !last) {
-          <a [routerLink]="item.route" class="breadcrumb-link">{{
-            item.label
-          }}</a>
-          <span class="separator">/</span>
-        } @else {
-          <span class="breadcrumb-current">{{ item.label }}</span>
-        }
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    @for (item of breadcrumbs(); track item.label; let last = $last) {
+      @if (item.route && !last) {
+        <a [routerLink]="item.route" class="breadcrumb-link">{{
+          item.label
+        }}</a>
+        <span class="separator">/</span>
+      } @else {
+        <span class="breadcrumb-current">{{ item.label }}</span>
       }
-    </nav>
-    <h1>{{ title() }}</h1>
-    @if (description()) {
-      <p class="meta">{{ description() }}</p>
     }
-  </div>
+  </nav>
+
+  @if (description()) {
+    <span class="meta">{{ description() }}</span>
+  }
 
   <!-- AdSense Banner - Right Side -->
   @if (showAd()) {

@@ -37,13 +37,48 @@
     display: flex;
     align-items: center;
     gap: 8px;
+
+    &.search-group {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+    }
   }
 
-  .toolbar-label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-color-secondary);
-    white-space: nowrap;
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-ground);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 0 10px;
+    width: 100%;
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: var(--primary-color);
+    }
+
+    i {
+      color: var(--text-color-secondary);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .search-spinner {
+      color: var(--primary-color);
+    }
+  }
+
+  .search-input {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0.45rem 0 !important;
+    font-size: 0.85rem !important;
+    width: 100%;
+    min-width: 0;
   }
 
   .toolbar-spacer {
@@ -221,10 +256,10 @@
   }
 }
 
-// Search dropdown (for future use)
+// Search dropdown
 .search-results {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: var(--surface-card);
@@ -375,12 +410,17 @@
     padding: 8px 12px;
     gap: 8px;
 
-    .toolbar-label {
-      display: none;
-    }
-
     .toolbar-group {
       gap: 4px;
+
+      &.search-group {
+        order: 10;
+        flex-basis: 100%;
+      }
+    }
+
+    .search-input {
+      font-size: 0.8rem !important;
     }
 
     ::ng-deep {

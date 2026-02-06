@@ -20,6 +20,7 @@ import { Divider } from 'primeng/divider';
 import { Panel } from 'primeng/panel';
 import { Drawer } from 'primeng/drawer';
 import { Dialog } from 'primeng/dialog';
+import { InputText } from 'primeng/inputtext';
 import * as L from 'leaflet';
 
 interface LayerOption {
@@ -49,7 +50,8 @@ interface DrawOption {
     Divider,
     Panel,
     Drawer,
-    Dialog
+    Dialog,
+    InputText
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './map-tools.component.html',
@@ -73,9 +75,7 @@ export class MapToolsComponent implements OnDestroy {
   // Draw options
   drawOptions: DrawOption[] = [
     { label: 'Marker', value: 'marker', icon: 'pi pi-map-marker', tooltip: 'Nokta ekle' },
-    { label: 'Çizgi', value: 'polyline', icon: 'pi pi-minus', tooltip: 'Çizgi çiz (mesafe ölçümü)' },
-    { label: 'Alan', value: 'polygon', icon: 'pi pi-stop', tooltip: 'Alan çiz (alan ölçümü)' },
-    { label: 'Daire', value: 'circle', icon: 'pi pi-circle', tooltip: 'Daire çiz' }
+    { label: 'Çizgi', value: 'polyline', icon: 'pi pi-minus', tooltip: 'Çizgi çiz (mesafe ölçümü)' }
   ];
 
   // State
@@ -107,14 +107,8 @@ export class MapToolsComponent implements OnDestroy {
     // Apply initial base layer
     this.mapLayerService.applyBaseLayer(map, this.selectedLayer());
 
-    // Enable draw plugin
+    // Enable draw plugin (full Geoman toolbar on map)
     this.mapPluginService.enableDraw(map);
-
-    // Enable geocoder
-    this.mapPluginService.enableGeocoder(map, {
-      placeholder: 'Adres veya koordinat ara...',
-      errorMessage: 'Sonuç bulunamadı'
-    });
   }
 
   onLayerChange(layer: BaseLayerName): void {
@@ -146,6 +140,19 @@ export class MapToolsComponent implements OnDestroy {
     const query = this.searchQuery().trim();
     if (!query || !this.map) return;
 
+    // Try parsing as coordinates (e.g. "41.0082, 28.9784")
+    const coords = this.parseCoordinates(query);
+    if (coords) {
+      this.map.setView([coords.lat, coords.lng], 14);
+      L.marker([coords.lat, coords.lng])
+        .addTo(this.map)
+        .bindPopup(`${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`)
+        .openPopup();
+      this.searchResults.set([]);
+      return;
+    }
+
+    // Nominatim address search
     this.isSearching.set(true);
 
     try {
@@ -161,6 +168,15 @@ export class MapToolsComponent implements OnDestroy {
     } finally {
       this.isSearching.set(false);
     }
+  }
+
+  private parseCoordinates(input: string): { lat: number; lng: number } | null {
+    const match = input.match(/^(-?\d+\.?\d*)\s*[,\s]\s*(-?\d+\.?\d*)$/);
+    if (!match) return null;
+    const lat = parseFloat(match[1]);
+    const lng = parseFloat(match[2]);
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return { lat, lng };
   }
 
   onSearchKeydown(event: KeyboardEvent): void {
@@ -200,18 +216,6 @@ export class MapToolsComponent implements OnDestroy {
     } catch (err) {
       console.error('Kopyalama hatası:', err);
     }
-  }
-
-  zoomIn(): void {
-    this.map?.zoomIn();
-  }
-
-  zoomOut(): void {
-    this.map?.zoomOut();
-  }
-
-  resetView(): void {
-    this.map?.setView([39.9334, 32.8597], 6);
   }
 
   locateMe(): void {

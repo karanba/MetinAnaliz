@@ -13,72 +13,32 @@
   <div class="map-container-wrapper">
     <!-- Toolbar -->
     <div class="map-toolbar">
-      <!-- Draw Tools -->
-      <div class="toolbar-group">
-        <span class="toolbar-label">Çizim:</span>
-        @for (option of drawOptions; track option.value) {
-          <p-button
-            [icon]="option.icon"
-            [severity]="selectedDrawMode() === option.value ? 'primary' : 'secondary'"
-            [outlined]="selectedDrawMode() !== option.value"
-            [pTooltip]="option.tooltip"
-            tooltipPosition="bottom"
-            (onClick)="onDrawModeChange(option.value)"
-            size="small"
+      <!-- Search -->
+      <div class="toolbar-group search-group">
+        <div class="search-box">
+          <i class="pi pi-search"></i>
+          <input
+            type="text"
+            pInputText
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            (keyup.enter)="searchAddress()"
+            placeholder="Adres veya koordinat ara..."
+            class="search-input"
           />
+          @if (isSearching()) {
+            <i class="pi pi-spin pi-spinner search-spinner"></i>
+          }
+        </div>
+        @if (searchResults().length > 0) {
+          <div class="search-results">
+            @for (result of searchResults(); track $index) {
+              <div class="search-result-item" (click)="goToResult(result)">
+                <span class="result-name">{{ result.name }}</span>
+              </div>
+            }
+          </div>
         }
-        <p-button
-          icon="pi pi-trash"
-          severity="danger"
-          [outlined]="true"
-          pTooltip="Çizimleri temizle"
-          tooltipPosition="bottom"
-          (onClick)="clearDrawings()"
-          size="small"
-          [disabled]="drawnItems().length === 0"
-        />
-      </div>
-
-      <p-divider layout="vertical" />
-
-      <!-- View Controls -->
-      <div class="toolbar-group">
-        <p-button
-          icon="pi pi-plus"
-          severity="secondary"
-          [outlined]="true"
-          pTooltip="Yakınlaştır"
-          tooltipPosition="bottom"
-          (onClick)="zoomIn()"
-          size="small"
-        />
-        <p-button
-          icon="pi pi-minus"
-          severity="secondary"
-          [outlined]="true"
-          pTooltip="Uzaklaştır"
-          tooltipPosition="bottom"
-          (onClick)="zoomOut()"
-          size="small"
-        />
-        <p-button
-          icon="pi pi-home"
-          severity="secondary"
-          [outlined]="true"
-          pTooltip="Başlangıç görünümü"
-          tooltipPosition="bottom"
-          (onClick)="resetView()"
-          size="small"
-        />
-        <p-button
-          icon="pi pi-compass"
-          severity="secondary"
-          [outlined]="true"
-          pTooltip="Konumumu bul"
-          tooltipPosition="bottom"
-          (onClick)="locateMe()"
-          size="small"
-        />
       </div>
 
       <div class="toolbar-spacer"></div>
@@ -108,8 +68,17 @@
         />
       </div>
 
-      <!-- Settings -->
+      <!-- Actions -->
       <div class="toolbar-group">
+        <p-button
+          icon="pi pi-compass"
+          severity="secondary"
+          [outlined]="true"
+          pTooltip="Konumumu bul"
+          tooltipPosition="bottom"
+          (onClick)="locateMe()"
+          size="small"
+        />
         <p-button
           icon="pi pi-cog"
           severity="secondary"
