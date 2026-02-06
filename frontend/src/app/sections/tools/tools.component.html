@@ -71,7 +71,7 @@
     }
 
     <!-- Category Sections -->
-    @for (group of toolsCatalog(); track group.section) {
+    @for (group of toolsCatalog(); track group.section; let idx = $index) {
       <section class="category-section">
         <div class="category-header">
           <div class="category-info">
@@ -96,6 +96,20 @@
           }
         </div>
       </section>
+
+      <!-- Inline Ad after 2nd category -->
+      @if (idx === 1) {
+        <div class="tools-ad-section" #adContainer>
+          <ins
+            class="adsbygoogle"
+            style="display: block"
+            data-ad-client="ca-pub-7885050453788342"
+            data-ad-slot="8441819013"
+            data-ad-format="horizontal"
+            data-full-width-responsive="true"
+          ></ins>
+        </div>
+      }
     }
   }
 </div>

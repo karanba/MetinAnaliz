@@ -18,6 +18,8 @@ import { SelectButton } from 'primeng/selectbutton';
 import { Tooltip } from 'primeng/tooltip';
 import { Divider } from 'primeng/divider';
 import { Panel } from 'primeng/panel';
+import { Drawer } from 'primeng/drawer';
+import { Dialog } from 'primeng/dialog';
 import * as L from 'leaflet';
 
 interface LayerOption {
@@ -45,7 +47,9 @@ interface DrawOption {
     SelectButton,
     Tooltip,
     Divider,
-    Panel
+    Panel,
+    Drawer,
+    Dialog
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './map-tools.component.html',
@@ -81,6 +85,8 @@ export class MapToolsComponent implements OnDestroy {
   searchResults = signal<any[]>([]);
   isSearching = signal(false);
   showMeasurements = signal(true);
+  measurementsDrawerOpen = signal(false);
+  settingsOpen = signal(false);
 
   // Computed
   measurements = computed(() => this.mapPluginService.measurements());

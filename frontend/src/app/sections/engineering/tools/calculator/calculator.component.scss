@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
 }
 
 .header-label {
@@ -144,6 +145,11 @@
 :host ::ng-deep .error-message {
   margin-top: 12px;
   width: 100%;
+}
+
+// Mobile Settings Toggle (hidden on desktop)
+.mobile-settings-toggle {
+  display: none;
 }
 
 // Settings Bar
@@ -332,7 +338,8 @@
   flex-direction: column;
 }
 
-.history-header {
+.history-header,
+.drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -352,6 +359,13 @@
       color: var(--accent);
     }
   }
+}
+
+.drawer-header {
+  width: 100%;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .empty-history {
@@ -465,6 +479,11 @@
   }
 }
 
+// Floating History Button (mobile only)
+.floating-history-btn {
+  display: none;
+}
+
 // Shortcuts Dialog
 .shortcuts-content {
   padding: 8px 0;
@@ -504,9 +523,66 @@
 
 // Mobile Responsive
 @media (max-width: 768px) {
+  // Hide page header and card header on mobile
+  :host ::ng-deep app-page-header {
+    display: none;
+  }
 
-  .header-title-row h2 {
-    font-size: 1.2rem;
+  .card-header {
+    display: none;
+  }
+
+  .side-section {
+    display: none;
+  }
+
+  // Show mobile settings toggle
+  .mobile-settings-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--stroke);
+    background: #f8f9fa;
+    border-radius: 10px;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 4px;
+
+    .pi-cog {
+      color: var(--accent);
+    }
+
+    .pi-chevron-down,
+    .pi-chevron-up {
+      margin-left: auto;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    &:active {
+      background: #e9ecef;
+    }
+  }
+
+  // Hide settings by default on mobile, show when expanded
+  .settings-bar {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0;
+
+    &.mobile-expanded {
+      display: flex;
+    }
+  }
+
+  .setting-item {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .expression-input {
@@ -518,28 +594,20 @@
     font-size: 1.2rem;
   }
 
-  .settings-bar {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .setting-item {
-    width: 100%;
-    justify-content: space-between;
-  }
-
   .scientific-buttons {
     grid-template-columns: repeat(4, 1fr);
   }
 
+  // Bigger touch targets
   .calc-btn {
-    padding: 10px;
-    font-size: 0.9rem;
+    padding: 14px 10px;
+    font-size: 0.95rem;
+    min-height: 48px;
   }
 
   .function-btn {
-    font-size: 0.75rem;
-    padding: 8px 4px;
+    font-size: 0.8rem;
+    padding: 10px 6px;
   }
 
   .main-buttons {
@@ -547,7 +615,50 @@
   }
 
   .number-btn {
-    font-size: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .memory-btn {
+    padding: 10px;
+  }
+
+  // Show floating history button
+  .floating-history-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #176b7a, #0f5560);
+    color: white;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    z-index: 999;
+    transition: transform 0.2s ease;
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    .history-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--sun);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
   }
 
   :host ::ng-deep .p-tab {
@@ -561,6 +672,18 @@
     i {
       font-size: 1.2rem;
     }
+  }
+}
+
+// Drawer history list override
+:host ::ng-deep .history-drawer {
+  .history-list {
+    max-height: none;
+    padding: 0 16px 16px;
+  }
+
+  .empty-history {
+    padding: 32px 16px;
   }
 }
 

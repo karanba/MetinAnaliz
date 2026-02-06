@@ -489,3 +489,9 @@
     font-size: 1rem;
   }
 }
+
+@media (max-width: 390px) {
+  .footer-subtitle {
+    display: none;
+  }
+}

@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, AfterViewInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../components/shared';
 import { ToolRegistryService } from '../../services/tool-registry.service';
@@ -21,9 +21,11 @@ interface CatalogSection {
   templateUrl: './tools.component.html',
   styleUrls: ['./tools.component.scss'],
 })
-export class ToolsComponent {
+export class ToolsComponent implements AfterViewInit {
   private toolRegistry = inject(ToolRegistryService);
   private favoritesService = inject(ToolFavoritesService);
+  private platformId = inject(PLATFORM_ID);
+  private adPushed = false;
 
   searchQuery = signal('');
 
@@ -70,4 +72,19 @@ export class ToolsComponent {
         color: tool.color
       }));
   });
+
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        try {
+          if (!this.adPushed) {
+            ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+            this.adPushed = true;
+          }
+        } catch (e) {
+          console.error('AdSense error:', e);
+        }
+      }, 100);
+    }
+  }
 }

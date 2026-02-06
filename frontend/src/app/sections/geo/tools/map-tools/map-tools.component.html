@@ -7,28 +7,12 @@
       { label: 'Harita Araçları', route: '/tools/geo' },
       { label: 'Harita' }
     ]"
-    [showAd]="true"
+    [showAd]="false"
   />
 
   <div class="map-container-wrapper">
     <!-- Toolbar -->
     <div class="map-toolbar">
-      <!-- Layer Selector -->
-      <div class="toolbar-group">
-        <span class="toolbar-label">Katman:</span>
-        <p-selectButton
-          [options]="layerOptions"
-          [ngModel]="selectedLayer()"
-          (ngModelChange)="onLayerChange($event)"
-          optionLabel="label"
-          optionValue="value"
-          [allowEmpty]="false"
-          size="small"
-        />
-      </div>
-
-      <p-divider layout="vertical" />
-
       <!-- Draw Tools -->
       <div class="toolbar-group">
         <span class="toolbar-label">Çizim:</span>
@@ -123,6 +107,19 @@
           [disabled]="drawnItems().length === 0"
         />
       </div>
+
+      <!-- Settings -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-cog"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="settingsOpen.set(true)"
+          pTooltip="Ayarlar"
+          tooltipPosition="bottom"
+          size="small"
+        />
+      </div>
     </div>
 
     <!-- Main Content -->
@@ -133,6 +130,14 @@
           [showCoordinates]="true"
           (mapReady)="onMapReady($event)"
         />
+
+        <!-- Mobile Measurements FAB -->
+        @if (measurements().length > 0 || drawnItems().length > 0) {
+          <button class="floating-list-btn" (click)="measurementsDrawerOpen.set(true)">
+            <i class="pi pi-calculator"></i>
+            <span class="list-badge">{{ measurements().length + drawnItems().length }}</span>
+          </button>
+        }
       </div>
 
       <!-- Side Panel -->
@@ -223,4 +228,94 @@
       </div>
     </div>
   </div>
+
+  <!-- Settings Dialog -->
+  <p-dialog
+    [visible]="settingsOpen()"
+    (onHide)="settingsOpen.set(false)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '340px', maxWidth: '92vw' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="settings-header">
+        <i class="pi pi-cog"></i>
+        <span>Ayarlar</span>
+      </div>
+    </ng-template>
+
+    <div class="layer-setting">
+      <span class="setting-label">Harita Katmanı</span>
+      <p-selectButton
+        [options]="layerOptions"
+        [ngModel]="selectedLayer()"
+        (ngModelChange)="onLayerChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        [allowEmpty]="false"
+        size="small"
+      />
+    </div>
+  </p-dialog>
+
+  <!-- Mobile Measurements Drawer -->
+  <p-drawer
+    [(visible)]="measurementsDrawerOpen"
+    position="bottom"
+    [style]="{ height: '50vh' }"
+    styleClass="measurements-drawer"
+  >
+    <ng-template pTemplate="header">
+      <div class="drawer-header">
+        <h3><i class="pi pi-calculator"></i> Ölçümler ve Çizimler</h3>
+      </div>
+    </ng-template>
+
+    <div class="drawer-content">
+      @if (measurements().length > 0) {
+        <div class="drawer-section">
+          <h4>Ölçümler ({{ measurements().length }})</h4>
+          <div class="measurements-list">
+            @for (measurement of measurements(); track $index) {
+              <div class="measurement-item">
+                <i class="pi" [ngClass]="measurement.type === 'distance' ? 'pi-arrows-h' : 'pi-stop'"></i>
+                <span class="measurement-type">
+                  {{ measurement.type === 'distance' ? 'Mesafe' : 'Alan' }}:
+                </span>
+                <span class="measurement-value">{{ measurement.formatted }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (drawnItems().length > 0) {
+        <div class="drawer-section">
+          <h4>Çizimler ({{ drawnItems().length }})</h4>
+          <div class="drawings-list">
+            @for (item of drawnItems(); track $index) {
+              <div class="drawing-item">
+                <i class="pi" [ngClass]="{
+                  'pi-map-marker': item.type === 'marker',
+                  'pi-minus': item.type === 'polyline',
+                  'pi-stop': item.type === 'polygon' || item.type === 'rectangle',
+                  'pi-circle': item.type === 'circle'
+                }"></i>
+                <span class="drawing-type">
+                  @switch (item.type) {
+                    @case ('marker') { Nokta }
+                    @case ('polyline') { Çizgi }
+                    @case ('polygon') { Poligon }
+                    @case ('circle') { Daire }
+                    @case ('rectangle') { Dikdörtgen }
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </p-drawer>
 </div>

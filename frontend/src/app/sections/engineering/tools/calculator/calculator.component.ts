@@ -15,6 +15,7 @@ import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Dialog } from 'primeng/dialog';
+import { Drawer } from 'primeng/drawer';
 import { Tooltip } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Message } from 'primeng/message';
@@ -42,6 +43,7 @@ interface CalcButton {
     Select,
     SelectButton,
     Dialog,
+    Drawer,
     Tooltip,
     ToggleSwitch,
     Message,
@@ -82,6 +84,10 @@ export class CalculatorComponent {
   ];
 
   scientificNotation = false;
+
+  // Mobile
+  settingsOpen = signal(false);
+  historyDrawerOpen = signal(false);
 
   // Dialogs
   shortcutsDialogVisible = false;

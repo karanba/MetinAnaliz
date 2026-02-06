@@ -6,7 +6,7 @@
       { label: 'Araçlar', route: '/tools' },
       { label: 'Hesap Makinesi' }
     ]"
-    [showAd]="true"
+    [showAd]="false"
   />
 
   <div class="calculator-layout">
@@ -72,8 +72,15 @@
           }
         </div>
 
+        <!-- Mobile Settings Toggle -->
+        <button class="mobile-settings-toggle" (click)="settingsOpen.set(!settingsOpen())">
+          <i class="pi pi-cog"></i>
+          <span>Ayarlar</span>
+          <i class="pi" [class.pi-chevron-down]="!settingsOpen()" [class.pi-chevron-up]="settingsOpen()"></i>
+        </button>
+
         <!-- Settings Bar -->
-        <div class="settings-bar">
+        <div class="settings-bar" [class.mobile-expanded]="settingsOpen()">
           <div class="setting-item">
             <label>Açı:</label>
             <p-selectButton
@@ -166,7 +173,7 @@
       </p-card>
     </div>
 
-    <!-- Right Column: History & Info -->
+    <!-- Right Column: History & Info (desktop only) -->
     <div class="side-section">
       <p-card class="history-card">
         <div class="history-header">
@@ -213,7 +220,55 @@
       </p-card>
     </div>
   </div>
+
+  <!-- Mobile History FAB -->
+  <button class="floating-history-btn" (click)="historyDrawerOpen.set(true)">
+    <i class="pi pi-history"></i>
+    @if (history.entries().length > 0) {
+      <span class="history-badge">{{ history.entries().length }}</span>
+    }
+  </button>
 </div>
+
+<!-- Mobile History Drawer -->
+<p-drawer
+  [(visible)]="historyDrawerOpen"
+  position="bottom"
+  [style]="{ height: '60vh' }"
+  styleClass="history-drawer"
+>
+  <ng-template pTemplate="header">
+    <div class="drawer-header">
+      <h3><i class="pi pi-history"></i> Geçmiş</h3>
+      @if (history.entries().length > 0) {
+        <p-button
+          icon="pi pi-trash"
+          [text]="true"
+          [rounded]="true"
+          severity="danger"
+          (onClick)="clearHistory()"
+          pTooltip="Geçmişi temizle"
+        ></p-button>
+      }
+    </div>
+  </ng-template>
+
+  @if (history.entries().length === 0) {
+    <div class="empty-history">
+      <i class="pi pi-clock"></i>
+      <p>Henüz hesaplama yok</p>
+    </div>
+  } @else {
+    <div class="history-list">
+      @for (entry of history.entries(); track trackByHistoryId($index, entry)) {
+        <button class="history-entry" (click)="useHistoryEntry(entry); historyDrawerOpen.set(false)">
+          <span class="history-expression">{{ entry.expression }}</span>
+          <span class="history-result">= {{ entry.result }}</span>
+        </button>
+      }
+    </div>
+  }
+</p-drawer>
 
 <!-- Keyboard Shortcuts Dialog -->
 <p-dialog

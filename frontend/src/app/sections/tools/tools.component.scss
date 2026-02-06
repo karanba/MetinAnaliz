@@ -217,6 +217,24 @@
   }
 }
 
+// Inline Ad
+.tools-ad-section {
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+  overflow: hidden;
+
+  .adsbygoogle {
+    width: 100%;
+    max-width: 728px;
+  }
+}
+
 // Empty State
 .empty-state {
   display: flex;
@@ -307,6 +325,12 @@
     i {
       font-size: 1.05rem;
     }
+  }
+
+  .tools-ad-section {
+    padding: 12px;
+    border-radius: 14px;
+    min-height: 80px;
   }
 
   .empty-state {

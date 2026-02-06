@@ -7,7 +7,7 @@
       { label: 'Harita Araçları', route: '/tools/geo' },
       { label: 'Havaalanları' }
     ]"
-    [showAd]="true"
+    [showAd]="false"
   />
 
   <div class="airports-container">
@@ -72,22 +72,6 @@
         />
       </div>
 
-      <p-divider layout="vertical" />
-
-      <!-- Layer Selector -->
-      <div class="toolbar-group">
-        <span class="toolbar-label">Katman:</span>
-        <p-selectButton
-          [options]="layerOptions"
-          [ngModel]="selectedLayer()"
-          (ngModelChange)="onLayerChange($event)"
-          optionLabel="label"
-          optionValue="value"
-          [allowEmpty]="false"
-          size="small"
-        />
-      </div>
-
       <div class="toolbar-spacer"></div>
 
       <!-- Find My Location -->
@@ -111,6 +95,19 @@
           severity="secondary"
           [outlined]="true"
           (onClick)="resetFilters()"
+          size="small"
+        />
+      </div>
+
+      <!-- Settings -->
+      <div class="toolbar-group">
+        <p-button
+          icon="pi pi-cog"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="settingsOpen.set(true)"
+          pTooltip="Ayarlar"
+          tooltipPosition="bottom"
           size="small"
         />
       </div>
@@ -139,6 +136,14 @@
             <i class="pi pi-exclamation-triangle"></i>
             <span>{{ error() }}</span>
           </div>
+        }
+
+        <!-- Mobile List FAB -->
+        @if (filteredAirports().length > 0) {
+          <button class="floating-list-btn" (click)="listDrawerOpen.set(true)">
+            <i class="pi pi-list"></i>
+            <span class="list-badge">{{ sortedAirports().length }}</span>
+          </button>
         }
       </div>
 
@@ -285,4 +290,116 @@
       </div>
     </div>
   </div>
+
+  <!-- Settings Dialog -->
+  <p-dialog
+    [visible]="settingsOpen()"
+    (onHide)="settingsOpen.set(false)"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '340px', maxWidth: '92vw' }"
+  >
+    <ng-template pTemplate="header">
+      <div class="settings-header">
+        <i class="pi pi-cog"></i>
+        <span>Ayarlar</span>
+      </div>
+    </ng-template>
+
+    <div class="layer-setting">
+      <span class="setting-label">Harita Katmanı</span>
+      <p-selectButton
+        [options]="layerOptions"
+        [ngModel]="selectedLayer()"
+        (ngModelChange)="onLayerChange($event)"
+        optionLabel="label"
+        optionValue="value"
+        [allowEmpty]="false"
+        size="small"
+      />
+    </div>
+  </p-dialog>
+
+  <!-- Mobile List Drawer -->
+  <p-drawer
+    [(visible)]="listDrawerOpen"
+    position="bottom"
+    [style]="{ height: '70vh' }"
+    styleClass="list-drawer"
+  >
+    <ng-template pTemplate="header">
+      <div class="drawer-header">
+        <h3><i class="pi pi-building"></i> Havaalanları</h3>
+        <p-tag [value]="sortedAirports().length + ' / ' + totalCount()" severity="info" />
+      </div>
+    </ng-template>
+
+    <div class="drawer-controls">
+      <div class="search-box">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          pInputText
+          [ngModel]="listSearchQuery()"
+          (ngModelChange)="listSearchQuery.set($event)"
+          placeholder="Listede ara..."
+          class="search-input"
+        />
+      </div>
+      <div class="sort-controls">
+        <p-select
+          [options]="sortOptions"
+          [ngModel]="sortField()"
+          (ngModelChange)="onSortFieldChange($event)"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="sort-select"
+        />
+        <p-button
+          [icon]="sortDirection() === 'asc' ? 'pi pi-sort-alpha-down' : 'pi pi-sort-alpha-up'"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="toggleSortDirection()"
+          size="small"
+        />
+      </div>
+    </div>
+
+    <div class="airport-list">
+      @for (airport of sortedAirports().slice(0, 100); track airport.id) {
+        <div
+          class="airport-item"
+          (click)="zoomToAirport(airport); listDrawerOpen.set(false)"
+        >
+          <div class="airport-codes">
+            @if (airport.iata_code) {
+              <p-tag
+                [value]="airport.iata_code"
+                [severity]="getTypeSeverity(airport.type)"
+              />
+            } @else {
+              <p-tag
+                [value]="airport.ident"
+                severity="secondary"
+              />
+            }
+          </div>
+          <div class="airport-info">
+            <span class="airport-name">{{ airport.name }}</span>
+            <span class="airport-location">
+              {{ airport.municipality || airport.iso_region }}
+              · {{ airport.iso_country }}
+            </span>
+          </div>
+          <i class="pi pi-chevron-right"></i>
+        </div>
+      } @empty {
+        <div class="empty-list">
+          <i class="pi pi-info-circle"></i>
+          <span>Sonuç bulunamadı</span>
+        </div>
+      }
+    </div>
+  </p-drawer>
 </div>

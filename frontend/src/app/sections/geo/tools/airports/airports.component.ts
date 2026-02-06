@@ -21,10 +21,11 @@ import { Select } from 'primeng/select';
 import { MultiSelect } from 'primeng/multiselect';
 import { InputText } from 'primeng/inputtext';
 import { Divider } from 'primeng/divider';
-import { Panel } from 'primeng/panel';
 import { Tag } from 'primeng/tag';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Tooltip } from 'primeng/tooltip';
+import { Drawer } from 'primeng/drawer';
+import { Dialog } from 'primeng/dialog';
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
 
@@ -60,10 +61,11 @@ interface SortOption {
     MultiSelect,
     InputText,
     Divider,
-    Panel,
     Tag,
     ProgressSpinner,
-    Tooltip
+    Tooltip,
+    Drawer,
+    Dialog
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './airports.component.html',
@@ -109,6 +111,8 @@ export class AirportsComponent implements OnInit, OnDestroy {
   selectedTypes = signal<AirportType[]>(['large_airport', 'medium_airport']);
   searchQuery = signal<string>('');
   showList = signal<boolean>(true);
+  listDrawerOpen = signal<boolean>(false);
+  settingsOpen = signal<boolean>(false);
   listSearchQuery = signal<string>('');
   sortField = signal<AirportSortField>('name');
   sortDirection = signal<SortDirection>('asc');

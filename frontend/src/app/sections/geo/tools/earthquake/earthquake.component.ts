@@ -29,13 +29,12 @@ import { Slider } from "primeng/slider";
 import { ToggleSwitch } from "primeng/toggleswitch";
 import { Tooltip } from "primeng/tooltip";
 import { Divider } from "primeng/divider";
-import { Panel } from "primeng/panel";
 import { Tag } from "primeng/tag";
 import { ProgressSpinner } from "primeng/progressspinner";
 import { InputText } from "primeng/inputtext";
 import { Select } from "primeng/select";
-import { MultiSelect } from "primeng/multiselect";
 import { Dialog } from "primeng/dialog";
+import { Drawer } from "primeng/drawer";
 import * as L from "leaflet";
 
 interface TimePresetOption {
@@ -70,13 +69,12 @@ interface SortOption {
     ToggleSwitch,
     Tooltip,
     Divider,
-    Panel,
     Tag,
     ProgressSpinner,
     InputText,
     Select,
-    MultiSelect,
     Dialog,
+    Drawer,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./earthquake.component.html",
@@ -95,10 +93,10 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
 
   // Time preset options
   timePresets: TimePresetOption[] = [
-    { label: "Son 1 Saat", value: "hour" },
+    { label: "1 Saat", value: "hour" },
     { label: "Bugün", value: "today" },
-    { label: "Son 7 Gün", value: "week" },
-    { label: "Son 30 Gün", value: "month" },
+    { label: "7 Gün", value: "week" },
+    { label: "30 Gün", value: "month" },
   ];
 
   // Layer options
@@ -148,6 +146,7 @@ export class EarthquakeComponent implements OnInit, OnDestroy {
   filterByViewport = signal<boolean>(true);
   private mapBounds = signal<L.LatLngBounds | null>(null);
   sourceSettingsOpen = signal<boolean>(false);
+  listDrawerOpen = signal<boolean>(false);
   settingsTab = signal<"sources" | "magnitude">("sources");
   recentAnimationMinutes = signal<number>(60);
   private userLocationMarker: L.Marker | null = null;
