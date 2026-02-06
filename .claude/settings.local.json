@@ -14,7 +14,8 @@
       "Bash(.venv/Scripts/pip install:*)",
       "Bash(.venv/Scripts/python:*)",
       "Bash(curl:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

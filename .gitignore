@@ -127,7 +127,26 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-ornekler/
+# Project specific
 sonuclar/
+temp/
+nul
+
+# Backend
+backend/__pycache__/
+backend/.pytest_cache/
+backend/*.egg-info/
+backend/examples/
+
+# Frontend
 frontend/.angular/
 frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude
+.claude/

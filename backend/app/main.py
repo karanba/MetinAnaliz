@@ -1,40 +1,35 @@
-"""
-Secure version of main.py with security middleware integrated.
-This demonstrates how to implement the security features.
-
-To use this:
-1. Install required packages: pip install slowapi redis python-dotenv
-2. Rename this file to main.py (backup original first)
-3. Create a .env file with your configuration
-"""
 from __future__ import annotations
 
 import csv
 import io
 import math
-import re
 import os
+import re
+from contextlib import asynccontextmanager
 from pathlib import Path
 from enum import Enum
-from typing import Dict, List, Protocol
+from typing import AsyncIterator, Dict, List, Protocol
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import Response
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, validator
+from fastapi.responses import Response
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-# Import security middleware
-from security_middleware import (
-    RateLimitMiddleware,
-    SecurityHeadersMiddleware,
-    RequestSizeLimitMiddleware,
-    sanitize_text_input,
-    validate_text_content,
-)
+from backend.routers import earthquake, pdf
+from backend.services.earthquake_cache import earthquake_cache
+from backend.services.pdf_service import pdf_service
 
 # Load environment variables
 load_dotenv()
+
+# Security middleware imports
+from backend.middleware.security import sanitize_text_input, validate_text_content
+
+# Configuration from environment variables
+MAX_TEXT_LENGTH = int(os.getenv("MAX_REQUEST_SIZE", "1048576"))  # Default: 1MB in bytes (for text, ~1M chars)
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:4200").split(",")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 VOWELS = set("aeıioöuü")
 
@@ -46,20 +41,8 @@ class AnalysisType(str, Enum):
 
 
 class AnalyzeRequest(BaseModel):
-    text: str = Field(..., description="Turkish text to analyze", max_length=100000)
+    text: str = Field(..., description="Turkish text to analyze")
     analysis_type: AnalysisType = Field(default=AnalysisType.yod, description="Type of readability analysis")
-
-    @validator('text')
-    def validate_text_field(cls, v):
-        """Pydantic validator for additional text validation"""
-        if not v or not v.strip():
-            raise ValueError('Text cannot be empty')
-
-        # Check for null bytes
-        if '\x00' in v:
-            raise ValueError('Text contains invalid characters')
-
-        return v.strip()
 
 
 class WordInfo(BaseModel):
@@ -80,7 +63,7 @@ class Statistics(BaseModel):
     oks_value: float
     syllable_counts: dict
     syllable_distribution: dict
-    yod_value: float
+    yod_value: float  # Kept for backward compatibility
     readability_score: float
     analysis_type: str
 
@@ -97,17 +80,9 @@ class ExportFormat(str, Enum):
 
 
 class ExportRequest(BaseModel):
-    text: str = Field(..., description="Turkish text to analyze", max_length=100000)
+    text: str = Field(..., description="Turkish text to analyze")
     format: ExportFormat = Field(..., description="Export format")
     analysis_type: AnalysisType = Field(default=AnalysisType.yod, description="Type of readability analysis")
-
-    @validator('text')
-    def validate_text_field(cls, v):
-        if not v or not v.strip():
-            raise ValueError('Text cannot be empty')
-        if '\x00' in v:
-            raise ValueError('Text contains invalid characters')
-        return v.strip()
 
 
 class Exporter(Protocol):
@@ -120,11 +95,13 @@ class Exporter(Protocol):
 
 
 def split_sentences(text: str) -> List[str]:
+    # Split on ., ?, ! with optional trailing whitespace.
     parts = re.split(r"[.!?]+\s*", text.strip())
     return [p for p in (part.strip() for part in parts) if p]
 
 
 def extract_words(sentence: str) -> List[str]:
+    # Match Turkish letters and standard ASCII letters.
     return re.findall(r"[A-Za-zÇĞİÖŞÜçğıöşü]+", sentence)
 
 
@@ -133,23 +110,40 @@ def count_syllables(word: str) -> int:
 
 
 def calculate_yod(oks: float, h3: float, h4: float, h5: float, h6: float) -> float:
+    """Calculate YOD (Yeni Okunabilirlik Değeri) - New Readability Value"""
     return math.sqrt(oks * ((h3 * 0.84) + (h4 * 1.5) + (h5 * 3.5) + (h6 * 26.25)))
 
 
 def calculate_atesman(total_words: int, total_sentences: int, total_syllables: int) -> float:
+    """
+    Calculate Ateşman Readability Score
+    Turkish adaptation of Flesch Reading Ease
+    Formula: A = 198.825 - 40.175 × (K/C) - 2.610 × (H/K)
+    where K=words, C=sentences, H=syllables
+    """
     if total_sentences == 0 or total_words == 0:
         return 0.0
+
     words_per_sentence = total_words / total_sentences
     syllables_per_word = total_syllables / total_words
+
     atesman_score = 198.825 - (40.175 * words_per_sentence) - (2.610 * syllables_per_word)
     return atesman_score
 
 
 def calculate_cetinkaya_uzun(total_words: int, total_sentences: int, total_syllables: int) -> float:
+    """
+    Calculate Çetinkaya-Uzun Readability Score
+    Alternative Turkish readability formula
+    Formula: ÇU = 118.823 - 25.987 × (K/C) - 0.971 × (H/K)
+    where K=words, C=sentences, H=syllables
+    """
     if total_sentences == 0 or total_words == 0:
         return 0.0
+
     words_per_sentence = total_words / total_sentences
     syllables_per_word = total_syllables / total_words
+
     cetinkaya_score = 118.823 - (25.987 * words_per_sentence) - (0.971 * syllables_per_word)
     return cetinkaya_score
 
@@ -209,6 +203,7 @@ def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> A
     h5 = ratio_for(5)
     h6 = ratio_for_min(6)
 
+    # Calculate readability score based on analysis type
     if analysis_type == AnalysisType.yod:
         readability_score = calculate_yod(oks, h3, h4, h5, h6)
     elif analysis_type == AnalysisType.atesman:
@@ -218,6 +213,7 @@ def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> A
     else:
         readability_score = calculate_yod(oks, h3, h4, h5, h6)
 
+    # Keep yod_value for backward compatibility (always calculate it)
     yod_value = calculate_yod(oks, h3, h4, h5, h6)
 
     stats = Statistics(
@@ -247,6 +243,8 @@ def analyze_text(text: str, analysis_type: AnalysisType = AnalysisType.yod) -> A
 
 def _build_text_lines(analysis: AnalyzeResponse) -> List[str]:
     stats = analysis.statistics
+
+    # Determine the score label based on analysis type
     score_label = "YOD"
     if stats.analysis_type == "atesman":
         score_label = "Ateşman Skoru"
@@ -299,6 +297,7 @@ class CsvExporter:
                         word.syllable_count,
                     ]
                 )
+        # Use UTF-8 with BOM for better compatibility (e.g., Excel) with Turkish characters.
         return output.getvalue().encode("utf-8-sig")
 
 
@@ -322,14 +321,14 @@ class PdfExporter:
             from reportlab.pdfbase import pdfmetrics
             from reportlab.pdfbase.ttfonts import TTFont
             from reportlab.pdfgen import canvas
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover
             raise RuntimeError("PDF export requires reportlab") from exc
 
         font_path = _resolve_pdf_font_path()
         if font_path is None:
             raise RuntimeError(
                 "PDF export requires a Unicode-capable TTF font. "
-                "Place a font at fonts/NotoSans-Regular.ttf or ensure a system font is available."
+                "Place a font at backend/fonts/NotoSans-Regular.ttf or ensure a system font is available."
             )
 
         pdfmetrics.registerFont(TTFont("UnicodeFont", str(font_path)))
@@ -352,11 +351,13 @@ class PdfExporter:
 
 
 def _resolve_pdf_font_path() -> Path | None:
+    # Backend fonts directory: backend/fonts/
+    backend_dir = Path(__file__).resolve().parent.parent
     candidates = [
-        Path(__file__).resolve().parent / "fonts" / "NotoSans-Regular.ttf",
-        Path("fonts") / "NotoSans-Regular.ttf",
-        Path(__file__).resolve().parent / "fonts" / "DejaVuSans.ttf",
-        Path("fonts") / "DejaVuSans.ttf",
+        backend_dir / "fonts" / "NotoSans-Regular.ttf",
+        backend_dir / "fonts" / "DejaVuSans.ttf",
+        Path("backend/fonts") / "NotoSans-Regular.ttf",
+        Path("backend/fonts") / "DejaVuSans.ttf",
         Path(r"C:\Windows\Fonts\arial.ttf"),
         Path(r"C:\Windows\Fonts\SegoeUI.ttf"),
         Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
@@ -376,100 +377,66 @@ EXPORTERS: Dict[ExportFormat, Exporter] = {
     ExportFormat.pdf: PdfExporter(),
 }
 
-# ============================================
-# APPLICATION SETUP WITH SECURITY
-# ============================================
 
-app = FastAPI(
-    title="Metin Analiz API",
-    description="Secure Turkish text analysis API",
-    version="1.0.0"
-)
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Application lifespan handler."""
+    # Startup
+    await pdf_service.initialize()
+    yield
+    # Shutdown - cleanup resources
+    await pdf_service.shutdown()
+    await earthquake_cache.close()
 
-# Add security middleware (ORDER MATTERS!)
-# 1. Security headers (first to apply to all responses)
-app.add_middleware(SecurityHeadersMiddleware)
 
-# 2. Rate limiting
-app.add_middleware(RateLimitMiddleware, requests_per_minute=60)
+app = FastAPI(title="Metin Analiz API", lifespan=lifespan)
 
-# 3. Request size limiting
-app.add_middleware(RequestSizeLimitMiddleware, max_size=1024 * 1024)  # 1MB
+# Include routers
+app.include_router(earthquake.router)
+app.include_router(pdf.router)
 
-# 4. CORS (configure based on environment)
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:4200").split(",")
+# Configure CORS - Controls which domains can access the API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=ALLOWED_ORIGINS,  # Domains allowed to access the API
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST"],  # Only allow GET and POST methods
     allow_headers=["Content-Type", "Authorization"],
-    max_age=3600,
+    max_age=3600,  # Cache preflight requests for 1 hour
 )
 
-# ============================================
-# ENDPOINTS
-# ============================================
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint"""
-    return {"status": "ok", "version": "1.0.0"}
+    return {"status": "ok"}
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
-def analyze_endpoint(request: Request, payload: AnalyzeRequest) -> AnalyzeResponse:
-    """
-    Analyze Turkish text with security measures.
-    """
+def analyze_endpoint(payload: AnalyzeRequest) -> AnalyzeResponse:
     try:
-        # Log request (without sensitive data)
-        client_ip = request.client.host if request.client else "unknown"
-        print(f"[INFO] Analysis request from {client_ip}, text_length={len(payload.text)}")
-
-        # Sanitize and validate input
-        sanitized_text = sanitize_text_input(payload.text, max_length=100000)
+        # Sanitize and validate input to prevent XSS and injection attacks
+        sanitized_text = sanitize_text_input(payload.text, max_length=MAX_TEXT_LENGTH)
         validate_text_content(sanitized_text)
 
-        # Process analysis
-        result = analyze_text(sanitized_text, payload.analysis_type)
-
-        return result
-
+        return analyze_text(sanitized_text, payload.analysis_type)
     except ValueError as exc:
-        # Log warning for invalid input
-        print(f"[WARNING] Invalid input from {request.client.host}: {str(exc)}")
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-    except Exception as exc:
-        # Log error but don't expose details to client
-        print(f"[ERROR] Unexpected error: {str(exc)}")
-        raise HTTPException(status_code=500, detail="Internal server error") from exc
 
 
 @app.post("/export")
-def export_endpoint(request: Request, payload: ExportRequest):
-    """
-    Export analysis results with security measures.
-    """
+def export_endpoint(payload: ExportRequest):
     try:
-        # Log request
-        client_ip = request.client.host if request.client else "unknown"
-        print(f"[INFO] Export request from {client_ip}, format={payload.format}")
-
-        # Sanitize and validate input
-        sanitized_text = sanitize_text_input(payload.text, max_length=100000)
+        # Sanitize and validate input to prevent XSS and injection attacks
+        sanitized_text = sanitize_text_input(payload.text, max_length=MAX_TEXT_LENGTH)
         validate_text_content(sanitized_text)
 
-        # Analyze text
         analysis = analyze_text(sanitized_text, payload.analysis_type)
-
     except ValueError as exc:
-        print(f"[WARNING] Invalid input from {request.client.host}: {str(exc)}")
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     exporter = EXPORTERS.get(payload.format)
     if exporter is None:
-        raise HTTPException(status_code=400, detail="Unsupported export format")
+        raise HTTPException(status_code=400, detail="unsupported export format")
 
     try:
         content = exporter.export(analysis)
@@ -477,40 +444,5 @@ def export_endpoint(request: Request, payload: ExportRequest):
         raise HTTPException(status_code=501, detail=str(exc)) from exc
 
     filename = f"metin-analiz.{exporter.extension}"
-    headers = {
-        "Content-Disposition": f'attachment; filename="{filename}"',
-        # Additional security headers for file download
-        "X-Content-Type-Options": "nosniff",
-    }
+    headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
     return Response(content=content, media_type=exporter.content_type, headers=headers)
-
-
-# ============================================
-# STARTUP/SHUTDOWN EVENTS
-# ============================================
-
-@app.on_event("startup")
-async def startup_event():
-    """Log application startup"""
-    environment = os.getenv("ENVIRONMENT", "development")
-    print(f"[INFO] Starting Metin Analiz API in {environment} mode")
-    print(f"[INFO] Allowed origins: {allowed_origins}")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Log application shutdown"""
-    print("[INFO] Shutting down Metin Analiz API")
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    # Development server
-    uvicorn.run(
-        "main_secure:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )

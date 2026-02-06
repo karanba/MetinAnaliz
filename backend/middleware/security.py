@@ -246,7 +246,7 @@ To use these security features, update your main.py:
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from security_middleware import (
+from backend.middleware.security import (
     RateLimitMiddleware,
     SecurityHeadersMiddleware,
     RequestSizeLimitMiddleware,

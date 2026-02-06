@@ -9,7 +9,7 @@ from typing import Any
 
 from fastapi import APIRouter, Query, HTTPException
 
-from services.earthquake_cache import earthquake_cache
+from backend.services.earthquake_cache import earthquake_cache
 
 router = APIRouter(prefix="/earthquakes", tags=["earthquakes"])
 
