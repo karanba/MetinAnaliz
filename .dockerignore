@@ -1,0 +1,38 @@
+# Dependencies
+frontend/node_modules
+backend/__pycache__
+backend/.pytest_cache
+backend/*.egg-info
+.venv
+
+# Build outputs
+frontend/dist
+frontend/.angular
+
+# IDE
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Docs (not needed in container)
+docs/
+*.md
+!backend/README.md
+
+# Env files (use docker env vars instead)
+.env
+backend/.env
+
+# Test files
+backend/tests/
+frontend/e2e/
+
+# Temp/Output
+temp/
+sonuclar/
+
+# Claude
+.claude/

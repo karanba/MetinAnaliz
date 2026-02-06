@@ -15,7 +15,10 @@
       "Bash(.venv/Scripts/python:*)",
       "Bash(curl:*)",
       "Bash(git merge:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(python:*)",
+      "Bash(timeout 5 uvicorn:*)",
+      "Bash(pip install:*)"
     ]
   }
 }
