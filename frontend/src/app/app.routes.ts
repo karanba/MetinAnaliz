@@ -18,6 +18,7 @@ import { EarthquakeComponent } from './sections/geo/tools/earthquake/earthquake.
 import { AirportsComponent } from './sections/geo/tools/airports/airports.component';
 import { FileComponent } from './sections/file/file.component';
 import { PDFToolsComponent } from './sections/file/tools/pdf-tools/pdf-tools.component';
+import { PDFMergeComponent } from './sections/file/tools/pdf-merge/pdf-merge.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'tools', pathMatch: 'full' },
@@ -48,6 +49,7 @@ export const routes: Routes = [
   // File Tools (Dosya Araçları)
   { path: 'tools/file', component: FileComponent },
   { path: 'tools/file/pdf-tools', component: PDFToolsComponent },
+  { path: 'tools/file/pdf-merge', component: PDFMergeComponent },
 
   // Help
   {

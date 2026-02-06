@@ -144,13 +144,23 @@ export class ToolRegistryService {
       tools: [
         {
           id: 'pdf-tools',
-          title: 'PDF Araçları',
-          description: 'PDF dosyalarını Word formatına dönüştürün, birleştirin veya bölün',
+          title: 'PDF → Word',
+          description: 'PDF dosyalarını Word (DOCX) formatına dönüştürün',
           icon: 'file-pdf',
           route: '/tools/file/pdf-tools',
           color: 'sun',
           category: 'file',
-          keywords: ['pdf', 'word', 'docx', 'dönüştür', 'convert', 'birleştir', 'merge']
+          keywords: ['pdf', 'word', 'docx', 'dönüştür', 'convert']
+        },
+        {
+          id: 'pdf-merge',
+          title: 'PDF Birleştir',
+          description: 'Birden fazla PDF dosyasını tek bir dosyada birleştirin',
+          icon: 'copy',
+          route: '/tools/file/pdf-merge',
+          color: 'accent',
+          category: 'file',
+          keywords: ['pdf', 'birleştir', 'merge', 'combine', 'dosya']
         }
       ]
     }
