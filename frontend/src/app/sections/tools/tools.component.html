@@ -3,31 +3,99 @@
     title="Araçlar"
     description="Metin analizi, mühendislik ve tasarım araçlarına göz atın"
     [breadcrumbs]="[{ label: 'Araçlar' }]"
+    [showAd]="false"
   />
 
-  @for (group of toolsCatalog(); track group.section) {
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <i class="pi pi-search search-icon"></i>
+    <input
+      type="text"
+      placeholder="Araç ara..."
+      [value]="searchQuery()"
+      (input)="searchQuery.set($any($event.target).value)"
+    />
+    @if (searchQuery()) {
+      <button class="search-clear" (click)="searchQuery.set('')">
+        <i class="pi pi-times"></i>
+      </button>
+    }
+  </div>
+
+  @if (isSearching()) {
+    <!-- Search Results -->
     <section class="category-section">
       <div class="category-header">
         <div class="category-info">
-          <div class="category-icon">
-            <i class="pi {{ group.icon }}"></i>
+          <div class="category-icon search-results-icon">
+            <i class="pi pi-search"></i>
           </div>
           <div class="category-text">
-            <h2>{{ group.section }}</h2>
-            <p>{{ group.description }}</p>
+            <h2>Arama Sonuçları</h2>
+            <p>{{ searchResults().length }} araç bulundu</p>
           </div>
         </div>
-        <a [routerLink]="group.route" class="category-link">
-          Tümünü Gör
-          <i class="pi pi-arrow-right"></i>
-        </a>
       </div>
 
-      <div class="tools-grid">
-        @for (tool of group.tools; track tool.route) {
-          <app-tool-card [tool]="tool" />
-        }
-      </div>
+      @if (searchResults().length) {
+        <div class="tools-grid">
+          @for (tool of searchResults(); track tool.route) {
+            <app-tool-card [tool]="tool" />
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <i class="pi pi-search"></i>
+          <p>"{{ searchQuery() }}" ile eşleşen araç bulunamadı</p>
+        </div>
+      }
     </section>
+  } @else {
+    <!-- Favorites (only when favorites exist) -->
+    @if (favoriteTools().length) {
+      <div class="favorites-bar">
+        <i class="pi pi-star-fill favorites-label-icon"></i>
+        <div class="favorites-list">
+          @for (tool of favoriteTools(); track tool.route) {
+            <a
+              [routerLink]="tool.route"
+              class="fav-item"
+              [class.sun]="tool.color === 'sun'"
+              [title]="tool.title + ' — ' + tool.description"
+            >
+              <i [class]="'pi ' + tool.icon"></i>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Category Sections -->
+    @for (group of toolsCatalog(); track group.section) {
+      <section class="category-section">
+        <div class="category-header">
+          <div class="category-info">
+            <div class="category-icon">
+              <i class="pi {{ group.icon }}"></i>
+            </div>
+            <div class="category-text">
+              <h2>{{ group.section }}</h2>
+              <p>{{ group.description }}</p>
+            </div>
+          </div>
+          <a [routerLink]="group.route" class="category-link">
+            <span class="link-text-full">Tümünü Gör</span>
+            <span class="link-text-short">Tümü</span>
+            <i class="pi pi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div class="tools-grid">
+          @for (tool of group.tools; track tool.route) {
+            <app-tool-card [tool]="tool" />
+          }
+        </div>
+      </section>
+    }
   }
 </div>

@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ToolInfo } from '../../../models/tool.models';
+import { ToolFavoritesService } from '../../../services/tool-favorites.service';
 
 // Re-export ToolInfo for backward compatibility
 export { ToolInfo } from '../../../models/tool.models';
@@ -20,6 +21,13 @@ export { ToolInfo } from '../../../models/tool.models';
         <h3>{{ tool().title }}</h3>
         <p>{{ tool().description }}</p>
       </div>
+      <button
+        class="tool-favorite"
+        [class.active]="isFavorite()"
+        (click)="toggleFavorite($event)"
+      >
+        <i [class]="isFavorite() ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+      </button>
       <div class="tool-arrow">
         <i class="pi pi-arrow-right"></i>
       </div>
@@ -52,6 +60,10 @@ export { ToolInfo } from '../../../models/tool.models';
         .tool-arrow {
           opacity: 1;
           transform: translateX(0);
+        }
+
+        .tool-favorite i {
+          color: var(--muted);
         }
       }
 
@@ -109,6 +121,39 @@ export { ToolInfo } from '../../../models/tool.models';
       }
     }
 
+    .tool-favorite {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+
+      i {
+        font-size: 0.9rem;
+        color: var(--stroke);
+        transition: color 0.2s ease;
+      }
+
+      &:hover {
+        background: rgba(246, 170, 28, 0.1);
+
+        i {
+          color: #f6aa1c;
+        }
+      }
+
+      &.active i {
+        color: #f6aa1c;
+      }
+    }
+
     .tool-arrow {
       display: flex;
       align-items: center;
@@ -161,6 +206,15 @@ export { ToolInfo } from '../../../models/tool.models';
         }
       }
 
+      .tool-favorite {
+        width: 28px;
+        height: 28px;
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+
       .tool-arrow {
         display: none;
       }
@@ -169,4 +223,14 @@ export { ToolInfo } from '../../../models/tool.models';
 })
 export class ToolCardComponent {
   tool = input.required<ToolInfo>();
+
+  private favoritesService = inject(ToolFavoritesService);
+
+  isFavorite = computed(() => this.favoritesService.isFavorite(this.tool().route));
+
+  toggleFavorite(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.favoritesService.toggleFavorite(this.tool().route);
+  }
 }

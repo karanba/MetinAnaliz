@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PageHeaderComponent, ToolCardComponent, ToolInfo } from '../../components/shared';
 import { ToolRegistryService } from '../../services/tool-registry.service';
+import { ToolFavoritesService } from '../../services/tool-favorites.service';
 
 interface CatalogSection {
   section: string;
@@ -22,6 +23,11 @@ interface CatalogSection {
 })
 export class ToolsComponent {
   private toolRegistry = inject(ToolRegistryService);
+  private favoritesService = inject(ToolFavoritesService);
+
+  searchQuery = signal('');
+
+  isSearching = computed(() => this.searchQuery().trim().length > 0);
 
   // Transform sections to catalog format for template compatibility
   toolsCatalog = computed<CatalogSection[]>(() =>
@@ -39,4 +45,29 @@ export class ToolsComponent {
       }))
     }))
   );
+
+  searchResults = computed<ToolInfo[]>(() => {
+    const query = this.searchQuery().trim();
+    if (!query) return [];
+    return this.toolRegistry.searchTools(query).map(tool => ({
+      title: tool.title,
+      description: tool.description,
+      icon: 'pi-' + tool.icon,
+      route: tool.route,
+      color: tool.color
+    }));
+  });
+
+  favoriteTools = computed<ToolInfo[]>(() => {
+    const favRoutes = this.favoritesService.favorites();
+    return this.toolRegistry.allTools()
+      .filter(tool => favRoutes.has(tool.route))
+      .map(tool => ({
+        title: tool.title,
+        description: tool.description,
+        icon: 'pi-' + tool.icon,
+        route: tool.route,
+        color: tool.color
+      }));
+  });
 }

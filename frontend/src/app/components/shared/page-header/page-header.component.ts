@@ -45,6 +45,9 @@ export class PageHeaderComponent implements AfterViewChecked {
   }
 
   private loadAd(): void {
+    if (!this.showAd()) {
+      return;
+    }
     try {
       const adsbygoogle = (window as any).adsbygoogle || [];
       if (adsbygoogle && !this.adPushed) {
