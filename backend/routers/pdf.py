@@ -10,7 +10,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import Response
 from pydantic import BaseModel
 
-from backend.services.pdf_service import (
+from services.pdf_service import (
     pdf_service,
     PDFValidationError,
     PDFConversionError,

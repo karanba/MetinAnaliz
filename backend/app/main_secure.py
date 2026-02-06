@@ -25,7 +25,7 @@ from pydantic import BaseModel, Field, validator
 from dotenv import load_dotenv
 
 # Import security middleware
-from backend.middleware.security import (
+from middleware.security import (
     RateLimitMiddleware,
     SecurityHeadersMiddleware,
     RequestSizeLimitMiddleware,

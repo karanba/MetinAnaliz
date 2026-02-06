@@ -16,15 +16,15 @@ from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
-from backend.routers import earthquake, pdf
-from backend.services.earthquake_cache import earthquake_cache
-from backend.services.pdf_service import pdf_service
+from routers import earthquake, pdf
+from services.earthquake_cache import earthquake_cache
+from services.pdf_service import pdf_service
 
 # Load environment variables
 load_dotenv()
 
 # Security middleware imports
-from backend.middleware.security import sanitize_text_input, validate_text_content
+from middleware.security import sanitize_text_input, validate_text_content
 
 # Configuration from environment variables
 MAX_TEXT_LENGTH = int(os.getenv("MAX_REQUEST_SIZE", "1048576"))  # Default: 1MB in bytes (for text, ~1M chars)
