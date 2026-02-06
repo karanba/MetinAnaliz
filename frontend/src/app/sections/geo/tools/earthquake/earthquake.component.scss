@@ -1,44 +1,21 @@
-:host {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
+@use '../geo-tool';
 
-.earthquake-page {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  position: relative;
+// ========================================
+// Earthquake-specific styles
+// ========================================
+
+.geo-page {
   --legend-bottom-offset: 40px;
 }
 
-.earthquake-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  background: var(--surface-ground);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-// Toolbar
-.earthquake-toolbar {
-  display: flex;
-  align-items: center;
+// Toolbar overrides (compact, no-wrap, scrollable)
+.geo-toolbar {
   gap: 8px;
   padding: 8px 12px;
-  background: var(--surface-card);
-  border-bottom: 1px solid var(--surface-border);
   flex-wrap: nowrap;
   overflow-x: auto;
 
   .toolbar-group {
-    display: flex;
-    align-items: center;
     gap: 6px;
     flex-shrink: 0;
 
@@ -50,8 +27,6 @@
   .toolbar-label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--text-color-secondary);
-    white-space: nowrap;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -62,17 +37,10 @@
     color: var(--text-color-secondary);
   }
 
-  .toolbar-spacer {
-    flex: 1;
-    min-width: 8px;
-  }
-
   ::ng-deep {
-    .p-selectbutton {
-      .p-button {
-        padding: 0.35rem 0.55rem;
-        font-size: 0.78rem;
-      }
+    .p-selectbutton .p-button {
+      padding: 0.35rem 0.55rem;
+      font-size: 0.78rem;
     }
 
     .time-mobile {
@@ -101,26 +69,13 @@
     }
 
     .p-divider.p-divider-vertical {
-      margin: 0;
       padding: 0 2px;
       height: 20px;
-
-      &::before {
-        border-left-color: var(--surface-border);
-      }
     }
   }
 }
 
-// Main content
-.earthquake-content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  position: relative;
-}
-
-// Sources Settings
+// Settings button on map
 .settings-button {
   position: absolute;
   bottom: 16px;
@@ -128,6 +83,7 @@
   z-index: 1001;
 }
 
+// Settings dialog content
 .sources-dialog {
   display: flex;
   flex-direction: column;
@@ -157,14 +113,14 @@
   gap: 8px;
   font-size: 0.75rem;
   color: var(--text-color-secondary);
-}
 
-.animation-row input[type="number"] {
-  width: 90px;
-  padding: 4px 6px;
-  border-radius: 8px;
-  border: 1px solid var(--surface-border);
-  font-size: 0.75rem;
+  input[type="number"] {
+    width: 90px;
+    padding: 4px 6px;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border);
+    font-size: 0.75rem;
+  }
 }
 
 .section-title {
@@ -200,47 +156,22 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.settings-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
 .layer-setting {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0 12px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--surface-border);
-
-  .setting-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-color);
-    white-space: nowrap;
-  }
 }
 
 .settings-tabs {
   margin-top: 4px;
   margin-bottom: 10px;
+
   ::ng-deep .p-selectbutton .p-button {
     padding: 0.35rem 0.6rem;
     font-size: 0.75rem;
   }
 }
 
-:host ::ng-deep .p-dialog .p-dialog-header {
-  display: flex !important;
-  align-items: center;
-  gap: 8px;
-}
-
+// Source settings
 .source-choice-list {
   display: flex;
   flex-direction: column;
@@ -257,17 +188,16 @@
   border: 1px solid var(--surface-border);
   border-radius: 10px;
   padding: 6px 8px;
-}
 
-.source-choice input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  accent-color: var(--primary-color);
+  input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--primary-color);
+  }
 }
 
 .sources-status {
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
   gap: 6px;
 }
@@ -310,147 +240,11 @@
   }
 }
 
-.map-area {
-  flex: 1;
-  position: relative;
-
-  app-base-map {
-    position: absolute;
-    inset: 0;
-  }
-}
-
-// Prevent base map min-height from forcing page scroll
-:host ::ng-deep app-base-map .map-wrapper {
-  min-height: 0;
-}
-
-// Loading & Error overlays
-.loading-overlay,
-.error-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.error-overlay {
-  color: var(--red-600);
-
-  i {
-    font-size: 2rem;
-  }
-
-  span {
-    font-size: 0.9rem;
-    text-align: center;
-  }
-}
-
-// Side Panel
-.side-panel {
-  width: 320px;
-  background: var(--surface-card);
-  border-left: 1px solid var(--surface-border);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-}
-
-.panel-header-fixed {
-  padding: 12px 16px;
-  background: var(--surface-50);
-  border-bottom: 1px solid var(--surface-border);
-  flex-shrink: 0;
-
-  .panel-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-
-    span {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-  }
-}
-
-// List controls (search + sort)
-.list-controls {
-  padding: 12px;
-  background: var(--surface-card);
-  border-bottom: 1px solid var(--surface-border);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex-shrink: 0;
-
-  .search-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    i {
-      position: absolute;
-      left: 10px;
-      color: var(--text-color-secondary);
-      font-size: 0.85rem;
-    }
-
-    .search-input {
-      width: 100%;
-      padding-left: 32px;
-      font-size: 0.85rem;
-    }
-  }
-
-  .sort-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-
-    ::ng-deep .sort-select {
-      flex: 1;
-      font-size: 0.85rem;
-    }
-  }
-}
-
-// Scrollable list container
+// Earthquake list items
 .earthquake-list-container {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-}
-
-.empty-list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 32px 16px;
-  color: var(--text-color-secondary);
-  gap: 8px;
-
-  i {
-    font-size: 1.5rem;
-  }
-
-  span {
-    font-size: 0.85rem;
-  }
 }
 
 .earthquake-list {
@@ -520,56 +314,15 @@
   }
 }
 
-.list-footer {
-  padding: 12px 16px;
-  text-align: center;
-  border-top: 1px solid var(--surface-border);
-  background: var(--surface-50);
-
-  .more-count {
-    font-size: 0.8rem;
-    color: var(--text-color-secondary);
+// Status bar overrides
+.geo-statusbar .status-item {
+  &.auto-refresh-active {
+    color: var(--primary-color);
+    font-weight: 500;
   }
 }
 
-// Status Bar
-.earthquake-statusbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px 12px;
-  background: var(--surface-card);
-  border-top: 1px solid var(--surface-border);
-  font-size: 0.75rem;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  overflow: hidden;
-
-  .status-left,
-  .status-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .status-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--text-color-secondary);
-
-    i {
-      font-size: 0.8rem;
-    }
-
-    &.auto-refresh-active {
-      color: var(--primary-color);
-      font-weight: 500;
-    }
-  }
-}
-
-// Magnitude Legend
+// Magnitude legend
 .magnitude-legend {
   position: absolute;
   bottom: var(--legend-bottom-offset);
@@ -613,73 +366,15 @@
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.8);
 
-    &.minor {
-      background: #22c55e;
-    }
-    &.light {
-      background: #eab308;
-    }
-    &.moderate {
-      background: #f59e0b;
-    }
-    &.strong {
-      background: #ea580c;
-    }
-    &.major {
-      background: #dc2626;
-    }
+    &.minor { background: #22c55e; }
+    &.light { background: #eab308; }
+    &.moderate { background: #f59e0b; }
+    &.strong { background: #ea580c; }
+    &.major { background: #dc2626; }
   }
 }
 
-// User location marker
-:host ::ng-deep {
-  .user-location-marker {
-    .pulse-marker {
-      position: relative;
-      width: 20px;
-      height: 20px;
-    }
-
-    .pulse-dot {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 12px;
-      height: 12px;
-      background: var(--primary-color);
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .pulse-ring {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      background: var(--primary-color);
-      border-radius: 50%;
-      opacity: 0.4;
-      animation: pulse-animation 1.5s infinite;
-    }
-
-    @keyframes pulse-animation {
-      0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 0.4;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(2);
-        opacity: 0;
-      }
-    }
-  }
-}
-
-// Subtle animation for recent quakes (last 1 hour)
+// Quake animation (recent quakes)
 :host ::ng-deep .recent-quake {
   animation: quake-ripple 2.4s ease-out infinite;
   transform-origin: center;
@@ -707,155 +402,45 @@
   }
 }
 
-// Popup styles (global)
-:host ::ng-deep {
-  .earthquake-popup {
-    h4 {
-      margin: 0 0 8px 0;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .popup-details {
-      margin-bottom: 8px;
-
-      p {
-        margin: 4px 0;
-        font-size: 0.85rem;
-
-        strong {
-          color: var(--text-color-secondary);
-        }
-      }
-    }
-
-    a {
-      font-size: 0.85rem;
-      color: var(--primary-color);
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-// Floating List Button (mobile only)
-.floating-list-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(135deg, #176b7a, #0f5560);
-  color: white;
-  font-size: 1.3rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-  z-index: 999;
-  transition: transform 0.2s ease;
-
-  &:active {
-    transform: scale(0.95);
+// Popup styles
+:host ::ng-deep .earthquake-popup {
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
   }
 
-  .list-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    background: var(--sun, #f6aa1c);
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-  }
-}
-
-// Drawer overrides
-:host ::ng-deep .list-drawer {
-  .drawer-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 0 16px 12px;
-    border-bottom: 1px solid var(--surface-border);
+  .popup-details {
     margin-bottom: 8px;
-  }
 
-  .search-box {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    i {
-      position: absolute;
-      left: 10px;
-      color: var(--text-color-secondary);
+    p {
+      margin: 4px 0;
       font-size: 0.85rem;
-    }
 
-    .search-input {
-      width: 100%;
-      padding-left: 32px;
-      font-size: 0.85rem;
+      strong {
+        color: var(--text-color-secondary);
+      }
     }
   }
 
-  .sort-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center;
+  a {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    text-decoration: none;
 
-    .sort-select {
-      flex: 1;
-      font-size: 0.85rem;
+    &:hover {
+      text-decoration: underline;
     }
-  }
-
-  .earthquake-list {
-    padding: 0 16px 16px;
   }
 }
 
-.drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-
-  h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.1rem;
-    margin: 0;
-    color: var(--ink, var(--text-color));
-
-    i {
-      color: var(--accent, var(--primary-color));
-    }
-  }
+// Drawer list padding
+:host ::ng-deep .list-drawer .earthquake-list {
+  padding: 0 16px 16px;
 }
 
 // Responsive
 @media (max-width: 1024px) {
-  .side-panel {
-    display: none;
-  }
-
-  .floating-list-btn {
-    display: flex;
-  }
-
   .magnitude-legend {
     bottom: calc(var(--legend-bottom-offset) - 20px);
     left: 8px;
@@ -868,7 +453,7 @@
 }
 
 @media (max-width: 768px) {
-  .earthquake-toolbar {
+  .geo-toolbar {
     gap: 6px;
     padding: 6px 8px;
 
@@ -924,9 +509,7 @@
     }
   }
 
-  .magnitude-legend {
-    .legend-title {
-      display: none;
-    }
+  .magnitude-legend .legend-title {
+    display: none;
   }
 }

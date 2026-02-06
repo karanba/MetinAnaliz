@@ -1,4 +1,4 @@
-<div class="map-tools-page">
+<div class="geo-page">
   <app-page-header
     title="Harita"
     description="İnteraktif harita, mesafe ve alan ölçümü, koordinat bulma"
@@ -10,9 +10,9 @@
     [showAd]="false"
   />
 
-  <div class="map-container-wrapper">
+  <div class="geo-container">
     <!-- Toolbar -->
-    <div class="map-toolbar">
+    <div class="geo-toolbar">
       <!-- Search -->
       <div class="toolbar-group search-group">
         <div class="search-box">
@@ -92,7 +92,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="map-content">
+    <div class="geo-content">
       <!-- Map -->
       <div class="map-area">
         <app-base-map
@@ -168,7 +168,7 @@
     </div>
 
     <!-- Status Bar -->
-    <div class="map-statusbar">
+    <div class="geo-statusbar">
       <div class="status-left">
         @if (isDrawActive()) {
           <span class="status-item active">
