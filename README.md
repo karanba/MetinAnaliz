@@ -8,6 +8,7 @@ Türkçe metin analizi ve PDF işleme platformu.
 
 ```bash
 cd backend
+cp ../.env.example .env  # Environment ayarlarını kopyala
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
