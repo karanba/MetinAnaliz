@@ -7,6 +7,7 @@ import { HelpFaqComponent } from './help/help-faq.component';
 import { CalculatorComponent } from './sections/engineering/tools/calculator/calculator.component';
 import { GraphComponent } from './sections/engineering/tools/graph/graph.component';
 import { StlViewerComponent } from './sections/engineering/tools/stl-viewer/stl-viewer.component';
+import { PeriodicTableComponent } from './sections/engineering/tools/periodic-table/periodic-table.component';
 import { ToolsComponent } from './sections/tools/tools.component';
 import { EngineeringComponent } from './sections/engineering/engineering.component';
 import { LanguageComponent } from './sections/language/language.component';
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'tools/engineering/calculator', component: CalculatorComponent },
   { path: 'tools/engineering/graph', component: GraphComponent },
   { path: 'tools/engineering/stl-viewer', component: StlViewerComponent },
+  { path: 'tools/engineering/periodic-table', component: PeriodicTableComponent },
 
   // Design Tools
   { path: 'tools/design', component: DesignComponent },

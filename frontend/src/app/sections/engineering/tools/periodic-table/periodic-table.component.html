@@ -1,0 +1,120 @@
+<div class="periodic-table-page">
+  <app-page-header
+    title="Periyodik Cetvel"
+    description="Klasik periyodik tablo görünümü, gruplar ve element detayları"
+    [breadcrumbs]="[
+      { label: 'Araçlar', route: '/tools' },
+      { label: 'Mühendislik', route: '/tools/engineering' },
+      { label: 'Periyodik Cetvel' }
+    ]"
+  />
+
+  <div class="periodic-layout">
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Arama ve Filtre</h3>
+        @if (selectedElement()) {
+          <button class="clear-btn" type="button" (click)="clearSelection()">
+            Seçimi Temizle
+          </button>
+        }
+      </div>
+
+      <label class="search">
+        <span class="label">Element ara</span>
+        <input
+          type="text"
+          placeholder="Sembol, isim ya da atom numarası"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+      </label>
+
+      <div class="legend">
+        <span class="legend-title">Gruplar</span>
+        <div class="legend-grid">
+          @for (item of categoryLegend; track item.category) {
+            <div class="legend-item">
+              <span class="legend-swatch" [attr.data-category]="item.category"></span>
+              <span class="legend-label">{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="details">
+        @if (selectedElement(); as element) {
+          <div class="details-header" [attr.data-category]="element.category">
+            <div class="details-symbol">{{ element.symbol }}</div>
+            <div>
+              <div class="details-name">{{ element.name }}</div>
+              <div class="details-number">Atom No: {{ element.atomicNumber }}</div>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="details-item">
+              <span>Periyot</span>
+              <strong>{{ element.period }}</strong>
+            </div>
+            <div class="details-item">
+              <span>Grup</span>
+              <strong>{{ element.group }}</strong>
+            </div>
+            <div class="details-item">
+              <span>Blok</span>
+              <strong>{{ element.block.toUpperCase() }}</strong>
+            </div>
+            <div class="details-item">
+              <span>Kategori</span>
+              <strong>{{ getCategoryLabel(element.category) }}</strong>
+            </div>
+          </div>
+        } @else {
+          <div class="details-empty">
+            Detayları görmek için bir element seçin.
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="table-panel">
+      <div class="table-scroll">
+        <div class="periodic-grid">
+          @for (group of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]; track group) {
+            <div class="group-label" [style.gridColumn]="group + 1">{{ group }}</div>
+          }
+
+          @for (period of [1,2,3,4,5,6,7]; track period) {
+            <div class="period-label" [style.gridRow]="period + 1">{{ period }}</div>
+          }
+
+          <div class="series-label lan" [style.gridRow]="9">Lantanitler</div>
+          <div class="series-label act" [style.gridRow]="10">Aktinitler</div>
+
+          @for (element of elements; track element.atomicNumber) {
+            <button
+              class="element"
+              type="button"
+              [class.selected]="selectedElement()?.atomicNumber === element.atomicNumber"
+              [class.dimmed]="searchQuery() && !matchesQuery(element)"
+              [attr.data-category]="element.category"
+              [style.gridColumn]="getGridColumn(element)"
+              [style.gridRow]="getGridRow(element)"
+              (click)="selectElement(element)"
+              [attr.aria-label]="element.name + ' (' + element.symbol + ')'"
+            >
+              <span class="number">{{ element.atomicNumber }}</span>
+              <span class="symbol">{{ element.symbol }}</span>
+              <span class="name">{{ element.name }}</span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="table-hint">
+        Yatay kaydırma ile tüm tabloyu görebilirsiniz. Mobilde yakınlaştırma için çift dokunma desteklenir.
+      </div>
+    </div>
+  </div>
+</div>

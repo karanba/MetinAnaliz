@@ -74,6 +74,16 @@ export class ToolRegistryService {
           color: 'sun',
           category: 'engineering',
           keywords: ['stl', '3d', 'model', 'cad']
+        },
+        {
+          id: 'periodic-table',
+          title: 'Periyodik Cetvel',
+          description: 'Klasik periyodik tablo görünümü, gruplar ve element detayları',
+          icon: 'table',
+          route: '/tools/engineering/periodic-table',
+          color: 'sun',
+          category: 'engineering',
+          keywords: ['periyodik', 'cetvel', 'element', 'kimya', 'tablo']
         }
       ]
     },
@@ -86,7 +96,7 @@ export class ToolRegistryService {
       tools: [
         {
           id: 'color-converter',
-          title: 'Renk Dönüştürücü',
+          title: 'Renk Seçimi',
           description: 'Renk formatları arası dönüşüm, palet oluşturma ve kontrast kontrolü',
           icon: 'palette',
           route: '/tools/design/color-converter',
