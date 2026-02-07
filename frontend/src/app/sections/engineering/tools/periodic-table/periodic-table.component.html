@@ -20,42 +20,44 @@
         }
       </div>
 
-      <div class="language-toggle" role="group" aria-label="Dil seçimi">
-        <button
-          type="button"
-          class="lang-btn"
-          [class.active]="language() === 'tr'"
-          (click)="setLanguage('tr')"
-        >
-          TR
-        </button>
-        <button
-          type="button"
-          class="lang-btn"
-          [class.active]="language() === 'en'"
-          (click)="setLanguage('en')"
-        >
-          EN
-        </button>
-      </div>
+      <div class="toggle-row">
+        <div class="language-toggle" role="group" aria-label="Dil seçimi">
+          <button
+            type="button"
+            class="lang-btn"
+            [class.active]="language() === 'tr'"
+            (click)="setLanguage('tr')"
+          >
+            TR
+          </button>
+          <button
+            type="button"
+            class="lang-btn"
+            [class.active]="language() === 'en'"
+            (click)="setLanguage('en')"
+          >
+            EN
+          </button>
+        </div>
 
-      <div class="view-toggle" role="group" aria-label="Görünüm seçimi">
-        <button
-          type="button"
-          class="view-btn"
-          [class.active]="viewMode() === 'compact'"
-          (click)="viewMode.set('compact')"
-        >
-          Kısa
-        </button>
-        <button
-          type="button"
-          class="view-btn"
-          [class.active]="viewMode() === 'full'"
-          (click)="viewMode.set('full')"
-        >
-          Tam
-        </button>
+        <div class="view-toggle" role="group" aria-label="Görünüm seçimi">
+          <button
+            type="button"
+            class="view-btn"
+            [class.active]="viewMode() === 'compact'"
+            (click)="viewMode.set('compact')"
+          >
+            Kısa
+          </button>
+          <button
+            type="button"
+            class="view-btn"
+            [class.active]="viewMode() === 'full'"
+            (click)="viewMode.set('full')"
+          >
+            Tam
+          </button>
+        </div>
       </div>
 
       <label class="search">
@@ -67,18 +69,6 @@
           (ngModelChange)="searchQuery.set($event)"
         />
       </label>
-
-      <div class="legend">
-        <span class="legend-title">Gruplar</span>
-        <div class="legend-grid">
-          @for (item of categoryLegend; track item.category) {
-            <div class="legend-item">
-              <span class="legend-swatch" [attr.data-category]="item.category"></span>
-              <span class="legend-label">{{ getCategoryLabel(item.category) }}</span>
-            </div>
-          }
-        </div>
-      </div>
 
       <div class="details">
         @if (selectedElement(); as element) {
@@ -172,7 +162,9 @@
       <div class="table-scroll">
         <div class="periodic-grid">
           @for (group of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]; track group) {
-            <div class="group-label" [style.gridColumn]="group + 1">{{ group }}</div>
+            <div class="group-label" [style.gridColumn]="group + 1">
+              {{ group }}
+            </div>
           }
 
           @for (period of [1,2,3,4,5,6,7]; track period) {
@@ -205,6 +197,18 @@
       <div class="table-hint">
         Yatay kaydırma ile tüm tabloyu görebilirsiniz. Mobilde yakınlaştırma için çift dokunma desteklenir.
       </div>
+    </div>
+  </div>
+
+  <div class="legend legend-inline legend-bottom">
+    <span class="legend-title">Gruplar</span>
+    <div class="legend-grid">
+      @for (item of categoryLegend; track item.category) {
+        <div class="legend-item">
+          <span class="legend-swatch" [attr.data-category]="item.category"></span>
+          <span class="legend-label">{{ getCategoryLabel(item.category) }}</span>
+        </div>
+      }
     </div>
   </div>
 </div>
