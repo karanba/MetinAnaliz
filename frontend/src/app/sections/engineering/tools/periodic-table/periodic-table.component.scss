@@ -11,7 +11,7 @@
 
 .periodic-layout {
   display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr;
+  grid-template-columns: minmax(320px, 380px) 1fr;
   gap: 16px;
 }
 
@@ -276,6 +276,28 @@
   color: var(--muted);
   font-size: 0.85rem;
   line-height: 1.4;
+}
+
+.details-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--stroke);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--ink);
+  font-size: 0.85rem;
+
+  small {
+    color: rgba(71, 85, 105, 0.8);
+    font-size: 0.7rem;
+  }
 }
 
 .table-panel {

@@ -25,17 +25,17 @@
           type="button"
           class="lang-btn"
           [class.active]="language() === 'tr'"
-          (click)="language.set('tr')"
+          (click)="setLanguage('tr')"
         >
-          Türkçe
+          TR
         </button>
         <button
           type="button"
           class="lang-btn"
           [class.active]="language() === 'en'"
-          (click)="language.set('en')"
+          (click)="setLanguage('en')"
         >
-          English
+          EN
         </button>
       </div>
 
@@ -46,7 +46,7 @@
           [class.active]="viewMode() === 'compact'"
           (click)="viewMode.set('compact')"
         >
-          Kısaltılmış
+          Kısa
         </button>
         <button
           type="button"
@@ -135,26 +135,30 @@
               </div>
               <strong class="mono">{{ getValue(element.electronConfig) }}</strong>
             </div>
-            <div class="details-item detail-extended full-width isotopes-item">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('isotopes') }}</span>
-                <small>{{ getDetailHint('isotopes') }}</small>
-              </div>
-              @if (getIsotopes(element.commonIsotopes).length) {
-                <div class="isotopes">
-                  @for (iso of getIsotopes(element.commonIsotopes); track iso.label) {
-                    <span class="isotope-chip">
-                      <span class="iso-label">{{ iso.label }}</span>
-                      @if (iso.abundance !== undefined) {
-                        <span class="iso-abundance">{{ iso.abundance }}%</span>
-                      }
-                    </span>
-                  }
-                </div>
-              } @else {
-                <span class="placeholder">—</span>
-              }
+          </div>
+
+          <div class="details-section detail-extended">
+            <div class="section-title">
+              <span>{{ getDetailLabel('isotopes') }}</span>
+              <small>{{ getDetailHint('isotopes') }}</small>
             </div>
+            @if (getIsotopes(element.commonIsotopes).length) {
+              <div class="isotopes">
+                @for (iso of getIsotopes(element.commonIsotopes); track iso.label) {
+                  <span
+                    class="isotope-chip"
+                    [attr.title]="getIsotopeTooltip(iso)"
+                  >
+                    <span class="iso-label">{{ iso.label }}</span>
+                    @if (iso.abundance !== undefined) {
+                      <span class="iso-abundance">{{ iso.abundance }}%</span>
+                    }
+                  </span>
+                }
+              </div>
+            } @else {
+              <span class="placeholder">—</span>
+            }
           </div>
         } @else {
           <div class="details-empty">

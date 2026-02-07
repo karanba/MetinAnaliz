@@ -227,6 +227,18 @@ const EMPTY_DETAIL_TEXT: Record<Language, string> = {
   en: 'Select an element to see its details.',
 };
 
+const ISOTOPE_TOOLTIP_TEXT: Record<
+  'abundance' | 'halfLife' | 'decayMode' | 'stable',
+  Record<Language, string>
+> = {
+  abundance: { tr: 'Bolluk', en: 'Abundance' },
+  halfLife: { tr: 'Yarı ömür', en: 'Half-life' },
+  decayMode: { tr: 'Bozunma', en: 'Decay' },
+  stable: { tr: 'Stabil', en: 'Stable' },
+};
+
+const LANGUAGE_STORAGE_KEY = 'periodicTableLanguage';
+
 @Component({
   selector: 'app-periodic-table',
   standalone: true,
@@ -251,6 +263,10 @@ export class PeriodicTableComponent {
 
   constructor() {
     if (typeof window !== 'undefined') {
+      const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
+      if (storedLanguage === 'tr' || storedLanguage === 'en') {
+        this.language.set(storedLanguage);
+      }
       const isMobile = window.matchMedia('(max-width: 720px)').matches;
       this.viewMode.set(isMobile ? 'full' : 'compact');
     }
@@ -296,6 +312,13 @@ export class PeriodicTableComponent {
     return this.language() === 'tr' ? element.nameTr : element.nameEn;
   }
 
+  setLanguage(language: Language): void {
+    this.language.set(language);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    }
+  }
+
   getValue(value?: string | number): string {
     if (value === null || value === undefined) return '—';
     const text = String(value).trim();
@@ -316,5 +339,22 @@ export class PeriodicTableComponent {
 
   getEmptyDetailText(): string {
     return EMPTY_DETAIL_TEXT[this.language()];
+  }
+
+  getIsotopeTooltip(isotope: NonNullable<PeriodicElement['commonIsotopes']>[number]): string {
+    const parts: string[] = [];
+    if (isotope.abundance !== undefined) {
+      parts.push(`${ISOTOPE_TOOLTIP_TEXT.abundance[this.language()]}: ${isotope.abundance}%`);
+    }
+    if (isotope.isStable) {
+      parts.push(ISOTOPE_TOOLTIP_TEXT.stable[this.language()]);
+    } else if (isotope.halfLife) {
+      const unit = isotope.halfLifeUnit ? ` ${isotope.halfLifeUnit}` : '';
+      parts.push(`${ISOTOPE_TOOLTIP_TEXT.halfLife[this.language()]}: ${isotope.halfLife}${unit}`);
+    }
+    if (isotope.decayMode) {
+      parts.push(`${ISOTOPE_TOOLTIP_TEXT.decayMode[this.language()]}: ${isotope.decayMode}`);
+    }
+    return parts.join(' • ');
   }
 }
