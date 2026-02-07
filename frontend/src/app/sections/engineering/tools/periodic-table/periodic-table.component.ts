@@ -260,6 +260,9 @@ export class PeriodicTableComponent {
   readonly selectedElement = signal<PeriodicElement | null>(null);
   readonly language = signal<'tr' | 'en'>('tr');
   readonly viewMode = signal<'compact' | 'full'>('compact');
+  readonly isMobile = signal(false);
+  readonly isSheetOpen = signal(false);
+  readonly isLegendOpen = signal(false);
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -268,7 +271,9 @@ export class PeriodicTableComponent {
         this.language.set(storedLanguage);
       }
       const isMobile = window.matchMedia('(max-width: 720px)').matches;
+      this.isMobile.set(isMobile);
       this.viewMode.set(isMobile ? 'full' : 'compact');
+      this.isLegendOpen.set(!isMobile);
     }
   }
 
@@ -298,10 +303,22 @@ export class PeriodicTableComponent {
 
   selectElement(element: PeriodicElement): void {
     this.selectedElement.set(element);
+    if (this.isMobile()) {
+      this.isSheetOpen.set(true);
+    }
   }
 
   clearSelection(): void {
     this.selectedElement.set(null);
+    this.isSheetOpen.set(false);
+  }
+
+  closeSheet(): void {
+    this.isSheetOpen.set(false);
+  }
+
+  toggleLegend(): void {
+    this.isLegendOpen.update(value => !value);
   }
 
   getCategoryLabel(category: ElementCategory): string {

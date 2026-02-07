@@ -13,149 +13,153 @@
     <div class="panel">
       <div class="panel-header">
         <h3>Arama ve Filtre</h3>
-        @if (selectedElement()) {
+        @if (selectedElement() && !isMobile()) {
           <button class="clear-btn" type="button" (click)="clearSelection()">
             Seçimi Temizle
           </button>
         }
       </div>
 
-      <div class="toggle-row">
-        <div class="language-toggle" role="group" aria-label="Dil seçimi">
-          <button
-            type="button"
-            class="lang-btn"
-            [class.active]="language() === 'tr'"
-            (click)="setLanguage('tr')"
-          >
-            TR
-          </button>
-          <button
-            type="button"
-            class="lang-btn"
-            [class.active]="language() === 'en'"
-            (click)="setLanguage('en')"
-          >
-            EN
-          </button>
+      <div class="controls-row">
+        <div class="toggle-row">
+          <div class="language-toggle" role="group" aria-label="Dil seçimi">
+            <button
+              type="button"
+              class="lang-btn"
+              [class.active]="language() === 'tr'"
+              (click)="setLanguage('tr')"
+            >
+              TR
+            </button>
+            <button
+              type="button"
+              class="lang-btn"
+              [class.active]="language() === 'en'"
+              (click)="setLanguage('en')"
+            >
+              EN
+            </button>
+          </div>
+
+          <div class="view-toggle" role="group" aria-label="Görünüm seçimi">
+            <button
+              type="button"
+              class="view-btn"
+              [class.active]="viewMode() === 'compact'"
+              (click)="viewMode.set('compact')"
+            >
+              Kısa
+            </button>
+            <button
+              type="button"
+              class="view-btn"
+              [class.active]="viewMode() === 'full'"
+              (click)="viewMode.set('full')"
+            >
+              Tam
+            </button>
+          </div>
         </div>
 
-        <div class="view-toggle" role="group" aria-label="Görünüm seçimi">
-          <button
-            type="button"
-            class="view-btn"
-            [class.active]="viewMode() === 'compact'"
-            (click)="viewMode.set('compact')"
-          >
-            Kısa
-          </button>
-          <button
-            type="button"
-            class="view-btn"
-            [class.active]="viewMode() === 'full'"
-            (click)="viewMode.set('full')"
-          >
-            Tam
-          </button>
+        <label class="search">
+          <span class="label">Element ara</span>
+          <input
+            type="text"
+            placeholder="Sembol, isim ya da atom numarası"
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+          />
+        </label>
+      </div>
+
+      @if (!isMobile()) {
+        <div class="details">
+          @if (selectedElement(); as element) {
+            <div class="details-header" [attr.data-category]="element.category">
+              <div class="details-symbol">{{ element.symbol }}</div>
+              <div>
+                <div class="details-name">{{ getElementName(element) }}</div>
+                <div class="details-number">
+                  {{ getDetailLabel('atomicNumber') }}: {{ element.atomicNumber }}
+                </div>
+              </div>
+            </div>
+
+            <div class="details-grid">
+              <div class="details-item">
+                <div class="details-meta">
+                  <span>{{ getDetailLabel('period') }}</span>
+                  <small>{{ getDetailHint('period') }}</small>
+                </div>
+                <strong>{{ element.period }}</strong>
+              </div>
+              <div class="details-item">
+                <div class="details-meta">
+                  <span>{{ getDetailLabel('group') }}</span>
+                  <small>{{ getDetailHint('group') }}</small>
+                </div>
+                <strong>{{ element.group }}</strong>
+              </div>
+              <div class="details-item">
+                <div class="details-meta">
+                  <span>{{ getDetailLabel('block') }}</span>
+                  <small>{{ getDetailHint('block') }}</small>
+                </div>
+                <strong>{{ element.block.toUpperCase() }}</strong>
+              </div>
+              <div class="details-item">
+                <div class="details-meta">
+                  <span>{{ getDetailLabel('category') }}</span>
+                  <small>{{ getDetailHint('category') }}</small>
+                </div>
+                <strong>{{ getCategoryLabel(element.category) }}</strong>
+              </div>
+              <div class="details-item detail-extended">
+                <div class="details-meta">
+                  <span>{{ getDetailLabel('atomicWeight') }}</span>
+                  <small>{{ getDetailHint('atomicWeight') }}</small>
+                </div>
+                <strong>{{ getValue(element.atomicWeight) }}</strong>
+              </div>
+              <div class="details-item detail-extended">
+                <div class="details-meta">
+                  <span>{{ getDetailLabel('electronConfig') }}</span>
+                  <small>{{ getDetailHint('electronConfig') }}</small>
+                </div>
+                <strong class="mono">{{ getValue(element.electronConfig) }}</strong>
+              </div>
+            </div>
+
+            <div class="details-section detail-extended">
+              <div class="section-title">
+                <span>{{ getDetailLabel('isotopes') }}</span>
+                <small>{{ getDetailHint('isotopes') }}</small>
+              </div>
+              @if (getIsotopes(element.commonIsotopes).length) {
+                <div class="isotopes">
+                  @for (iso of getIsotopes(element.commonIsotopes); track iso.label) {
+                    <span
+                      class="isotope-chip"
+                      [attr.title]="getIsotopeTooltip(iso)"
+                    >
+                      <span class="iso-label">{{ iso.label }}</span>
+                      @if (iso.abundance !== undefined) {
+                        <span class="iso-abundance">{{ iso.abundance }}%</span>
+                      }
+                    </span>
+                  }
+                </div>
+              } @else {
+                <span class="placeholder">—</span>
+              }
+            </div>
+          } @else {
+            <div class="details-empty">
+              {{ getEmptyDetailText() }}
+            </div>
+          }
         </div>
-      </div>
-
-      <label class="search">
-        <span class="label">Element ara</span>
-        <input
-          type="text"
-          placeholder="Sembol, isim ya da atom numarası"
-          [ngModel]="searchQuery()"
-          (ngModelChange)="searchQuery.set($event)"
-        />
-      </label>
-
-      <div class="details">
-        @if (selectedElement(); as element) {
-          <div class="details-header" [attr.data-category]="element.category">
-            <div class="details-symbol">{{ element.symbol }}</div>
-            <div>
-              <div class="details-name">{{ getElementName(element) }}</div>
-              <div class="details-number">
-                {{ getDetailLabel('atomicNumber') }}: {{ element.atomicNumber }}
-              </div>
-            </div>
-          </div>
-
-          <div class="details-grid">
-            <div class="details-item">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('period') }}</span>
-                <small>{{ getDetailHint('period') }}</small>
-              </div>
-              <strong>{{ element.period }}</strong>
-            </div>
-            <div class="details-item">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('group') }}</span>
-                <small>{{ getDetailHint('group') }}</small>
-              </div>
-              <strong>{{ element.group }}</strong>
-            </div>
-            <div class="details-item">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('block') }}</span>
-                <small>{{ getDetailHint('block') }}</small>
-              </div>
-              <strong>{{ element.block.toUpperCase() }}</strong>
-            </div>
-            <div class="details-item">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('category') }}</span>
-                <small>{{ getDetailHint('category') }}</small>
-              </div>
-              <strong>{{ getCategoryLabel(element.category) }}</strong>
-            </div>
-            <div class="details-item detail-extended">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('atomicWeight') }}</span>
-                <small>{{ getDetailHint('atomicWeight') }}</small>
-              </div>
-              <strong>{{ getValue(element.atomicWeight) }}</strong>
-            </div>
-            <div class="details-item detail-extended">
-              <div class="details-meta">
-                <span>{{ getDetailLabel('electronConfig') }}</span>
-                <small>{{ getDetailHint('electronConfig') }}</small>
-              </div>
-              <strong class="mono">{{ getValue(element.electronConfig) }}</strong>
-            </div>
-          </div>
-
-          <div class="details-section detail-extended">
-            <div class="section-title">
-              <span>{{ getDetailLabel('isotopes') }}</span>
-              <small>{{ getDetailHint('isotopes') }}</small>
-            </div>
-            @if (getIsotopes(element.commonIsotopes).length) {
-              <div class="isotopes">
-                @for (iso of getIsotopes(element.commonIsotopes); track iso.label) {
-                  <span
-                    class="isotope-chip"
-                    [attr.title]="getIsotopeTooltip(iso)"
-                  >
-                    <span class="iso-label">{{ iso.label }}</span>
-                    @if (iso.abundance !== undefined) {
-                      <span class="iso-abundance">{{ iso.abundance }}%</span>
-                    }
-                  </span>
-                }
-              </div>
-            } @else {
-              <span class="placeholder">—</span>
-            }
-          </div>
-        } @else {
-          <div class="details-empty">
-            {{ getEmptyDetailText() }}
-          </div>
-        }
-      </div>
+      }
     </div>
 
     <div class="table-panel">
@@ -200,9 +204,12 @@
     </div>
   </div>
 
-  <div class="legend legend-inline legend-bottom">
-    <span class="legend-title">Gruplar</span>
-    <div class="legend-grid">
+  <div class="legend legend-inline legend-bottom" [class.is-collapsed]="isMobile() && !isLegendOpen()">
+    <button class="legend-toggle" type="button" (click)="toggleLegend()">
+      <span class="legend-title">Gruplar</span>
+      <span class="legend-chevron" [class.open]="isLegendOpen()"></span>
+    </button>
+    <div class="legend-grid" [attr.aria-hidden]="isMobile() && !isLegendOpen()">
       @for (item of categoryLegend; track item.category) {
         <div class="legend-item">
           <span class="legend-swatch" [attr.data-category]="item.category"></span>
@@ -211,4 +218,89 @@
       }
     </div>
   </div>
+
+  @if (isMobile() && isSheetOpen() && selectedElement(); as element) {
+    <div class="sheet-backdrop" (click)="closeSheet()"></div>
+    <div class="sheet-panel" [attr.data-category]="element.category">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">
+          <span class="sheet-symbol">{{ element.symbol }}</span>
+          <div>
+            <div class="details-name">{{ getElementName(element) }}</div>
+            <div class="details-number">
+              {{ getDetailLabel('atomicNumber') }}: {{ element.atomicNumber }}
+            </div>
+          </div>
+        </div>
+        <button class="sheet-close" type="button" (click)="closeSheet()">Kapat</button>
+      </div>
+
+      <div class="details-grid">
+        <div class="details-item">
+          <div class="details-meta">
+            <span>{{ getDetailLabel('period') }}</span>
+            <small>{{ getDetailHint('period') }}</small>
+          </div>
+          <strong>{{ element.period }}</strong>
+        </div>
+        <div class="details-item">
+          <div class="details-meta">
+            <span>{{ getDetailLabel('group') }}</span>
+            <small>{{ getDetailHint('group') }}</small>
+          </div>
+          <strong>{{ element.group }}</strong>
+        </div>
+        <div class="details-item">
+          <div class="details-meta">
+            <span>{{ getDetailLabel('block') }}</span>
+            <small>{{ getDetailHint('block') }}</small>
+          </div>
+          <strong>{{ element.block.toUpperCase() }}</strong>
+        </div>
+        <div class="details-item">
+          <div class="details-meta">
+            <span>{{ getDetailLabel('category') }}</span>
+            <small>{{ getDetailHint('category') }}</small>
+          </div>
+          <strong>{{ getCategoryLabel(element.category) }}</strong>
+        </div>
+        <div class="details-item detail-extended">
+          <div class="details-meta">
+            <span>{{ getDetailLabel('atomicWeight') }}</span>
+            <small>{{ getDetailHint('atomicWeight') }}</small>
+          </div>
+          <strong>{{ getValue(element.atomicWeight) }}</strong>
+        </div>
+        <div class="details-item detail-extended">
+          <div class="details-meta">
+            <span>{{ getDetailLabel('electronConfig') }}</span>
+            <small>{{ getDetailHint('electronConfig') }}</small>
+          </div>
+          <strong class="mono">{{ getValue(element.electronConfig) }}</strong>
+        </div>
+      </div>
+
+      <div class="details-section detail-extended">
+        <div class="section-title">
+          <span>{{ getDetailLabel('isotopes') }}</span>
+          <small>{{ getDetailHint('isotopes') }}</small>
+        </div>
+        @if (getIsotopes(element.commonIsotopes).length) {
+          <div class="isotopes">
+            @for (iso of getIsotopes(element.commonIsotopes); track iso.label) {
+              <span class="isotope-chip" [attr.title]="getIsotopeTooltip(iso)">
+                <span class="iso-label">{{ iso.label }}</span>
+                @if (iso.abundance !== undefined) {
+                  <span class="iso-abundance">{{ iso.abundance }}%</span>
+                }
+              </span>
+            }
+          </div>
+        } @else {
+          <span class="placeholder">—</span>
+        }
+      </div>
+    </div>
+  }
 </div>
