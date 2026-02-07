@@ -20,6 +20,25 @@
         }
       </div>
 
+      <div class="language-toggle" role="group" aria-label="Dil seçimi">
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="language() === 'tr'"
+          (click)="language.set('tr')"
+        >
+          Türkçe
+        </button>
+        <button
+          type="button"
+          class="lang-btn"
+          [class.active]="language() === 'en'"
+          (click)="language.set('en')"
+        >
+          English
+        </button>
+      </div>
+
       <label class="search">
         <span class="label">Element ara</span>
         <input
@@ -47,10 +66,10 @@
           <div class="details-header" [attr.data-category]="element.category">
             <div class="details-symbol">{{ element.symbol }}</div>
             <div>
-              <div class="details-name">{{ element.name }}</div>
-              <div class="details-number">Atom No: {{ element.atomicNumber }}</div>
-            </div>
+            <div class="details-name">{{ getElementName(element) }}</div>
+            <div class="details-number">Atom No: {{ element.atomicNumber }}</div>
           </div>
+        </div>
 
           <div class="details-grid">
             <div class="details-item">
@@ -106,7 +125,7 @@
             >
               <span class="number">{{ element.atomicNumber }}</span>
               <span class="symbol">{{ element.symbol }}</span>
-              <span class="name">{{ element.name }}</span>
+              <span class="name">{{ getElementName(element) }}</span>
             </button>
           }
         </div>

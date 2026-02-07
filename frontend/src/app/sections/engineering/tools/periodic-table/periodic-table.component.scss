@@ -39,6 +39,33 @@
   }
 }
 
+.language-toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: #ffffff;
+  width: fit-content;
+}
+
+.lang-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: rgba(31, 122, 140, 0.15);
+    color: var(--accent);
+    font-weight: 600;
+  }
+}
+
 .clear-btn {
   border: none;
   background: rgba(31, 122, 140, 0.12);
