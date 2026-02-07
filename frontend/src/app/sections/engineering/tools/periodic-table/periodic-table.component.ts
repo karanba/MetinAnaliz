@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../../../components/shared';
+import { ELEMENT_DETAILS, ElementDetails } from './periodic-table.data';
 
 type ElementCategory =
   | 'alkali-metal'
@@ -20,7 +21,7 @@ type ElementBlock = 's' | 'p' | 'd' | 'f';
 
 type ElementSeries = 'lanthanide' | 'actinide';
 
-interface PeriodicElement {
+interface PeriodicElement extends ElementDetails {
   atomicNumber: number;
   symbol: string;
   nameEn: string;
@@ -154,18 +155,20 @@ const ELEMENTS: PeriodicElement[] = [
   { atomicNumber: 118, symbol: 'Og', nameEn: 'Oganesson', nameTr: 'Oganesson', period: 7, group: 18, category: 'noble-gas', block: 'p' },
 ];
 
-const CATEGORY_LABELS: Record<ElementCategory, string> = {
-  'alkali-metal': 'Alkali Metal',
-  'alkaline-earth': 'Toprak Alkali',
-  'transition-metal': 'Geçiş Metali',
-  'post-transition': 'Geçiş Sonrası',
-  'metalloid': 'Yarı Metal',
-  'nonmetal': 'Ametal',
-  'halogen': 'Halojen',
-  'noble-gas': 'Soygaz',
-  'lanthanide': 'Lantanit',
-  'actinide': 'Aktinit',
-  'unknown': 'Bilinmeyen',
+type Language = 'tr' | 'en';
+
+const CATEGORY_LABELS: Record<ElementCategory, Record<Language, string>> = {
+  'alkali-metal': { tr: 'Alkali Metal', en: 'Alkali Metal' },
+  'alkaline-earth': { tr: 'Toprak Alkali', en: 'Alkaline Earth' },
+  'transition-metal': { tr: 'Geçiş Metali', en: 'Transition Metal' },
+  'post-transition': { tr: 'Geçiş Sonrası', en: 'Post-Transition' },
+  'metalloid': { tr: 'Yarı Metal', en: 'Metalloid' },
+  'nonmetal': { tr: 'Ametal', en: 'Nonmetal' },
+  'halogen': { tr: 'Halojen', en: 'Halogen' },
+  'noble-gas': { tr: 'Soygaz', en: 'Noble Gas' },
+  'lanthanide': { tr: 'Lantanit', en: 'Lanthanide' },
+  'actinide': { tr: 'Aktinit', en: 'Actinide' },
+  'unknown': { tr: 'Bilinmeyen', en: 'Unknown' },
 };
 
 const CATEGORY_ORDER: ElementCategory[] = [
@@ -181,6 +184,49 @@ const CATEGORY_ORDER: ElementCategory[] = [
   'actinide',
 ];
 
+const DETAIL_TEXT: Record<
+  'atomicNumber' | 'period' | 'group' | 'block' | 'category' | 'atomicWeight' | 'electronConfig' | 'isotopes',
+  Record<Language, { label: string; hint: string }>
+> = {
+  atomicNumber: {
+    tr: { label: 'Atom No', hint: 'Periyodik tablodaki sıra numarası' },
+    en: { label: 'Atomic No', hint: 'Position in the periodic table' },
+  },
+  period: {
+    tr: { label: 'Periyot', hint: 'Elektron katman sayısı' },
+    en: { label: 'Period', hint: 'Number of electron shells' },
+  },
+  group: {
+    tr: { label: 'Grup', hint: 'Benzer kimyasal özellikler' },
+    en: { label: 'Group', hint: 'Elements with similar properties' },
+  },
+  block: {
+    tr: { label: 'Blok', hint: 'Valans elektron alt kabuğu' },
+    en: { label: 'Block', hint: 'Valence electron subshell' },
+  },
+  category: {
+    tr: { label: 'Kategori', hint: 'Metaller, ametaller ve türevleri' },
+    en: { label: 'Category', hint: 'Metals, nonmetals, and more' },
+  },
+  atomicWeight: {
+    tr: { label: 'Atom Ağırlığı', hint: 'Ortalama atomik kütle (u)' },
+    en: { label: 'Atomic Weight', hint: 'Average atomic mass (u)' },
+  },
+  electronConfig: {
+    tr: { label: 'Elektron Dizilimi', hint: 'Elektronların kabuk dağılımı' },
+    en: { label: 'Electron Config', hint: 'Electron shell distribution' },
+  },
+  isotopes: {
+    tr: { label: 'Yaygın İzotoplar', hint: 'Doğada en çok görülenler' },
+    en: { label: 'Common Isotopes', hint: 'Most naturally abundant' },
+  },
+};
+
+const EMPTY_DETAIL_TEXT: Record<Language, string> = {
+  tr: 'Detayları görmek için bir element seçin.',
+  en: 'Select an element to see its details.',
+};
+
 @Component({
   selector: 'app-periodic-table',
   standalone: true,
@@ -190,15 +236,25 @@ const CATEGORY_ORDER: ElementCategory[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PeriodicTableComponent {
-  readonly elements = ELEMENTS;
+  readonly elements = ELEMENTS.map(element => ({
+    ...element,
+    ...ELEMENT_DETAILS[element.atomicNumber],
+  }));
   readonly categoryLegend = CATEGORY_ORDER.map(category => ({
     category,
-    label: CATEGORY_LABELS[category],
   }));
 
   readonly searchQuery = signal('');
   readonly selectedElement = signal<PeriodicElement | null>(null);
   readonly language = signal<'tr' | 'en'>('tr');
+  readonly viewMode = signal<'compact' | 'full'>('compact');
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.matchMedia('(max-width: 720px)').matches;
+      this.viewMode.set(isMobile ? 'full' : 'compact');
+    }
+  }
 
   getGridRow(element: PeriodicElement): number {
     if (element.series === 'lanthanide') return 9;
@@ -233,10 +289,32 @@ export class PeriodicTableComponent {
   }
 
   getCategoryLabel(category: ElementCategory): string {
-    return CATEGORY_LABELS[category] ?? category;
+    return CATEGORY_LABELS[category]?.[this.language()] ?? category;
   }
 
   getElementName(element: PeriodicElement): string {
     return this.language() === 'tr' ? element.nameTr : element.nameEn;
+  }
+
+  getValue(value?: string | number): string {
+    if (value === null || value === undefined) return '—';
+    const text = String(value).trim();
+    return text ? text : '—';
+  }
+
+  getIsotopes(value?: PeriodicElement['commonIsotopes']): PeriodicElement['commonIsotopes'] {
+    return value && value.length ? value : [];
+  }
+
+  getDetailLabel(key: keyof typeof DETAIL_TEXT): string {
+    return DETAIL_TEXT[key][this.language()].label;
+  }
+
+  getDetailHint(key: keyof typeof DETAIL_TEXT): string {
+    return DETAIL_TEXT[key][this.language()].hint;
+  }
+
+  getEmptyDetailText(): string {
+    return EMPTY_DETAIL_TEXT[this.language()];
   }
 }

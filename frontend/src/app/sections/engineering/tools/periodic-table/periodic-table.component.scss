@@ -66,6 +66,33 @@
   }
 }
 
+.view-toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: #ffffff;
+  width: fit-content;
+}
+
+.view-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.active {
+    background: rgba(31, 122, 140, 0.15);
+    color: var(--accent);
+    font-weight: 600;
+  }
+}
+
 .clear-btn {
   border: none;
   background: rgba(31, 122, 140, 0.12);
@@ -199,6 +226,52 @@
   }
 }
 
+.details-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  small {
+    color: rgba(71, 85, 105, 0.8);
+    font-size: 0.7rem;
+  }
+}
+
+.isotopes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.isotope-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(31, 122, 140, 0.12);
+  color: var(--ink);
+  font-size: 0.72rem;
+  border: 1px solid rgba(31, 122, 140, 0.2);
+}
+
+.iso-label {
+  font-weight: 600;
+}
+
+.iso-abundance {
+  color: var(--muted);
+}
+
+.placeholder {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.mono {
+  font-family: 'Source Code Pro', monospace;
+}
+
 .details-empty {
   color: var(--muted);
   font-size: 0.85rem;
@@ -299,6 +372,16 @@
   text-overflow: ellipsis;
 }
 
+.periodic-table-page[data-view='compact'] {
+  .detail-extended {
+    display: none;
+  }
+
+  .name {
+    display: none;
+  }
+}
+
 .table-hint {
   font-size: 0.75rem;
   color: var(--muted);
@@ -383,10 +466,6 @@
   .periodic-grid {
     grid-template-columns: 42px repeat(18, minmax(46px, 1fr));
     grid-auto-rows: 60px;
-  }
-
-  .name {
-    display: none;
   }
 
   .legend-grid {
