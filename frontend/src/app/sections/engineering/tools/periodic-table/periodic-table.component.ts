@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../../../components/shared';
@@ -247,7 +247,7 @@ const LANGUAGE_STORAGE_KEY = 'periodicTableLanguage';
   styleUrls: ['./periodic-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PeriodicTableComponent {
+export class PeriodicTableComponent implements OnDestroy {
   readonly elements = ELEMENTS.map(element => ({
     ...element,
     ...ELEMENT_DETAILS[element.atomicNumber],
@@ -262,7 +262,9 @@ export class PeriodicTableComponent {
   readonly viewMode = signal<'compact' | 'full'>('compact');
   readonly isMobile = signal(false);
   readonly isSheetOpen = signal(false);
-  readonly isLegendOpen = signal(false);
+  readonly isLegendOpen = signal(true);
+  private mediaQuery?: MediaQueryList;
+  private mediaHandler?: (event: MediaQueryListEvent) => void;
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -270,10 +272,30 @@ export class PeriodicTableComponent {
       if (storedLanguage === 'tr' || storedLanguage === 'en') {
         this.language.set(storedLanguage);
       }
-      const isMobile = window.matchMedia('(max-width: 720px)').matches;
-      this.isMobile.set(isMobile);
-      this.viewMode.set(isMobile ? 'full' : 'compact');
-      this.isLegendOpen.set(!isMobile);
+      this.mediaQuery = window.matchMedia('(max-width: 720px)');
+      const applyMedia = (matches: boolean) => {
+        this.isMobile.set(matches);
+        this.viewMode.set(matches ? 'full' : 'compact');
+        if (matches) {
+          this.isLegendOpen.set(false);
+        }
+        if (!matches) {
+          this.isSheetOpen.set(false);
+        }
+      };
+      applyMedia(this.mediaQuery.matches);
+      this.mediaHandler = (event: MediaQueryListEvent) => {
+        applyMedia(event.matches);
+      };
+      this.mediaQuery.addEventListener?.('change', this.mediaHandler);
+      this.mediaQuery.addListener?.(this.mediaHandler);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.mediaQuery && this.mediaHandler) {
+      this.mediaQuery.removeEventListener?.('change', this.mediaHandler);
+      this.mediaQuery.removeListener?.(this.mediaHandler);
     }
   }
 
